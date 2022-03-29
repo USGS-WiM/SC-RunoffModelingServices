@@ -40,7 +40,7 @@ class CurveNumber(BaseModel):
         schema_extra = {
             "example": {
                 "x": 34.01599,
-                "y": -80.99818,
+                "y": -80.99818
             }
         }
 
