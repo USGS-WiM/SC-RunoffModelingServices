@@ -4,13 +4,21 @@
 
 This is the FastAPI setup of runoff modeling services for South Carolina StreamStats Phase II.
 
-## Prerequisites
+## Getting Started
 
-```text
-Python 3
-```
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
-To run the services locally, run the following in your Windows command prompt:
+### Prerequisites
+
+- Python 3
+
+### Secrets file
+
+If any ScienceBase map services have not been published, you will need to use and update a secrets file to access these files. [Download the file here](https://doimspp.sharepoint.com/:u:/r/sites/GS-UMidWIM/Shared%20Documents/Projects/Streamstats%20Ecosystem/South%20Carolina%20Customizations/secrets.py?csf=1&web=1&e=N5bf8W) and follow the instructions in the file. 
+
+### Running locally
+
+Run the following in your Windows command prompt:
 
 ```bash
 # create a virtual environment
@@ -22,6 +30,22 @@ pip install -r requirements.txt
 # deploy at a local server
 uvicorn main:app --host 0.0.0.0 --port 8000
 ```
+
+Alternate instructions for the Windows Anaconda3 prompt:
+
+```bash
+# create a new Conda environment
+conda create --name ss-runoffmodelingservices
+# active the Conda environment
+conda activate ss-runoffmodelingservices
+# install the project's dependencies
+conda install pip
+pip install -r requirements.txt
+# deploy at a local server
+uvicorn main:app --host 0.0.0.0 --port 8000
+```
+
+Add `--reload` to the end of the `uvicorn main:app --host 0.0.0.0 --port 8000` to enable hot reload for local testing purposes only.
 
 Once the above code has been run successfully, the service documentation will be available at http://127.0.0.1:8000/docs/.
 
