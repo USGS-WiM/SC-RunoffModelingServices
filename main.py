@@ -3,7 +3,7 @@ from fastapi.responses import RedirectResponse
 from starlette.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from ChannelWidthWeighting import curveNumber
+from RunoffModeling import curveNumber
 
 
 app = FastAPI(

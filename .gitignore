@@ -52,6 +52,7 @@ testem.log
 /typings
 **/*npm-debug.log.*
 **/*yarn-error.log.*
+secrets.py
 
 # System Files
 .DS_Store
