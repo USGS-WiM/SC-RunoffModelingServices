@@ -33,28 +33,28 @@ app.add_middleware(
 class CurveNumber(BaseModel):
 
     # all fields are required
-    x: float
-    y: float
+    lat: float
+    lon: float
 
     class Config:
         schema_extra = {
             "example": {
-                "x": -80.99818,
-                "y": 34.01599
+                "lat": 34.01599,
+                "lon": -80.99818
             }
         }
 
 class RainfallData(BaseModel):
 
     # all fields are required
-    x: float
-    y: float
+    lat: float
+    lon: float
 
     class Config:
         schema_extra = {
             "example": {
-                "x": -80.99818,
-                "y": 34.01599
+                "lat": 34.01599,
+                "lon": -80.99818
             }
         }
 
