@@ -39,8 +39,8 @@ class CurveNumber(BaseModel):
     class Config:
         schema_extra = {
             "example": {
-                "x": 34.01599,
-                "y": -80.99818
+                "x": -80.99818,
+                "y": 34.01599
             }
         }
 
@@ -53,8 +53,8 @@ class RainfallData(BaseModel):
     class Config:
         schema_extra = {
             "example": {
-                "x": 34.01599,
-                "y": -80.99818
+                "x": -80.99818,
+                "y": 34.01599
             }
         }
 
