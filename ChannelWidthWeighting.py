@@ -17,9 +17,12 @@ def rainfallData(lat, lon):
         raise Exception("Request to NOAA data server failed")
 
     # Extract the results from the response
-    data = response_content[response_content.index("quantiles = ")+len("quantiles = "):response_content.index("upper")-2]
-    data_lists = ast.literal_eval(data)
-    results = [list(map(float, sublist)) for sublist in data_lists]
+    data_string = response_content[response_content.index("quantiles = ")+len("quantiles = "):response_content.index("upper")-2] # String of data
+    data_lists = ast.literal_eval(data_string) # Convert string to list of lists
+    results = [list(map(float, sublist)) for sublist in data_lists] # Convert string values to floating point
+
+    # Precipitation frequency estimates (inches) by duration of storms (hours): 1, 2, 3, 6, 12, 24
+    # Columns correspond to average recurrence interval (years): 1, 2, 5, 10, 25, 50, 100, 200, 500, 1000
     results_1hr = results[4]
     results_2hr = results[5]
     results_3hr = results[6]
@@ -27,7 +30,8 @@ def rainfallData(lat, lon):
     results_12hr = results[8]
     results_24hr = results[9]
 
-    # Save values of interest
+    # Save values of interest: these values coorespond to Names in the Spreadsheet for the SC Synethic Unit Hydrograph Method
+    # Variable naming schema: ex. P50_12 refers to the precipitation frequency estimate (inches) for 12-hour storms with an average recurrence interval of 50 years (AEP 2%)
     P10_1 = results_1hr[3]
     P10_2 = results_2hr[3]
     P10_3 = results_3hr[3]
@@ -56,6 +60,7 @@ def rainfallData(lat, lon):
     P100_12 = results_12hr[6]
     P100_24 = results_24hr[6]
     
+    # Variable naming schema: ex. P2_24_5 refers to the precipitation frequency estimate (inches) for 24-hour storms with an average recurrence interval of 5 years (AEP 20%)
     P2_24_1 = results_24hr[0]
     P2_24_2 = results_24hr[1]
     P2_24_5 = results_24hr[2]
