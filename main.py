@@ -7,7 +7,7 @@ from ChannelWidthWeighting import curveNumber, rainfallData
 
 
 app = FastAPI(
-    title='Channel Width Weighting Services',
+    title='SC Runoff Modeling Services',
     openapi_url='/openapi.json',
     docs_url='/docs'
 )
