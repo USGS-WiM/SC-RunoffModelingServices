@@ -76,8 +76,8 @@ def curvenumber(request_body: CurveNumber, response: Response):
 
     try: 
         response = curveNumber(
-            request_body.x,
-            request_body.y
+            request_body.lat,
+            request_body.lon
         )
         return {
             "response": response,
@@ -91,8 +91,8 @@ def rainfalldata(request_body: RainfallData, response: Response):
 
     try: 
         response = rainfallData(
-            request_body.x,
-            request_body.y
+            request_body.lat,
+            request_body.lon
         )
         return {
             "response": response,
