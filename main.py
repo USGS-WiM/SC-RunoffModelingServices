@@ -39,8 +39,8 @@ class CurveNumber(BaseModel):
     class Config:
         schema_extra = {
             "example": {
-                "lat": 34.01599,
-                "lon": -80.99818
+                "lat": 33.3946,
+                "lon": -80.3474
             }
         }
 
@@ -53,8 +53,8 @@ class RainfallData(BaseModel):
     class Config:
         schema_extra = {
             "example": {
-                "lat": 34.01599,
-                "lon": -80.99818
+                "lat": 33.3946,
+                "lon": -80.3474
             }
         }
 
