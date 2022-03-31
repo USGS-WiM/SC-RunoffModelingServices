@@ -18,7 +18,7 @@ pydantic==1.9.0
 pylint==2.6.0
 python-dotenv==0.19.2
 PyYAML==6.0
-requests=2.27.1
+requests==2.27.1
 six==1.15.0
 sniffio==1.2.0
 starlette==0.17.1
