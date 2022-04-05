@@ -2,7 +2,7 @@ import requests
 import ast
 
 def curveNumber(lat, lon):
-    return "Hello, World!"
+    return "Hello, World! from curveNumber"
 
 # Retrieve rainfall data from the NOAA Precipitation Frequency Data Server
 # https://hdsc.nws.noaa.gov/hdsc/pfds/pfds_map_cont.html?bkmrk=sc
@@ -69,4 +69,7 @@ def rainfallData(lat, lon):
     P2_24_50 = results_24hr[5]
     P2_24_100 = results_24hr[6]
 
-    return P10_1,P10_2,P10_3,P10_6,P10_12,P10_24,P25_1,P25_2,P25_3,P25_6,P25_12,P25_24,P50_1,P50_2,P50_3,P50_6,P50_12,P50_24,P100_1,P100_2,P100_3,P100_6,P100_12,P100_24,P2_24_1,P2_24_2,P2_24_5,P2_24_10,P2_24_25,P2_24_50,P2_24_100 
+    return P10_1,P10_2,P10_3,P10_6,P10_12,P10_24,P25_1,P25_2,P25_3,P25_6,P25_12,P25_24,P50_1,P50_2,P50_3,P50_6,P50_12,P50_24,P100_1,P100_2,P100_3,P100_6,P100_12,P100_24,P2_24_1,P2_24_2,P2_24_5,P2_24_10,P2_24_25,P2_24_50,P2_24_100
+
+def rainfallDistributionCurve(lat, lon): 
+    return "Hello, World! from rainfallDistributionCurve"
