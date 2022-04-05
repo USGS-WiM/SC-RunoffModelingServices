@@ -3,8 +3,7 @@ from fastapi.responses import RedirectResponse
 from starlette.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from ChannelWidthWeighting import curveNumber, rainfallData
-
+from ChannelWidthWeighting import curveNumber, rainfallData, rainfallDistributionCurve
 
 app = FastAPI(
     title='SC Runoff Modeling Services',
@@ -58,6 +57,20 @@ class RainfallData(BaseModel):
             }
         }
 
+class RainfallDistributionCurve(BaseModel):
+
+    # all fields are required
+    lat: float
+    lon: float
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "lat": 33.3946,
+                "lon": -80.3474
+            }
+        }
+
 ######
 ##
 ## API Endpoints
@@ -69,7 +82,6 @@ class RainfallData(BaseModel):
 @app.get("/", include_in_schema=False)
 def docs_redirect_root():
     return RedirectResponse(url=app.docs_url)
-
 
 @app.post("/curvenumber/")
 def curvenumber(request_body: CurveNumber, response: Response):
@@ -127,6 +139,22 @@ def rainfalldata(request_body: RainfallData, response: Response):
             "P2_24_25": P2_24_25,
             "P2_24_50": P2_24_50,
             "P2_24_100": P2_24_100
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code = 500, detail =  str(e))
+
+@app.post("/rainfalldistributioncurve/")
+def rainfalldistributioncurve(request_body: RainfallDistributionCurve, response: Response):
+
+    try: 
+        rainfall_distribution_curve_letter, rainfall_distribution_curve_number = rainfallDistributionCurve(
+            request_body.lat,
+            request_body.lon
+        )
+        return {
+            "rainfall_distribution_curve_letter": rainfall_distribution_curve_letter,
+            "rainfall_distribution_curve_number": rainfall_distribution_curve_number,
         }
 
     except Exception as e:
