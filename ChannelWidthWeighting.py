@@ -2,7 +2,7 @@ import requests
 import ast
 
 def curveNumber(lat, lon):
-    return "Hello, World! from curveNumber"
+    return "Hello, World!"
 
 # Retrieve rainfall data from the NOAA Precipitation Frequency Data Server
 # https://hdsc.nws.noaa.gov/hdsc/pfds/pfds_map_cont.html?bkmrk=sc
@@ -26,16 +26,16 @@ def rainfallData(lat, lon):
     results_1hr = results[4]
     results_2hr = results[5]
     results_3hr = results[6]
-    results_6hr = reults[7]
-    results_12hr = rsults[8]
-    results_24hr = rsults[9]
+    results_6hr = results[7]
+    results_12hr = results[8]
+    results_24hr = results[9]
     # Save values ofinterest: these values coorespond to Names in the Spreadsheet for the SC Synethic Unit Hydrograph Method
     # Variable namin schema: ex. P50_12 refers to the precipitation frequency estimate (inches) for 12-hour storms with an average recurrence interval of 50 years (AEP 2%)
-    P10_1 = results_hr[3]
-    P10_2 = results_hr[3]
-    P10_3 = results_hr[3]
-    P10_6 = results_hr[3]
-    P10_12 = results12hr[3]
+    P10_1 = results_1hr[3]
+    P10_2 = results_2hr[3]
+    P10_3 = results_3hr[3]
+    P10_6 = results_6hr[3]
+    P10_12 = results_12hr[3]
     P10_24 = results_24hr[3]
     
     P25_1 = results_1hr[4]
