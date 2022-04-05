@@ -29,8 +29,8 @@ def rainfallData(lat, lon):
     results_6hr = results[7]
     results_12hr = results[8]
     results_24hr = results[9]
-    # Save values ofinterest: these values coorespond to Names in the Spreadsheet for the SC Synethic Unit Hydrograph Method
-    # Variable namin schema: ex. P50_12 refers to the precipitation frequency estimate (inches) for 12-hour storms with an average recurrence interval of 50 years (AEP 2%)
+    # Save values of interest: these values coorespond to Names in the Spreadsheet for the SC Synethic Unit Hydrograph Method
+    # Variable naming schema: ex. P50_12 refers to the precipitation frequency estimate (inches) for 12-hour storms with an average recurrence interval of 50 years (AEP 2%)
     P10_1 = results_1hr[3]
     P10_2 = results_2hr[3]
     P10_3 = results_3hr[3]
