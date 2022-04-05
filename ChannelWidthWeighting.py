@@ -96,4 +96,4 @@ def rainfallDistributionCurve(lat, lon):
     elif rainfall_distribution_curve_letter == "D":
         rainfall_distribution_curve_number = 7
 
-    return rainfall_distribution_curve_number
+    return rainfall_distribution_curve_letter, rainfall_distribution_curve_number

@@ -148,12 +148,13 @@ def rainfalldata(request_body: RainfallData, response: Response):
 def rainfalldistributioncurve(request_body: RainfallDistributionCurve, response: Response):
 
     try: 
-        response = rainfallDistributionCurve(
+        rainfall_distribution_curve_letter, rainfall_distribution_curve_number = rainfallDistributionCurve(
             request_body.lat,
             request_body.lon
         )
         return {
-            "response": response,
+            "rainfall_distribution_curve_letter": rainfall_distribution_curve_letter,
+            "rainfall_distribution_curve_number": rainfall_distribution_curve_number,
         }
 
     except Exception as e:
