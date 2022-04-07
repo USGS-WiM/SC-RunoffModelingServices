@@ -3,7 +3,8 @@ from fastapi.responses import RedirectResponse
 from starlette.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from ChannelWidthWeighting import curveNumber, rainfallData, rainfallDistributionCurve
+from SC_Synthetic_UH_Method import curveNumber, rainfallData, rainfallDistributionCurve
+from Bohman_Method import RI2
 
 app = FastAPI(
     title='SC Runoff Modeling Services',
@@ -155,6 +156,22 @@ def rainfalldistributioncurve(request_body: RainfallDistributionCurve, response:
         return {
             "rainfall_distribution_curve_letter": rainfall_distribution_curve_letter,
             "rainfall_distribution_curve_number": rainfall_distribution_curve_number,
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code = 500, detail =  str(e))
+
+@app.post("/RI2/")
+def ri2(request_body: RainfallData, response: Response):
+
+    try: 
+        ri2 = RI2(
+            request_body.lat,
+            request_body.lon
+        )
+
+        return {
+            "RI2": ri2
         }
 
     except Exception as e:
