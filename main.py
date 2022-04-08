@@ -4,7 +4,7 @@ from starlette.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from SC_Synthetic_UH_Method import curveNumber, rainfallData, rainfallDistributionCurve
-from Bohman_Method_1992 import RI2
+from Bohman_Method_1992 import getRI2
 
 app = FastAPI(
     title='SC Runoff Modeling Services',
@@ -165,7 +165,7 @@ def rainfalldistributioncurve(request_body: RainfallDistributionCurve, response:
 def ri2(request_body: RainfallData, response: Response):
 
     try: 
-        ri2 = RI2(
+        ri2 = getRI2(
             request_body.lat,
             request_body.lon
         )
