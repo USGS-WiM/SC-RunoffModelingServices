@@ -50,39 +50,37 @@ def runoffVolumeUrbanBasinBohman1992(lat, lon, estimateScenariosResponse, AEP, A
     if AEP not in ["50", "20", "10", "4", "2", "1", "0.5", "0.2"]:
         raise Exception("AEP value not valid")
     AEP = "UPK" + AEP.replace(".", "_") + "AEP"
-    print(AEP)
 
     estimateScenariosResponseList = json.loads(estimateScenariosResponse)
     for statisticGroup in estimateScenariosResponseList:
         if statisticGroup['statisticGroupName'] == "Urban Peak-Flow Statistics":
             regressionRegions = statisticGroup['regressionRegions']
 
-    region3Area = 0
+    region3FractionArea = 0
     region3Qp = 0
-    region4Area = 0
+    region4FractionArea = 0
     region4Qp = 0
 
     for regressionRegion in regressionRegions:
-        # print(regressionRegion)
-        if regressionRegion['code'] == "GC1585":
-            region3Area = regressionRegion['percentWeight'] / 100.0
+        if regressionRegion['code'] == "GC1585": # Region_3_Urban_2014_5030: Piedmont-upper Coastal Plain
+            region3FractionArea = regressionRegion['percentWeight'] / 100.0
             results = regressionRegion['results']
             for result in results:
                 if result['code'] == AEP:
                     region3Qp = result['value']
-        if regressionRegion['code'] == "GC1586":
-            region4Area = regressionRegion['percentWeight'] / 100.0
+        if regressionRegion['code'] == "GC1586": # Region_4_Urban_2014_5030: lower Coastal Plain
+            region4FractionArea = regressionRegion['percentWeight'] / 100.0
             results = regressionRegion['results']
             for result in results:
                 if result['code'] == AEP:
                     region4Qp = result['value']
     
-    weightedQp = (region3Qp * region3Area) + (region4Qp * region4Area)
+    weightedQp = (region3Qp * region3FractionArea) + (region4Qp * region4FractionArea)
 
     region3VR = 0.001525 * (A ** -1.038) * (region3Qp ** 1.013) * (LT ** 1.030) # Average runoff volume (inches)
     region4VR = 0.001648 * (A ** -1.038) * (region4Qp ** 1.013) * (LT ** 1.030) # Average runoff volume (inches)
     
-    weightedVR = (region3VR * region3Area) + (region4VR * region4Area)
+    weightedVR = (region3VR * region3FractionArea) + (region4VR * region4FractionArea)
 
     print(weightedQp)
     print(weightedVR)
