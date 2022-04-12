@@ -2,7 +2,7 @@
 
 # South Carolina StreamStats Runoff Modeling Services
 
-This is the FastAPI setup of runoff modeling services for South Carolina StreamStats Phase II.
+This is the FastAPI setup of runoff modeling services for South Carolina StreamStats Phase II. Service documentation can be found at https://sc-runoffmodeling.streamstats.usgs.gov/docs.
 
 ## Getting Started
 
@@ -48,6 +48,21 @@ uvicorn main:app --host 0.0.0.0 --port 8000
 Add `--reload` to the end of the `uvicorn main:app --host 0.0.0.0 --port 8000` to enable hot reload for local testing purposes only.
 
 Once the above code has been run successfully, the service documentation will be available at http://127.0.0.1:8000/docs/.
+
+## Deployment
+
+1. [Contact SysOps](https://github.com/USGS-WiM/wim-infrastructure/issues/new) to request access to the FastAPI_Services server
+2. Use [Putty](https://www.putty.org/) to SSH onto the FastAPI_Services server. In the Putty Configuration:
+     - Host Name: `<you_username>@FastAPI_Services_hostname_or_IP_address`
+     - Port: 22
+     - Connection type: SSH
+     - In the sidebar, Connection > SSH > Auth: "Private key file for authentication:" click "Browse" to upload your private key file
+     - Click "Open" to connect
+ 3. Go to the app directory: `cd /var/www/SC-RunoffModelingServices`
+ 4. Pull the latest code: `sudo git pull origin master`
+ 5. Restart the daemon: `sudo systemctl restart sc-runoffmodeling
+ 6. Check that the services were updated: https://sc-runoffmodeling.streamstats.usgs.gov/docs
+ 7. Exit when finished: `exit`
 
 ## Authors
 
