@@ -60,7 +60,7 @@ Once the above code has been run successfully, the service documentation will be
      - Click "Open" to connect
  3. Go to the app directory: `cd /var/www/SC-RunoffModelingServices`
  4. Pull the latest code: `sudo git pull origin master`
- 5. Restart the daemon: `sudo systemctl restart sc-runoffmodeling
+ 5. Restart the daemon: `sudo systemctl restart sc-runoffmodeling`
  6. Check that the services were updated: https://sc-runoffmodeling.streamstats.usgs.gov/docs
  7. Exit when finished: `exit`
 
