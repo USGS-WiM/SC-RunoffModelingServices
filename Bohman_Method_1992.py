@@ -25,6 +25,7 @@ def getRI2(lat, lon):
 
     return result_2hr_2yr
 
+
 # Inputs to Runoff Volume for an Urban Basin
 # Region: Piedmont-upper Coastal Plan (Region 3), or lower Coastal Plain (Region 4), or both
 # A: Drainage area (sq miles)
@@ -79,6 +80,35 @@ def runoffVolumeUrbanBasinBohman1992(lat, lon, estimateScenariosResponse, AEP, A
 
     region3VR = 0.001525 * (A ** -1.038) * (region3Qp ** 1.013) * (LT ** 1.030) # Average runoff volume (inches)
     region4VR = 0.001648 * (A ** -1.038) * (region4Qp ** 1.013) * (LT ** 1.030) # Average runoff volume (inches)
+    
+    weightedVR = (region3VR * region3FractionArea) + (region4VR * region4FractionArea)
+
+    print(weightedQp)
+    print(weightedVR)
+
+    return weightedQp, weightedVR
+
+def runoffVolumeUrbanBasinBohman1992V2(lat, lon, region3PercentArea, region4PercentArea, region3AEP, region4AEP, A, L, S, TIA):
+    # lat, lon: coordinates of the drainage point (float)
+    # region3PercentArea: percent area of the basin that is in Region_3_Urban_2014_5030: Piedmont-upper Coastal Plain (float)
+    # region4PercentArea: percent area of the basin that is in Region_4_Urban_2014_5030: lower Coastal Plain (float)
+    # region3AEP: flow statistic for the AEP of interest (ex. "UPK50AEP") in Region_3_Urban_2014_5030 (float)
+    # region4AEP: flow statistic for the AEP of interest (ex. "UPK50AEP") in Region_4_Urban_2014_5030 (float)
+    # A: drainage area (square miles)
+    # L: main channel length (miles)
+    # S: main channel slope (feet per mile)
+    # TIA: total impervious area (%)
+
+    RI2 = getRI2(lat, lon) # 2-year 2-hour rainfall amount (%)
+    LT = 20.2 * ((L/S**0.5)**0.623) * (TIA ** -0.919) * (RI2 ** 1.129) # Average basin lag time (hours)
+
+    region3FractionArea = region3PercentArea / 100.0
+    region4FractionArea = region4PercentArea / 100.0
+    
+    weightedQp = (region3AEP * region3FractionArea) + (region4AEP * region4FractionArea)
+
+    region3VR = 0.001525 * (A ** -1.038) * (region3AEP ** 1.013) * (LT ** 1.030) # Average runoff volume (inches)
+    region4VR = 0.001648 * (A ** -1.038) * (region4AEP ** 1.013) * (LT ** 1.030) # Average runoff volume (inches)
     
     weightedVR = (region3VR * region3FractionArea) + (region4VR * region4FractionArea)
 
