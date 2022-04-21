@@ -2,7 +2,7 @@
 
 # South Carolina StreamStats Runoff Modeling Services
 
-This is the FastAPI setup of runoff modeling services for South Carolina StreamStats Phase II. Service documentation can be found at https://sc-runoffmodeling.streamstats.usgs.gov/docs.
+This is the FastAPI setup of runoff modeling services for South Carolina StreamStats Phase II. Service documentation can be found at https://sc-runoffmodelingservices.streamstats.usgs.gov/docs.
 
 ## Getting Started
 
@@ -61,7 +61,7 @@ Once the above code has been run successfully, the service documentation will be
  3. Go to the app directory: `cd /var/www/SC-RunoffModelingServices`
  4. Pull the latest code: `sudo git pull origin master`
  5. Restart the daemon: `sudo systemctl restart sc-runoffmodeling`
- 6. Check that the services were updated: https://sc-runoffmodeling.streamstats.usgs.gov/docs
+ 6. Check that the services were updated: https://sc-runoffmodelingservices.streamstats.usgs.gov/docs
  7. Exit when finished: `exit`
 
 ## Authors
