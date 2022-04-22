@@ -4,7 +4,7 @@ from starlette.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from SC_Synthetic_UH_Method import curveNumber, rainfallData, rainfallDistributionCurve
-from Bohman_Method_1992 import getRI2
+from Bohman_Method_1992 import getRI2, computeUrbanFloodHydrographBohman1992
 
 app = FastAPI(
     title='SC Runoff Modeling Services',
@@ -69,6 +69,36 @@ class RainfallDistributionCurve(BaseModel):
             "example": {
                 "lat": 33.3946,
                 "lon": -80.3474
+            }
+        }
+
+class UrbanHydrographBohman1992(BaseModel):
+    # all fields are required
+    lat: float
+    lon: float
+    region3PercentArea: float
+    region4PercentArea: float
+    region3AEP: float
+    region4AEP: float
+    A: float
+    L: float
+    S: float
+    TIA: float
+
+    class Config:
+        null = 0.0
+        schema_extra = {
+            "example": {
+                "lat": 33.3946,
+                "lon": -80.3474,
+                "region3PercentArea": 0.0,
+                "region4PercentArea": 100.0,
+                "region3AEP": null,
+                "region4AEP": 35.7,
+                "A": 0.058,
+                "L": 0.503,
+                "S": 20.84,
+                "TIA": 4.13,
             }
         }
 
@@ -172,6 +202,31 @@ def ri2(request_body: RainfallData, response: Response):
 
         return {
             "RI2": ri2
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code = 500, detail =  str(e))
+
+@app.post("/urbanhydrographbohman1992/")
+def ri2(request_body: UrbanHydrographBohman1992, response: Response):
+
+    try: 
+        timeCoordinates, dischargeCoordinates = computeUrbanFloodHydrographBohman1992(
+            request_body.lat,
+            request_body.lon,
+            request_body.region3PercentArea,
+            request_body.region4PercentArea,
+            request_body.region3AEP,
+            request_body.region4AEP,
+            request_body.A,
+            request_body.L,
+            request_body.S,
+            request_body.TIA
+        )
+
+        return {
+            "timeCoordinates": timeCoordinates,
+            "dischargeCoordinates": dischargeCoordinates
         }
 
     except Exception as e:
