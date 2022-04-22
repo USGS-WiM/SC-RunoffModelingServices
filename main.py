@@ -212,7 +212,7 @@ def ri2(request_body: RainfallData, response: Response):
 def urbanhydrographbohman1992(request_body: UrbanHydrographBohman1992, response: Response):
 
     try: 
-        timeCoordinates, dischargeCoordinates = computeUrbanFloodHydrographBohman1992(
+        timeCoordinates, dischargeCoordinates, warningMessage = computeUrbanFloodHydrographBohman1992(
             request_body.lat,
             request_body.lon,
             request_body.region3PercentArea,
@@ -224,7 +224,8 @@ def urbanhydrographbohman1992(request_body: UrbanHydrographBohman1992, response:
             request_body.S,
             request_body.TIA
         )
-
+        if warningMessage is not None:
+            response.headers["warning"] = warningMessage
         return {
             "time_coordinates": timeCoordinates,
             "discharge_coordinates": dischargeCoordinates

@@ -1,3 +1,4 @@
+from logging import warning
 import requests
 import ast
 import numpy as np
@@ -91,6 +92,22 @@ def computeUrbanFloodHydrographBohman1992(lat, lon, region3PercentArea, region4P
     
     timeCoordinates = timeRatio * LTA
     dischargeCoordinates = ((region3DischargeRatio * region3FractionArea) + (region4DischargeRatio * region4FractionArea)) * weightedQp
+
+    # Check limitations of method on page 54
+    isWarning = False
+    if A < 0.18 or A > 9.05:
+        isWarning = True
+    if weightedQp < 33.1 or weightedQp > 1144:
+        isWarning = True
+    if LT < 0.27 or LT > 3.10:
+        isWarning = True
+        
+    if isWarning:
+        warningMessage = "One or more of the parameters is outside the suggested range. Estimates were extrapolated with unknown errors."
+    else:
+        warningMessage = None
+        
+
     #plt.scatter(timeCoordinates, dischargeCoordinates)
     #plt.show()
-    return timeCoordinates.tolist(), dischargeCoordinates.tolist()
+    return timeCoordinates.tolist(), dischargeCoordinates.tolist(), warningMessage
