@@ -60,11 +60,11 @@ def computeUrbanFloodHydrographBohman1992(lat, lon, region3PercentArea, region4P
     # tD: time (hours)
     # LT: lag time (hours) 
     # Time ratio: tD / LT
-    timeRatio = np.arange(0.10,2.55,0.05)
+    timeRatio = np.arange(0.05,2.55,0.05)
     # QtD: discharge at time t (cubic feet per second)
     # Qp: peak discharge (cubic feet per second)
     # Discharge ratio: QtD / Qp
-    region3DischargeRatioList =    [      0.10, 0.15, 0.21, 0.28,
+    region3DischargeRatioList =    [0.07, 0.10, 0.15, 0.21, 0.28,
                                     0.37, 0.47, 0.58, 0.69, 0.79,
                                     0.87, 0.93, 0.97, 1.00, 0.97,
                                     0.94, 0.89, 0.83, 0.77, 0.71,
@@ -75,7 +75,7 @@ def computeUrbanFloodHydrographBohman1992(lat, lon, region3PercentArea, region4P
                                     0.12, 0.11, 0.11, 0.10, 0.09,
                                     0.09, 0.08, 0.07, 0.07, 0.06]
     region3DischargeRatio = np.asarray(region3DischargeRatioList)
-    region4DischargeRatioList =    [      0.08, 0.12, 0.19, 0.28,
+    region4DischargeRatioList =    [0.00, 0.08, 0.12, 0.19, 0.28,
                                     0.39, 0.51, 0.64, 0.75, 0.85,
                                     0.93, 0.97, 1.00, 0.99, 0.97,
                                     0.94, 0.90, 0.86, 0.81, 0.76,
