@@ -91,4 +91,4 @@ def computeUrbanFloodHydrographBohman1992(lat, lon, region3PercentArea, region4P
     dischargeCoordinates = ((region3DischargeRatio * region3FractionArea) + (region4DischargeRatio * region4FractionArea)) * weightedQp
     #plt.scatter(timeCoordinates, dischargeCoordinates)
     #plt.show()
-    return timeCoordinates, dischargeCoordinates
+    return timeCoordinates.tolist(), dischargeCoordinates.tolist()
