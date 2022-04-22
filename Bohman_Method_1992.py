@@ -27,6 +27,8 @@ def getRI2(lat, lon):
 
     return result_2hr_2yr
 
+# Compute flood hydrographs for urban watersheds based on the Bohman 1992 method
+# Report: https://doi.org/10.3133/wri924040
 def computeUrbanFloodHydrographBohman1992(lat, lon, region3PercentArea, region4PercentArea, region3AEP, region4AEP, A, L, S, TIA):
     # lat, lon: coordinates of the drainage point (float)
     # region3PercentArea: percent area of the basin that is in Region_3_Urban_2014_5030: Piedmont-upper Coastal Plain (float)
@@ -89,9 +91,20 @@ def computeUrbanFloodHydrographBohman1992(lat, lon, region3PercentArea, region4P
                                     0.16, 0.14, 0.13, 0.13, 0.12,
                                     0.11, 0.10, 0.10, 0.09, 0.08]
     region4DischargeRatio = np.asarray(region4DischargeRatioList)
-    
+
+    # Determine the region with the largest percentage of drainage in order to use that region's discharge ratio values
+    if region3PercentArea > region4PercentArea:
+        dischargeRatio = region3DischargeRatio
+    else:
+        dischargeRatio = region4DischargeRatio
+
+    # Calculate coordinates for the urban flood hydrograph
     timeCoordinates = timeRatio * LTA
-    dischargeCoordinates = ((region3DischargeRatio * region3FractionArea) + (region4DischargeRatio * region4FractionArea)) * weightedQp
+    dischargeCoordinates = dischargeRatio * weightedQp
+
+    # Show the scatter plot of the rural flood hydrograph (for testing)
+    #plt.scatter(timeCoordinates, dischargeCoordinates)
+    #plt.show()
 
     # Check limitations of method on page 54
     isWarning = False
@@ -106,8 +119,5 @@ def computeUrbanFloodHydrographBohman1992(lat, lon, region3PercentArea, region4P
         warningMessage = "One or more of the parameters is outside the suggested range. Estimates were extrapolated with unknown errors."
     else:
         warningMessage = None
-        
 
-    #plt.scatter(timeCoordinates, dischargeCoordinates)
-    #plt.show()
     return timeCoordinates.tolist(), dischargeCoordinates.tolist(), warningMessage
