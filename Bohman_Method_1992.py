@@ -88,14 +88,10 @@ def computeUrbanFloodHydrographBohman1992(lat, lon, region3PercentArea, region4P
     region4DischargeRatio = np.asarray(region4DischargeRatioList)
     
     timeCoordinates = timeRatio * LTA
-    print(type(region3DischargeRatio))
-    print(type(region3FractionArea))
-    print(type(region4DischargeRatio))
-    print(type(region4FractionArea))
-    print(type(weightedQp))
     dischargeCoordinates = ((region3DischargeRatio * region3FractionArea) + (region4DischargeRatio * region4FractionArea)) * weightedQp
-    plt.scatter(timeCoordinates, dischargeCoordinates)
-    plt.show()
+    #plt.scatter(timeCoordinates, dischargeCoordinates)
+    #plt.show()
+    return timeCoordinates, dischargeCoordinates
 
 
 def main():
