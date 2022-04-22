@@ -73,6 +73,7 @@ class RainfallDistributionCurve(BaseModel):
         }
 
 class UrbanHydrographBohman1992(BaseModel):
+
     # all fields are required
     lat: float
     lon: float
@@ -86,14 +87,14 @@ class UrbanHydrographBohman1992(BaseModel):
     TIA: float
 
     class Config:
-        null = 0.0
+        null = 0.0 # null values will become 0.0
         schema_extra = {
             "example": {
                 "lat": 33.3946,
                 "lon": -80.3474,
                 "region3PercentArea": 0.0,
                 "region4PercentArea": 100.0,
-                "region3AEP": null,
+                "region3AEP": 0.0,
                 "region4AEP": 35.7,
                 "A": 0.058,
                 "L": 0.503,
@@ -208,7 +209,7 @@ def ri2(request_body: RainfallData, response: Response):
         raise HTTPException(status_code = 500, detail =  str(e))
 
 @app.post("/urbanhydrographbohman1992/")
-def ri2(request_body: UrbanHydrographBohman1992, response: Response):
+def urbanhydrographbohman1992(request_body: UrbanHydrographBohman1992, response: Response):
 
     try: 
         timeCoordinates, dischargeCoordinates = computeUrbanFloodHydrographBohman1992(
@@ -225,8 +226,8 @@ def ri2(request_body: UrbanHydrographBohman1992, response: Response):
         )
 
         return {
-            "timeCoordinates": timeCoordinates,
-            "dischargeCoordinates": dischargeCoordinates
+            "time_coordinates": timeCoordinates,
+            "discharge_coordinates": dischargeCoordinates
         }
 
     except Exception as e:
