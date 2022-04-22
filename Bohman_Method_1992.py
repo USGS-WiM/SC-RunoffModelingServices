@@ -38,6 +38,9 @@ def computeUrbanFloodHydrographBohman1992(lat, lon, region3PercentArea, region4P
     # S: main channel slope (feet per mile)
     # TIA: total impervious area (%)
 
+    if region3PercentArea == 0 and region4PercentArea == 0:
+        raise Exception("No area in Region_3_Urban_2014_5030 or Region_4_Urban_2014_5030")
+
     region3FractionArea = region3PercentArea / 100.0
     region4FractionArea = region4PercentArea / 100.0
 
