@@ -138,7 +138,7 @@ def computeRuralFloodHydrographBohman1989(regionBlueRidgePercentArea, regionPied
             warningMessage += warningMessageLT
 
     # Check limitations for runoff volume
-    warningMessageVR = "One or more of the parameters is outside the suggested range; runoff volume was estimated with unknown errors."
+    warningMessageVR = "One or more of the parameters is outside the suggested range; runoff volume was estimated with unknown errors. "
     if regionBlueRidgePercentArea > 0:
         if A < 30.2 or A > 455:
             warningMessage += warningMessageVR
@@ -168,6 +168,6 @@ def computeRuralFloodHydrographBohman1989(regionBlueRidgePercentArea, regionPied
         if regionLowerCoastalPlain1LT < 11.7 or regionLowerCoastalPlain1LT > 95.5 or regionLowerCoastalPlain2LT < 11.7 or regionLowerCoastalPlain2LT > 95.5:
             warningMessage += warningMessageVR
 
-    warningMessage += "These methods are not applicable to streams where regulation, urbanization, temporary in-channel storage, or overbank detention storage is significant."
+    warningMessage += "These methods are not applicable to streams where regulation, urbanization, temporary in-channel storage, or overbank detention storage is significant. "
 
     return weightedVR, timeCoordinates.tolist(), dischargeCoordinates.tolist(), warningMessage
