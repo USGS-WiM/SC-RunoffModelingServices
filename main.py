@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, Response
 from fastapi.responses import RedirectResponse
 from starlette.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from SC_Synthetic_UH_Method import curveNumber, rainfallData, rainfallDistributionCurve
 from Bohman_Method_1989 import computeRuralFloodHydrographBohman1989
@@ -74,25 +74,25 @@ class RainfallDistributionCurve(BaseModel):
         }
 class RuralHydrographBohman1989(BaseModel):
 
-    regionBlueRidgePercentArea: float = Field(0.0, title="Blue Ridge region percent area", description="percent area of the basin that is in the Blue Ridge region (percent, float)", example="0.0")
-    regionPiedmontPercentArea: float = Field(0.0, title="Piedmont region percent area", description="percent area of the basin that is in the Piedmont region (percent, float)", example="0.0")
+    regionBlueRidgePercentArea: float = Field(0.0, title="Blue Ridge region percent area", description="percent area of the basin that is in the Blue Ridge region (percent, float)", example="10.0")
+    regionPiedmontPercentArea: float = Field(0.0, title="Piedmont region percent area", description="percent area of the basin that is in the Piedmont region (percent, float)", example="90.0")
     regionUpperCoastalPlainPercentArea: float = Field(0.0, title="Upper Coastal Plain region percent area", description="percent area of the basin that is in the Upper Coastal Plain region (percent, float)", example="0.0")
     regionLowerCoastalPlain1PercentArea: float = Field(0.0, title="Lower Coastal Plain region 1 percent area", description="percent area of the basin that is in the Lower Coastal Plain region 1 (percent, float)", example="0.0")
     regionLowerCoastalPlain2PercentArea: float = Field(0.0, title="Lower Coastal Plain region 2 percent area", description="percent area of the basin that is in the Lower Coastal Plain region 2 (percent, float)", example="0.0")
-    Qp: float = Field(0.0, title="weighted Qp", description="flow statistic for the AEP of interest (ex. 'UPK50AEP') in Region_3_Urban_2014_5030 (cubic feet per second, float)", example="0.0")
-    A: float = Field(..., title="basin area", description="total drainage area of the delineated basin (square miles, float)", example="0.058")
+    Qp: float = Field(..., title="weighted Qp", description="area-weighted flow statistic for the AEP of interest (cubic feet per second, float)", example="400.0")
+    A: float = Field(..., title="basin area", description="total drainage area of the delineated basin (square miles, float)", example="35.0")
 
     class Config:
         null = 0.0 # null values will become 0.0
         schema_extra = {
             "example": {
-                "regionBlueRidgePercentArea": 0.0,
-                "regionPiedmontPercentArea": 0.0,
+                "regionBlueRidgePercentArea": 10.0,
+                "regionPiedmontPercentArea": 90.0,
                 "regionUpperCoastalPlainPercentArea": 0.0,
                 "regionLowerCoastalPlain1PercentArea": 0.0,
                 "regionLowerCoastalPlain2PercentArea": 0.0,
-                "Qp": 0.0,
-                "A": 0.058,
+                "Qp": 400.0,
+                "A": 35.0,
             }
         }
 
