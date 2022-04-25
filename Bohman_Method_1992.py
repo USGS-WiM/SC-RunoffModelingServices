@@ -1,4 +1,3 @@
-from logging import warning
 import requests
 import ast
 import numpy as np
@@ -25,39 +24,41 @@ def getRI2(lat, lon):
     # Extract value corresponding to 2-hr duration storms and 2-year average recurrence interval
     result_2hr_2yr = results[5][1]
 
+    # Return the 2-year 2-hour rainfall amount (inches)
     return result_2hr_2yr
 
 # Compute flood hydrographs for urban watersheds based on the Bohman 1992 method
 # Report: https://doi.org/10.3133/wri924040
-def computeUrbanFloodHydrographBohman1992(lat, lon, region3PercentArea, region4PercentArea, region3AEP, region4AEP, A, L, S, TIA):
+def computeUrbanFloodHydrographBohman1992(lat, lon, region3PercentArea, region4PercentArea, region3Qp, region4Qp, A, L, S, TIA):
     # lat, lon: coordinates of the drainage point (float)
-    # region3PercentArea: percent area of the basin that is in Region_3_Urban_2014_5030: Piedmont-upper Coastal Plain (float)
-    # region4PercentArea: percent area of the basin that is in Region_4_Urban_2014_5030: lower Coastal Plain (float)
-    # region3AEP: flow statistic for the AEP of interest (ex. "UPK50AEP") in Region_3_Urban_2014_5030 (float)
-    # region4AEP: flow statistic for the AEP of interest (ex. "UPK50AEP") in Region_4_Urban_2014_5030 (float)
+    # region3PercentArea: percent area of the basin that is in Region_3_Urban_2014_5030: Piedmont-upper Coastal Plain (%, float)
+    # region4PercentArea: percent area of the basin that is in Region_4_Urban_2014_5030: lower Coastal Plain (%, float)
+    # region3Qp: flow statistic for the AEP of interest (ex. "UPK50AEP") in Region_3_Urban_2014_5030 (cubic feet per second, float)
+    # region4Qp: flow statistic for the AEP of interest (ex. "UPK50AEP") in Region_4_Urban_2014_5030 (cubic feet per second, float)
     # A: drainage area (square miles)
     # L: main channel length (miles)
     # S: main channel slope (feet per mile)
     # TIA: total impervious area (%)
 
+    # Check that Region_3_Urban_2014_5030 or Region_4_Urban_2014_5030 has some area
     if region3PercentArea == 0 and region4PercentArea == 0:
         raise Exception("No area in Region_3_Urban_2014_5030 or Region_4_Urban_2014_5030")
 
+    # Calculate the fraction area of each region
     region3FractionArea = region3PercentArea / 100.0
     region4FractionArea = region4PercentArea / 100.0
 
     RI2 = getRI2(lat, lon) # 2-year 2-hour rainfall amount (%)
     LT = 20.2 * ((L/S**0.5)**0.623) * (TIA ** -0.919) * (RI2 ** 1.129) # Average basin lag time (hours), Equation 5
+    weightedQp = (region3Qp * region3FractionArea) + (region4Qp * region4FractionArea) # Weighted peak flow (cubic feet per second)
 
-    weightedQp = (region3AEP * region3FractionArea) + (region4AEP * region4FractionArea)
-
-    region3VR = 0.001525 * (A ** -1.038) * (region3AEP ** 1.013) * (LT ** 1.030) # Average runoff volume (inches), Equation 6
-    region4VR = 0.001648 * (A ** -1.038) * (region4AEP ** 1.013) * (LT ** 1.030) # Average runoff volume (inches), Equation 7
-    weightedVR = (region3VR * region3FractionArea) + (region4VR * region4FractionArea)
+    region3VR = 0.001525 * (A ** -1.038) * (weightedQp ** 1.013) * (LT ** 1.030) # Average runoff volume (inches), Equation 6
+    region4VR = 0.001648 * (A ** -1.038) * (weightedQp ** 1.013) * (LT ** 1.030) # Average runoff volume (inches), Equation 7
+    weightedVR = (region3VR * region3FractionArea) + (region4VR * region4FractionArea) # Weighted average runoff volume for an urban basin (inches)
     
-    region3F = 0.967 * (A ** -0.038) * (region3AEP ** 0.013) * (LT ** 0.030) # Adjustment factor, Equation 10
-    region4F = 0.934 * (A ** -0.038) * (region4AEP ** 0.013) * (LT ** 0.030) # Adjustment factor, Equation 11
-    weightedF = (region3F * region3FractionArea) + (region4F * region4FractionArea)
+    region3F = 0.967 * (A ** -0.038) * (weightedQp ** 0.013) * (LT ** 0.030) # Lag-time correction factor, Equation 10
+    region4F = 0.934 * (A ** -0.038) * (weightedQp ** 0.013) * (LT ** 0.030) # Lag-time correction factor, Equation 11
+    weightedF = (region3F * region3FractionArea) + (region4F * region4FractionArea) # Weighted lag-time correction factor
 
     LTA = weightedF * LT # Adjusted lag time
 
@@ -103,21 +104,33 @@ def computeUrbanFloodHydrographBohman1992(lat, lon, region3PercentArea, region4P
     dischargeCoordinates = dischargeRatio * weightedQp
 
     # Show the scatter plot of the rural flood hydrograph (for testing)
-    #plt.scatter(timeCoordinates, dischargeCoordinates)
-    #plt.show()
+    # plt.scatter(timeCoordinates, dischargeCoordinates)
+    # plt.show()
 
-    # Check limitations of method on page 54
-    isWarning = False
+    ## Check limitations
+
+    warningMessage = ""
+    # Check limitations of Runoff Volume method on page 54
+    warningMessageVR = "One or more of the parameters is outside the suggested range; runoff volume was estimated with unknown errors."
     if A < 0.18 or A > 9.05:
-        isWarning = True
+        warningMessage += warningMessageVR
     if weightedQp < 33.1 or weightedQp > 1144:
-        isWarning = True
+        warningMessage += warningMessageVR
     if LT < 0.27 or LT > 3.10:
-        isWarning = True
-        
-    if isWarning:
-        warningMessage = "One or more of the parameters is outside the suggested range. Estimates were extrapolated with unknown errors."
-    else:
+        warningMessage += warningMessageVR
+
+    # Check limitations of urban hydrograph method on page 65
+    warningMessageUH = "One or more of the parameters is outside the suggested range; urban hydrograph was estimated with unknown errors."
+    if A < 0.18 or A > 41.0:
+        warningMessage += warningMessageUH
+    if TIA < 10.0 or TIA > 51.0:
+        warningMessage += warningMessageUH
+    if (L/S**0.5) < 0.0493 or (L/S**0.5) > 0.875:
+        warningMessage += warningMessageUH
+    if RI2 < 1.95 or RI2 > 2.56:
+        warningMessage += warningMessageUH
+
+    if warningMessage == "":
         warningMessage = None
 
-    return timeCoordinates.tolist(), dischargeCoordinates.tolist(), warningMessage
+    return weightedVR, timeCoordinates.tolist(), dischargeCoordinates.tolist(), warningMessage

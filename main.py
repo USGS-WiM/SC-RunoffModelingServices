@@ -79,8 +79,8 @@ class UrbanHydrographBohman1992(BaseModel):
     lon: float = Field(..., title="longitude", description="longitude coordinate of the drainage point (float)", example="-80.3474")
     region3PercentArea: float = Field(0.0, title="region 3 percent area", description="percent area of the basin that is in Region_3_Urban_2014_5030: Piedmont-upper Coastal Plain (percent, float)", example="0.0")
     region4PercentArea: float = Field(0.0, title="region 4 percent area", description="percent area of the basin that is in Region_4_Urban_2014_5030: lower Coastal Plain (percent, float)", example="0.0")
-    region3AEP: float = Field(0.0, title="region 3 Qp", description="flow statistic for the AEP of interest (ex. 'UPK50AEP') in Region_3_Urban_2014_5030 (cubic feet per second, float)", example="0.0")
-    region4AEP: float = Field(0.0, title="region 4 Qp", description="flow statistic for the AEP of interest (ex. 'UPK50AEP') in Region_4_Urban_2014_5030 (cubic feet per second, float)", example="35.7")
+    region3Qp: float = Field(0.0, title="region 3 Qp", description="flow statistic for the AEP of interest (ex. 'UPK50AEP') in Region_3_Urban_2014_5030 (cubic feet per second, float)", example="0.0")
+    region4Qp: float = Field(0.0, title="region 4 Qp", description="flow statistic for the AEP of interest (ex. 'UPK50AEP') in Region_4_Urban_2014_5030 (cubic feet per second, float)", example="35.7")
     A: float = Field(..., title="basin area", description="Drainage area of the delineated basin (square miles, float)", example="0.058")
     L: float = Field(..., title="channel length", description="main channel length (miles, float)", example="0.503")
     S: float = Field(..., title="channel slope", description="main channel slope (feet per mile, float)", example="20.84")
@@ -94,8 +94,8 @@ class UrbanHydrographBohman1992(BaseModel):
                 "lon": -80.3474,
                 "region3PercentArea": 0.0,
                 "region4PercentArea": 100.0,
-                "region3AEP": 0.0,
-                "region4AEP": 35.7,
+                "region3Qp": 0.0,
+                "region4Qp": 35.7,
                 "A": 0.058,
                 "L": 0.503,
                 "S": 20.84,
@@ -212,13 +212,13 @@ def ri2(request_body: RainfallData, response: Response):
 def urbanhydrographbohman1992(request_body: UrbanHydrographBohman1992, response: Response):
 
     try: 
-        timeCoordinates, dischargeCoordinates, warningMessage = computeUrbanFloodHydrographBohman1992(
+        weightedVR, timeCoordinates, dischargeCoordinates, warningMessage = computeUrbanFloodHydrographBohman1992(
             request_body.lat,
             request_body.lon,
             request_body.region3PercentArea,
             request_body.region4PercentArea,
-            request_body.region3AEP,
-            request_body.region4AEP,
+            request_body.region3Qp,
+            request_body.region4Qp,
             request_body.A,
             request_body.L,
             request_body.S,
@@ -227,6 +227,7 @@ def urbanhydrographbohman1992(request_body: UrbanHydrographBohman1992, response:
         if warningMessage is not None:
             response.headers["warning"] = warningMessage
         return {
+            "weighted_runoff_volume": weightedVR,
             "time_coordinates": timeCoordinates,
             "discharge_coordinates": dischargeCoordinates
         }
