@@ -13,7 +13,7 @@ def computeRuralFloodHydrographBohman1989(regionBlueRidgePercentArea, regionPied
     # Qp: area-weighted flow statistic for the AEP of interest (cubic feet per second, float)
     # A: total basin drainage area (square miles, float)
 
-    # Check that some area is precent
+    # Check that some area is present
     if regionBlueRidgePercentArea + \
         regionPiedmontPercentArea + \
         regionUpperCoastalPlainPercentArea + \
