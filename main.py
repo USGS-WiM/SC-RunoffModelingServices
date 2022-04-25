@@ -71,6 +71,30 @@ class RainfallDistributionCurve(BaseModel):
                 "lon": -80.3474
             }
         }
+class RuralHydrographBohman1989(BaseModel):
+
+    regionBlueRidgePercentArea: float = Field(0.0, title="Blue Ridge region percent area", description="percent area of the basin that is in the Blue Ridge region (percent, float)", example="0.0")
+    regionPiedmontPercentArea: float = Field(0.0, title="Piedmont region percent area", description="percent area of the basin that is in the Piedmont region (percent, float)", example="0.0")
+    regionUpperCoastalPlainPercentArea: float = Field(0.0, title="Upper Coastal Plain region percent area", description="percent area of the basin that is in the Upper Coastal Plain region (percent, float)", example="0.0")
+    regionLowerCoastalPlain1PercentArea: float = Field(0.0, title="Lower Coastal Plain region 1 percent area", description="percent area of the basin that is in the Lower Coastal Plain region 1 (percent, float)", example="0.0")
+    regionLowerCoastalPlain2PercentArea: float = Field(0.0, title="Lower Coastal Plain region 2 percent area", description="percent area of the basin that is in the Lower Coastal Plain region 2 (percent, float)", example="0.0")
+    Qp: float = Field(0.0, title="weighted Qp", description="flow statistic for the AEP of interest (ex. 'UPK50AEP') in Region_3_Urban_2014_5030 (cubic feet per second, float)", example="0.0")
+    region4Qp: float = Field(0.0, title="region 4 Qp", description="area-weighted flow statistic for the AEP of interest (cubic feet per second, float)", example="35.7")
+    A: float = Field(..., title="basin area", description="total drainage area of the delineated basin (square miles, float)", example="0.058")
+
+    class Config:
+        null = 0.0 # null values will become 0.0
+        schema_extra = {
+            "example": {
+                "regionBlueRidgePercentArea": 0.0,
+                "regionPiedmontPercentArea": 0.0,
+                "regionUpperCoastalPlainPercentArea": 0.0,
+                "regionLowerCoastalPlain1PercentArea": 0.0,
+                "regionLowerCoastalPlain2PercentArea": 0.0,
+                "Qp": 0.0,
+                "A": 0.058,
+            }
+        }
 
 ######
 ##
