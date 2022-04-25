@@ -74,7 +74,6 @@ class RainfallDistributionCurve(BaseModel):
 
 class UrbanHydrographBohman1992(BaseModel):
 
-    # all fields are required
     lat: float = Field(..., title="latitude", description="latitude coordinate of the drainage point (float)", example="33.3946")
     lon: float = Field(..., title="longitude", description="longitude coordinate of the drainage point (float)", example="-80.3474")
     region3PercentArea: float = Field(0.0, title="region 3 percent area", description="percent area of the basin that is in Region_3_Urban_2014_5030: Piedmont-upper Coastal Plain (percent, float)", example="0.0")
