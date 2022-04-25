@@ -5,13 +5,13 @@ import numpy as np
 # Report: https://doi.org/10.3133/wri894087
 def computeRuralFloodHydrographBohman1989(regionBlueRidgePercentArea, regionPiedmontPercentArea, regionUpperCoastalPlainPercentArea,
                                             regionLowerCoastalPlain1PercentArea, regionLowerCoastalPlain2PercentArea, Qp, A):
-    # regionBlueRidgePercentArea: percent area of the basin that is in Blue Ridge (float)
-    # regionPiedmontPercentArea: percent area of the basin that is in Piedmont (float)
-    # regionUpperCoastalPlainPercentArea: percent area of the basin that is in Upper Coastal Plain (float)
-    # regionLowerCoastalPlain1PercentArea: percent area of the basin that is in Lower Coastal Plain Region 1 (float)
-    # regionLowerCoastalPlain2PercentArea: percent area of the basin that is in Lower Coastal Plain Region 2 (float)
-    # Qp: area-weighted flow statistic for the AEP of interest 
-    # A: total basin drainage area (square miles)
+    # regionBlueRidgePercentArea: percent area of the basin that is in Blue Ridge (percent, float)
+    # regionPiedmontPercentArea: percent area of the basin that is in Piedmont (percent, float)
+    # regionUpperCoastalPlainPercentArea: percent area of the basin that is in Upper Coastal Plain (percent, float)
+    # regionLowerCoastalPlain1PercentArea: percent area of the basin that is in Lower Coastal Plain Region 1 (percent, float)
+    # regionLowerCoastalPlain2PercentArea: percent area of the basin that is in Lower Coastal Plain Region 2 (percent, float)
+    # Qp: area-weighted flow statistic for the AEP of interest (cubic feet per second, float)
+    # A: total basin drainage area (square miles, float)
 
     # Calculate the fraction area of each region
     regionBlueRidgeFractionArea = regionBlueRidgePercentArea / 100.0
