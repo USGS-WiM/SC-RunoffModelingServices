@@ -42,7 +42,7 @@ def computeUrbanFloodHydrographBohman1992(lat, lon, region3PercentArea, region4P
 
     # Check that Region_3_Urban_2014_5030 or Region_4_Urban_2014_5030 has some area
     if region3PercentArea + region4PercentArea == 0:
-        raise Exception("No area in Region_3_Urban_2014_5030 or Region_4_Urban_2014_5030")
+        raise Exception("No area in Region_3_Urban_2014_5030 or Region_4_Urban_2014_5030.")
 
     # Calculate the fraction area of each region
     region3FractionArea = region3PercentArea / 100.0
@@ -111,7 +111,7 @@ def computeUrbanFloodHydrographBohman1992(lat, lon, region3PercentArea, region4P
 
     warningMessage = ""
     # Check limitations of Runoff Volume method on page 54
-    warningMessageVR = "One or more of the parameters is outside the suggested range; runoff volume was estimated with unknown errors."
+    warningMessageVR = "One or more of the parameters is outside the suggested range; runoff volume was estimated with unknown errors. "
     if A < 0.18 or A > 9.05:
         warningMessage += warningMessageVR
     if weightedQp < 33.1 or weightedQp > 1144:
@@ -120,7 +120,7 @@ def computeUrbanFloodHydrographBohman1992(lat, lon, region3PercentArea, region4P
         warningMessage += warningMessageVR
 
     # Check limitations of urban hydrograph method on page 65
-    warningMessageUH = "One or more of the parameters is outside the suggested range; urban hydrograph was estimated with unknown errors."
+    warningMessageUH = "One or more of the parameters is outside the suggested range; urban hydrograph was estimated with unknown errors. "
     if A < 0.18 or A > 41.0:
         warningMessage += warningMessageUH
     if TIA < 10.0 or TIA > 51.0:
@@ -130,7 +130,6 @@ def computeUrbanFloodHydrographBohman1992(lat, lon, region3PercentArea, region4P
     if RI2 < 1.95 or RI2 > 2.56:
         warningMessage += warningMessageUH
 
-    if warningMessage == "":
-        warningMessage = None
+    warningMessage += "These methods are not applicable in basins with large rural sub-basins or areas with extreme contrasts in level of urbanization. "
 
     return weightedVR, timeCoordinates.tolist(), dischargeCoordinates.tolist(), warningMessage
