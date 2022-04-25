@@ -4,8 +4,8 @@ from starlette.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from SC_Synthetic_UH_Method import curveNumber, rainfallData, rainfallDistributionCurve
+from Bohman_Method_1989 import computeRuralFloodHydrographBohman1989
 from Bohman_Method_1992 import getRI2, computeUrbanFloodHydrographBohman1992
-
 app = FastAPI(
     title='SC Runoff Modeling Services',
     openapi_url='/openapi.json',
@@ -69,6 +69,29 @@ class RainfallDistributionCurve(BaseModel):
             "example": {
                 "lat": 33.3946,
                 "lon": -80.3474
+            }
+        }
+class RuralHydrographBohman1989(BaseModel):
+
+    regionBlueRidgePercentArea: float = Field(0.0, title="Blue Ridge region percent area", description="percent area of the basin that is in the Blue Ridge region (percent, float)", example="10.0")
+    regionPiedmontPercentArea: float = Field(0.0, title="Piedmont region percent area", description="percent area of the basin that is in the Piedmont region (percent, float)", example="90.0")
+    regionUpperCoastalPlainPercentArea: float = Field(0.0, title="Upper Coastal Plain region percent area", description="percent area of the basin that is in the Upper Coastal Plain region (percent, float)", example="0.0")
+    regionLowerCoastalPlain1PercentArea: float = Field(0.0, title="Lower Coastal Plain region 1 percent area", description="percent area of the basin that is in the Lower Coastal Plain region 1 (percent, float)", example="0.0")
+    regionLowerCoastalPlain2PercentArea: float = Field(0.0, title="Lower Coastal Plain region 2 percent area", description="percent area of the basin that is in the Lower Coastal Plain region 2 (percent, float)", example="0.0")
+    Qp: float = Field(..., title="weighted Qp", description="area-weighted flow statistic for the AEP of interest (cubic feet per second, float)", example="400.0")
+    A: float = Field(..., title="basin area", description="total drainage area of the delineated basin (square miles, float)", example="35.0")
+
+    class Config:
+        null = 0.0 # null values will become 0.0
+        schema_extra = {
+            "example": {
+                "regionBlueRidgePercentArea": 10.0,
+                "regionPiedmontPercentArea": 90.0,
+                "regionUpperCoastalPlainPercentArea": 0.0,
+                "regionLowerCoastalPlain1PercentArea": 0.0,
+                "regionLowerCoastalPlain2PercentArea": 0.0,
+                "Qp": 400.0,
+                "A": 35.0,
             }
         }
 
@@ -207,6 +230,30 @@ def ri2(request_body: RainfallData, response: Response):
     except Exception as e:
         raise HTTPException(status_code = 500, detail =  str(e))
 
+@app.post("/ruralhydrographbohman1989/")
+def ruralhydrographbohman1989(request_body: RuralHydrographBohman1989, response: Response):
+
+    try: 
+        weightedVR, timeCoordinates, dischargeCoordinates, warningMessage = computeRuralFloodHydrographBohman1989(
+            request_body.regionBlueRidgePercentArea,
+            request_body.regionPiedmontPercentArea,
+            request_body.regionUpperCoastalPlainPercentArea,
+            request_body.regionLowerCoastalPlain1PercentArea,
+            request_body.regionLowerCoastalPlain2PercentArea,
+            request_body.Qp,
+            request_body.A,
+        )
+        if warningMessage is not None:
+            response.headers["warning"] = warningMessage
+        return {
+            "weighted_runoff_volume": weightedVR,
+            "time_coordinates": timeCoordinates,
+            "discharge_coordinates": dischargeCoordinates
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code = 500, detail =  str(e))
+        
 @app.post("/urbanhydrographbohman1992/")
 def urbanhydrographbohman1992(request_body: UrbanHydrographBohman1992, response: Response):
 
