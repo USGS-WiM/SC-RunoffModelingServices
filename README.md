@@ -67,6 +67,7 @@ Once the above code has been run successfully, the service documentation will be
 ## Authors
 
 - **[Andrea Medenblik](https://github.com/amedenblik)**  - *Web Developer* - [USGS Web Informatics & Mapping](https://wim.usgs.gov/)
+- **[Harper Wavra](https://github.com/harper-wavra)**  - *Web Developer* - [USGS Web Informatics & Mapping](https://wim.usgs.gov/)
 
 See also the list of [contributors](../../graphs/contributors) who participated in this project.
 
