@@ -13,6 +13,14 @@ def computeRuralFloodHydrographBohman1989(regionBlueRidgePercentArea, regionPied
     # Qp: area-weighted flow statistic for the AEP of interest (cubic feet per second, float)
     # A: total basin drainage area (square miles, float)
 
+    # Check that some area is precent
+    if regionBlueRidgePercentArea + \
+        regionPiedmontPercentArea + \
+        regionUpperCoastalPlainPercentArea + \
+        regionLowerCoastalPlain1PercentArea + \
+        regionLowerCoastalPlain2PercentArea == 0:
+        raise Exception("No area present for relevant Regression Regions.")
+
     # Calculate the fraction area of each region
     regionBlueRidgeFractionArea = regionBlueRidgePercentArea / 100.0
     regionPiedmontFractionArea = regionPiedmontPercentArea / 100.0
@@ -112,7 +120,7 @@ def computeRuralFloodHydrographBohman1989(regionBlueRidgePercentArea, regionPied
     # plt.show()
 
     ## Check limitations from Table 15
-    warningMessage = "These methods are not applicable to streams where regulation, urbanization, temporary in-channel storage, or overbank detention storage is significant."
+    warningMessage = ""
 
     # Check limitations for average basin lagtime
     warningMessageLT = "One or more of the parameters is outside the suggested range; basin lagtime was estimated with unknown errors."
@@ -161,6 +169,5 @@ def computeRuralFloodHydrographBohman1989(regionBlueRidgePercentArea, regionPied
             warningMessage += warningMessageVR
 
     warningMessage += "These methods are not applicable to streams where regulation, urbanization, temporary in-channel storage, or overbank detention storage is significant."
-
 
     return weightedVR, timeCoordinates.tolist(), dischargeCoordinates.tolist(), warningMessage
