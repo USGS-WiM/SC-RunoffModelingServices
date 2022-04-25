@@ -4,6 +4,7 @@ from starlette.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from SC_Synthetic_UH_Method import curveNumber, rainfallData, rainfallDistributionCurve
+from Bohman_Method_1989 import computeRuralFloodHydrographBohman1989
 from Bohman_Method_1992 import RI2
 
 app = FastAPI(
@@ -79,7 +80,6 @@ class RuralHydrographBohman1989(BaseModel):
     regionLowerCoastalPlain1PercentArea: float = Field(0.0, title="Lower Coastal Plain region 1 percent area", description="percent area of the basin that is in the Lower Coastal Plain region 1 (percent, float)", example="0.0")
     regionLowerCoastalPlain2PercentArea: float = Field(0.0, title="Lower Coastal Plain region 2 percent area", description="percent area of the basin that is in the Lower Coastal Plain region 2 (percent, float)", example="0.0")
     Qp: float = Field(0.0, title="weighted Qp", description="flow statistic for the AEP of interest (ex. 'UPK50AEP') in Region_3_Urban_2014_5030 (cubic feet per second, float)", example="0.0")
-    region4Qp: float = Field(0.0, title="region 4 Qp", description="area-weighted flow statistic for the AEP of interest (cubic feet per second, float)", example="35.7")
     A: float = Field(..., title="basin area", description="total drainage area of the delineated basin (square miles, float)", example="0.058")
 
     class Config:
@@ -196,6 +196,30 @@ def ri2(request_body: RainfallData, response: Response):
 
         return {
             "RI2": ri2
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code = 500, detail =  str(e))
+
+@app.post("/ruralhydrographbohman1989/")
+def ruralhydrographbohman1989(request_body: RuralHydrographBohman1989, response: Response):
+
+    try: 
+        weightedVR, timeCoordinates, dischargeCoordinates, warningMessage = computeRuralFloodHydrographBohman1989(
+            request_body.regionBlueRidgePercentArea,
+            request_body.regionPiedmontPercentArea,
+            request_body.regionUpperCoastalPlainPercentArea,
+            request_body.regionLowerCoastalPlain1PercentArea,
+            request_body.regionLowerCoastalPlain2PercentArea,
+            request_body.Qp,
+            request_body.A,
+        )
+        if warningMessage is not None:
+            response.headers["warning"] = warningMessage
+        return {
+            "weighted_runoff_volume": weightedVR,
+            "time_coordinates": timeCoordinates,
+            "discharge_coordinates": dischargeCoordinates
         }
 
     except Exception as e:
