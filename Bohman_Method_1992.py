@@ -35,10 +35,10 @@ def computeUrbanFloodHydrographBohman1992(lat, lon, region3PercentArea, region4P
     # region4PercentArea: percent area of the basin that is in Region_4_Urban_2014_5030: lower Coastal Plain (%, float)
     # region3Qp: flow statistic for the AEP of interest (ex. "UPK50AEP") in Region_3_Urban_2014_5030 (cubic feet per second, float)
     # region4Qp: flow statistic for the AEP of interest (ex. "UPK50AEP") in Region_4_Urban_2014_5030 (cubic feet per second, float)
-    # A: drainage area (square miles)
-    # L: main channel length (miles)
-    # S: main channel slope (feet per mile)
-    # TIA: total impervious area (%)
+    # A: drainage area (square miles, float)
+    # L: main channel length (miles, float)
+    # S: main channel slope (feet per mile, float)
+    # TIA: total impervious area (%, float)
 
     # Check that Region_3_Urban_2014_5030 or Region_4_Urban_2014_5030 has some area
     if region3PercentArea == 0 and region4PercentArea == 0:
