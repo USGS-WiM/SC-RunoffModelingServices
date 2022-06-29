@@ -39,6 +39,23 @@ def computeUrbanFloodHydrographBohman1992(lat, lon, region3PercentArea, region4P
     # L: main channel length (miles, float)
     # S: main channel slope (feet per mile, float)
     # TIA: total impervious area (%, float)
+    
+    # Validate A value
+    if A <= 0:
+        raise ValueError("Drainage Area must be greater than 0.")
+
+    # Validate L value
+    if L <= 0:
+        raise ValueError("Main Channel Length must be greater than 0.")
+        
+    # Validate S value
+    if S <= 0:
+        raise ValueError("Main Channel slope must be greater than 0.")
+    
+    # Validate TIA value
+    if TIA < 0 or TIA > 100:
+        raise ValueError("Total Impervious Area must be between 0 and 100.")
+
 
     # Check that Region_3_Urban_2014_5030 or Region_4_Urban_2014_5030 has some area
     if region3PercentArea + region4PercentArea == 0:
