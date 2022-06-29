@@ -244,7 +244,8 @@ def ruralhydrographbohman1989(request_body: RuralHydrographBohman1989, response:
             request_body.A,
         )
         if warningMessage is not None:
-            response.headers["warning"] = warningMessage
+            response.headers["X-warning"] = warningMessage
+            response.headers["Access-Control-Expose-Headers"] = "X-warning"
         return {
             "weighted_runoff_volume": weightedVR,
             "time_coordinates": timeCoordinates,
@@ -271,7 +272,8 @@ def urbanhydrographbohman1992(request_body: UrbanHydrographBohman1992, response:
             request_body.TIA
         )
         if warningMessage is not None:
-            response.headers["warning"] = warningMessage
+            response.headers["X-warning"] = warningMessage
+            response.headers["Access-Control-Expose-Headers"] = "X-warning"
         return {
             "weighted_runoff_volume": weightedVR,
             "time_coordinates": timeCoordinates,
