@@ -39,6 +39,23 @@ def computeUrbanFloodHydrographBohman1992(lat, lon, region3PercentArea, region4P
     # L: main channel length (miles, float)
     # S: main channel slope (feet per mile, float)
     # TIA: total impervious area (%, float)
+    
+    # Validate A value
+    if A <= 0:
+        raise ValueError("Drainage Area must be greater than 0.")
+
+    # Validate L value
+    if L <= 0:
+        raise ValueError("Main Channel Length must be greater than 0.")
+        
+    # Validate S value
+    if S <= 0:
+        raise ValueError("Main Channel slope must be greater than 0.")
+    
+    # Validate TIA value
+    if TIA < 0 or TIA > 100:
+        raise ValueError("Total Impervious Area must be between 0 and 100.")
+
 
     # Check that Region_3_Urban_2014_5030 or Region_4_Urban_2014_5030 has some area
     if region3PercentArea + region4PercentArea == 0:
@@ -110,24 +127,34 @@ def computeUrbanFloodHydrographBohman1992(lat, lon, region3PercentArea, region4P
     ## Check limitations
 
     warningMessage = ""
+    warningMessageVREnabled = False
+    warningMessageUHEnabled = False
+    
     # Check limitations of Runoff Volume method on page 54
     warningMessageVR = "One or more of the parameters is outside the suggested range; runoff volume was estimated with unknown errors. "
     if A < 0.18 or A > 9.05:
-        warningMessage += warningMessageVR
+        warningMessageVREnabled = True
     if weightedQp < 33.1 or weightedQp > 1144:
-        warningMessage += warningMessageVR
+        warningMessageVREnabled = True
     if LT < 0.27 or LT > 3.10:
+        warningMessageVREnabled = True
+
+    if warningMessageVREnabled:
         warningMessage += warningMessageVR
+        
 
     # Check limitations of urban hydrograph method on page 65
     warningMessageUH = "One or more of the parameters is outside the suggested range; urban hydrograph was estimated with unknown errors. "
     if A < 0.18 or A > 41.0:
-        warningMessage += warningMessageUH
+        warningMessageUHEnabled = True
     if TIA < 10.0 or TIA > 51.0:
-        warningMessage += warningMessageUH
+        warningMessageUHEnabled = True
     if (L/S**0.5) < 0.0493 or (L/S**0.5) > 0.875:
-        warningMessage += warningMessageUH
+        warningMessageUHEnabled = True
     if RI2 < 1.95 or RI2 > 2.56:
+        warningMessageUHEnabled = True
+    
+    if warningMessageUHEnabled:
         warningMessage += warningMessageUH
 
     warningMessage += "These methods are not applicable in basins with large rural sub-basins or areas with extreme contrasts in level of urbanization. "

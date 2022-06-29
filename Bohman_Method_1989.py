@@ -1,4 +1,5 @@
 import numpy as np
+import numbers
 # import matplotlib.pyplot as plt
 
 # Compute flood hydrographs for rural watersheds based on the Bohman 1989 method
@@ -12,6 +13,10 @@ def computeRuralFloodHydrographBohman1989(regionBlueRidgePercentArea, regionPied
     # regionLowerCoastalPlain2PercentArea: percent area of the basin that is in Lower Coastal Plain Region 2 (percent, float)
     # Qp: area-weighted flow statistic for the AEP of interest (cubic feet per second, float)
     # A: total basin drainage area (square miles, float)
+
+    # Validate A value
+    if A <= 0:
+        raise ValueError("Drainage Area must be greater than 0.")
 
     # Check that some area is present
     if regionBlueRidgePercentArea + \
@@ -121,52 +126,60 @@ def computeRuralFloodHydrographBohman1989(regionBlueRidgePercentArea, regionPied
 
     ## Check limitations from Table 15
     warningMessage = ""
+    warningMessageLTEnabled = False
+    warningMessageVREnabled = False
 
     # Check limitations for average basin lagtime
-    warningMessageLT = "One or more of the parameters is outside the suggested range; basin lagtime was estimated with unknown errors."
+    warningMessageLT = "One or more of the parameters is outside the suggested range; basin lagtime was estimated with unknown errors. "
     if regionBlueRidgePercentArea > 0:
         if A < 2.83 or A > 455:
-            warningMessage += warningMessageLT
+            warningMessageLTEnabled = True
     if regionPiedmontPercentArea > 0:
         if A < 0.52 or A > 444:
-            warningMessage += warningMessageLT
+            warningMessageLTEnabled = True
     if regionUpperCoastalPlainPercentArea > 0:
         if A < 2.92 or A > 401:
-            warningMessage += warningMessageLT
+            warningMessageLTEnabled = True
     if regionLowerCoastalPlain1PercentArea > 0 or regionLowerCoastalPlain2PercentArea > 0:
         if A < 7.67 or A > 401:
-            warningMessage += warningMessageLT
+            warningMessageLTEnabled = True
+
+    if warningMessageLTEnabled:
+        warningMessage += warningMessageLT
 
     # Check limitations for runoff volume
     warningMessageVR = "One or more of the parameters is outside the suggested range; runoff volume was estimated with unknown errors. "
     if regionBlueRidgePercentArea > 0:
         if A < 30.2 or A > 455:
-            warningMessage += warningMessageVR
+            warningMessageVREnabled = True
         if Qp < 231 or Qp > 12800:
-            warningMessage += warningMessageVR
+            warningMessageVREnabled = True
         if regionBlueRidgeLT < 8.77 or regionBlueRidgeLT > 19.6:
-            warningMessage += warningMessageVR
+            warningMessageVREnabled = True
     if regionPiedmontPercentArea > 0:
         if A < 0.52 or A > 444:
-            warningMessage += warningMessageVR
+            warningMessageVREnabled = True
         if Qp < 2.94 or Qp > 16400:
-            warningMessage += warningMessageVR
+            warningMessageVREnabled = True
         if regionPiedmontLT < 1.92 or regionPiedmontLT > 50.2:
-            warningMessage += warningMessageVR
+            warningMessageVREnabled = True
     if regionUpperCoastalPlainPercentArea > 0:
         if A < 2.92 or A > 122:
-            warningMessage += warningMessageVR
+            warningMessageVREnabled = True
         if Qp < 10.4 or Qp > 625:
-            warningMessage += warningMessageVR
+            warningMessageVREnabled = True
         if regionUpperCoastalPlainLT < 9.88 or regionUpperCoastalPlainLT > 49.7:
-            warningMessage += warningMessageVR
+            warningMessageVREnabled = True
     if regionLowerCoastalPlain1PercentArea > 0 or regionLowerCoastalPlain2PercentArea > 0:
         if A < 7.67 or A > 401:
-            warningMessage += warningMessageVR
+            warningMessageVREnabled = True
         if Qp < 16.7 or Qp > 2560:
-            warningMessage += warningMessageVR
+            warningMessageVREnabled = True
         if regionLowerCoastalPlain1LT < 11.7 or regionLowerCoastalPlain1LT > 95.5 or regionLowerCoastalPlain2LT < 11.7 or regionLowerCoastalPlain2LT > 95.5:
-            warningMessage += warningMessageVR
+            warningMessageVREnabled = True
+    
+    if warningMessageVREnabled:
+        warningMessage += warningMessageVR
 
     warningMessage += "These methods are not applicable to streams where regulation, urbanization, temporary in-channel storage, or overbank detention storage is significant. "
 
