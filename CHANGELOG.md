@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased](https://github.com/USGS-WiM/SC-RunoffModelingServices/tree/dev)
 
+### Added 
+
+-
+
+### Changed  
+
+-
+
+### Deprecated 
+
+-
+
+### Removed 
+
+- 
+
+### Fixed  
+
+- 
+
+### Security  
+
+- 
+
+## [v0.1.0](https://github.com/USGS-WiM/SC-RunoffModelingServices/releases/tag/v0.1.0) - 2022-06-29
 ### Added
 
 - rainfalldata endpoint: replicates "Rainfall Data" sheet in SC Unit Hydrograph spreadsheet
@@ -14,12 +39,3 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - RI2 endpoint: returns I2H2Y value from NOAA precipitation server 
 - urbanhydrographbohman199 endpoint: implements Bohman 1992 report
 - ruralhydrographbohman1989 endpoint: implements Bohman 1989 report
-
-### Changed
-
--
-
-### Fixed
-
--
-
