@@ -110,24 +110,34 @@ def computeUrbanFloodHydrographBohman1992(lat, lon, region3PercentArea, region4P
     ## Check limitations
 
     warningMessage = ""
+    warningMessageVREnabled = False
+    warningMessageUHEnabled = False
+    
     # Check limitations of Runoff Volume method on page 54
     warningMessageVR = "One or more of the parameters is outside the suggested range; runoff volume was estimated with unknown errors. "
     if A < 0.18 or A > 9.05:
-        warningMessage += warningMessageVR
+        warningMessageVREnabled = True
     if weightedQp < 33.1 or weightedQp > 1144:
-        warningMessage += warningMessageVR
+        warningMessageVREnabled = True
     if LT < 0.27 or LT > 3.10:
+        warningMessageVREnabled = True
+
+    if warningMessageVREnabled:
         warningMessage += warningMessageVR
+        
 
     # Check limitations of urban hydrograph method on page 65
     warningMessageUH = "One or more of the parameters is outside the suggested range; urban hydrograph was estimated with unknown errors. "
     if A < 0.18 or A > 41.0:
-        warningMessage += warningMessageUH
+        warningMessageUHEnabled = True
     if TIA < 10.0 or TIA > 51.0:
-        warningMessage += warningMessageUH
+        warningMessageUHEnabled = True
     if (L/S**0.5) < 0.0493 or (L/S**0.5) > 0.875:
-        warningMessage += warningMessageUH
+        warningMessageUHEnabled = True
     if RI2 < 1.95 or RI2 > 2.56:
+        warningMessageUHEnabled = True
+    
+    if warningMessageUHEnabled:
         warningMessage += warningMessageUH
 
     warningMessage += "These methods are not applicable in basins with large rural sub-basins or areas with extreme contrasts in level of urbanization. "
