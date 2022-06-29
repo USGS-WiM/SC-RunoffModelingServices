@@ -52,17 +52,18 @@ Once the above code has been run successfully, the service documentation will be
 ## Deployment
 
 1. [Contact SysOps](https://github.com/USGS-WiM/wim-infrastructure/issues/new) to request access to the FastAPI_Services server
-2. Use [Putty](https://www.putty.org/) to SSH onto the FastAPI_Services server. In the Putty Configuration:
+2. Connect to Pulse Secure or ask SysOps to add your IP address to the IP address allowlist in AWS
+3. Use [Putty](https://www.putty.org/) to SSH onto the FastAPI_Services server. In the Putty Configuration:
      - Host Name: `<you_username>@FastAPI_Services_hostname_or_IP_address`
      - Port: 22
      - Connection type: SSH
      - In the sidebar, Connection > SSH > Auth: "Private key file for authentication:" click "Browse" to upload your private key file
      - Click "Open" to connect
- 3. Go to the app directory: `cd /var/www/SC-RunoffModelingServices`
- 4. Pull the latest code: `sudo git pull origin master`
- 5. Restart the daemon: `sudo systemctl restart SC-RunoffModelingServices`
- 6. Check that the services were updated: https://sc-runoffmodelingservices.streamstats.usgs.gov/docs
- 7. Exit when finished: `exit`
+ 4. Go to the app directory: `cd /var/www/SC-RunoffModelingServices`
+ 5. Pull the latest code: `sudo git pull origin master`
+ 6. Restart the daemon: `sudo systemctl restart SC-RunoffModelingServices`
+ 7. Check that the services were updated: https://sc-runoffmodelingservices.streamstats.usgs.gov/docs
+ 8. Exit when finished: `exit`
 
 ## Authors
 
