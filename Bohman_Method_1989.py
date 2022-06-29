@@ -1,4 +1,5 @@
 import numpy as np
+import numbers
 # import matplotlib.pyplot as plt
 
 # Compute flood hydrographs for rural watersheds based on the Bohman 1989 method
@@ -12,6 +13,10 @@ def computeRuralFloodHydrographBohman1989(regionBlueRidgePercentArea, regionPied
     # regionLowerCoastalPlain2PercentArea: percent area of the basin that is in Lower Coastal Plain Region 2 (percent, float)
     # Qp: area-weighted flow statistic for the AEP of interest (cubic feet per second, float)
     # A: total basin drainage area (square miles, float)
+
+    # Validate A value
+    if A <= 0:
+        raise ValueError("Drainage Area must be greater than 0.")
 
     # Check that some area is present
     if regionBlueRidgePercentArea + \
