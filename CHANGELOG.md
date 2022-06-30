@@ -29,7 +29,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Security  
 
-- 
+
+
+## [v0.1.1](https://github.com/USGS-WiM/SC-RunoffModelingServices/releases/tag/v0.1.1) - 2022-06-30
+### Fixed  
+
+- Renamed custom response header for warning messages from `warning` to `X-warning`
+- Exposed custom response header"Access-Control-Expose-Headers"
 
 ## [v0.1.0](https://github.com/USGS-WiM/SC-RunoffModelingServices/releases/tag/v0.1.0) - 2022-06-29
 ### Added
