@@ -141,13 +141,13 @@ class LagTimeMethodTimeOfConcentration(BaseModel):
             }
         }
 class TravelTimeMethodTimeOfConcentration(BaseModel):
-    dataSheetFlow: dict
-    dataExcessSheetFlow: dict
-    P2_24_2: float
-    dataShallowConcentratedFlow: dict
-    dataChannelizedFlowOpenChannel: list
-    dataChannelizedFlowStormSewer: list
-    dataChannelizedFlowStormSewerOrOpenChannelUserInputVelocity: list
+    dataSheetFlow: dict = Field(..., title="Sheet Flow data", description="data corresponding to Sheet Flow section for Travel Time Method (list)")
+    dataExcessSheetFlow: dict = Field(..., title="Excess Sheet Flow data", description="data corresponding to Excess Sheet Flow section for Travel Time Method (list)")
+    P2_24_2: float = Field(..., title="2-yr 24-hr Precipitation", description="output from rainfallData function; precipitation frequency estimate (inches) for 24-hour storms with an average recurrence interval of 2 years (AEP 50%) (float)", example="3.76")
+    dataShallowConcentratedFlow: dict = Field(..., title="Shallow Concentrated Flow data", description="data corresponding to Shallow Concentrated Flow section for Travel Time Method (list)")
+    dataChannelizedFlowOpenChannel: list = Field(..., title="Channelized Flow - Open Channel data", description="data corresponding to Channelized Flow - Open Channel section for Travel Time Method (list)")
+    dataChannelizedFlowStormSewer: list = Field(..., title="Channelized Flow - Storm Sewer data", description="data corresponding to Channelized Flow - Storm Sewer section for Travel Time Method (list)")
+    dataChannelizedFlowStormSewerOrOpenChannelUserInputVelocity: list = Field(..., title="Channelized Flow (Storm Sewer and/or Open Channel) - User Input Velocity data", description="data corresponding to Channelized Flow (Storm Sewer and/or Open Channel) - User Input Velocity section for Travel Time Method (list)")
     class Config:
         schema_extra = {
             "example": {
