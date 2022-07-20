@@ -194,13 +194,13 @@ def channelizedFlowOpenChannelTravelTime(data):
 def channelizedFlowStormSewerTravelTime(data):
     # data (example): [
     #   {
-    #       "Pipe Material": "Concrete"
+    #       "Pipe Material": "Concrete",
     #       "Diameter": 30,
     #       "Length": 1500,
     #       "Slope": 1.0
     #   },
     #   {
-    #       "Pipe Material": "PVC"
+    #       "Pipe Material": "PVC",
     #       "Diameter": 24,
     #       "Length": 1200,
     #       "Slope": 0.5
