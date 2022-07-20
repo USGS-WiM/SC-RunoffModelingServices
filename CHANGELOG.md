@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added 
 
--
+- lagtimetc endpoint: computes Time of Concentration by the Lag Time Equation Method
+- traveltimetc endpoint: computes Time of Concentration by the Travel Time Method
 
 ### Changed  
 
