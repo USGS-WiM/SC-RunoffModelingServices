@@ -6,6 +6,8 @@ from pydantic import BaseModel, Field
 from SC_Synthetic_UH_Method import curveNumber, rainfallData, rainfallDistributionCurve
 from Bohman_Method_1989 import computeRuralFloodHydrographBohman1989
 from Bohman_Method_1992 import getRI2, computeUrbanFloodHydrographBohman1992
+from Tc_Calculator import lagTimeMethodTimeOfConcentration, travelTimeMethodTimeOfConcentration
+
 app = FastAPI(
     title='SC Runoff Modeling Services',
     openapi_url='/openapi.json',
@@ -122,6 +124,20 @@ class UrbanHydrographBohman1992(BaseModel):
                 "L": 0.503,
                 "S": 20.84,
                 "TIA": 4.13,
+            }
+        }
+
+class LagTimeMethodTimeofConcentration(BaseModel):
+    length: float = Field(..., title="length of flowpath", description="length of flow path in watershed, in feet (float)", example="1250")
+    slope: float = Field(..., title="slope of flowpath", description="slope of flow path in watershed, in % (float)", example="0.50")
+    CN: float = Field(..., title="Curve Number", description="Curve Number of watershed (float)", example="67.3")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "length": 1250,
+                "slope": 0.50,
+                "CN": 67.3
             }
         }
 
@@ -278,6 +294,22 @@ def urbanhydrographbohman1992(request_body: UrbanHydrographBohman1992, response:
             "weighted_runoff_volume": weightedVR,
             "time_coordinates": timeCoordinates,
             "discharge_coordinates": dischargeCoordinates
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code = 500, detail =  str(e))
+
+@app.post("/lagtimetc/")
+def lagtimetc(request_body: LagTimeMethodTimeofConcentration, response: Response):
+
+    try: 
+        timeOfConcentration = lagTimeMethodTimeOfConcentration(
+            request_body.length,
+            request_body.slope,
+            request_body.CN
+        )
+        return {
+            "time_of_concentration": timeOfConcentration
         }
 
     except Exception as e:
