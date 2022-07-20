@@ -141,67 +141,67 @@ class LagTimeMethodTimeOfConcentration(BaseModel):
             }
         }
 class TravelTimeMethodTimeOfConcentration(BaseModel):
-    dataSheetFlow: dict = Field(..., title="Sheet Flow data", description="data corresponding to Sheet Flow section for Travel Time Method (list)")
-    dataExcessSheetFlow: dict = Field(..., title="Excess Sheet Flow data", description="data corresponding to Excess Sheet Flow section for Travel Time Method (list)")
+    dataSheetFlow: list = Field(..., title="Sheet Flow data", description="data corresponding to Sheet Flow section for Travel Time Method (list)")
+    dataExcessSheetFlow: list = Field(..., title="Excess Sheet Flow data", description="data corresponding to Excess Sheet Flow section for Travel Time Method (list)")
     P2_24_2: float = Field(..., title="2-yr 24-hr Precipitation", description="output from rainfallData function; precipitation frequency estimate (inches) for 24-hour storms with an average recurrence interval of 2 years (AEP 50%) (float)", example="3.76")
-    dataShallowConcentratedFlow: dict = Field(..., title="Shallow Concentrated Flow data", description="data corresponding to Shallow Concentrated Flow section for Travel Time Method (list)")
+    dataShallowConcentratedFlow: list = Field(..., title="Shallow Concentrated Flow data", description="data corresponding to Shallow Concentrated Flow section for Travel Time Method (list)")
     dataChannelizedFlowOpenChannel: list = Field(..., title="Channelized Flow - Open Channel data", description="data corresponding to Channelized Flow - Open Channel section for Travel Time Method (list)")
     dataChannelizedFlowStormSewer: list = Field(..., title="Channelized Flow - Storm Sewer data", description="data corresponding to Channelized Flow - Storm Sewer section for Travel Time Method (list)")
     dataChannelizedFlowStormSewerOrOpenChannelUserInputVelocity: list = Field(..., title="Channelized Flow (Storm Sewer and/or Open Channel) - User Input Velocity data", description="data corresponding to Channelized Flow (Storm Sewer and/or Open Channel) - User Input Velocity section for Travel Time Method (list)")
     class Config:
         schema_extra = {
             "example": {
-                "dataSheetFlow": {
-                    "Light underbrush": 
+                "dataSheetFlow": [
                         {
+                            "Surface": "Light underbrush",
                             "Length": 300,
                             "Overland Slope": 0.33,
                         },
-                    "Natural Range": 
                         {
+                            "Surface": "Natural Range",
                             "Length": 66,
                             "Overland Slope": 3.33,
                         },
-                    "Bermuda grass": 
                         {
+                            "Surface": "Bermuda grass",
                             "Length": 33,
                             "Overland Slope": 0.00,
                         }
-                    },
-                "dataExcessSheetFlow": {
-                    "Short-grass pasture": 
+                ],
+                "dataExcessSheetFlow": [
                         {
+                            "Surface": "Short-grass pasture",
                             "Slope": 2.00,
                         }
-                    },
+                ],
                 "P2_24_2": 3.76,
-                "dataShallowConcentratedFlow": {
-                    "Nearly bare and untilled (overland flow)": 
+                "dataShallowConcentratedFlow": [
                         {
+                            "Shallow Flow Type": "Nearly bare and untilled (overland flow)",
                             "Length": 100,
                             "Slope": 0.50,
                         },
-                    "Cultivated straight row crops": 
                         {
+                            "Shallow Flow Type": "Cultivated straight row crops",
                             "Length": 110,
                             "Slope": 1.00,
                         },
-                    "Short-grass pasture": 
                         {
+                            "Shallow Flow Type": "Short-grass pasture",
                             "Length": 130,
                             "Slope": 2.00,
                         },
-                    "Minimum cultivation, contour or strip-cropped, and woodlands": 
                         {
+                            "Shallow Flow Type": "Minimum cultivation, contour or strip-cropped, and woodlands",
                             "Length": 120,
                             "Slope": 2.00,
                         },
-                    "Pavement and small upland gullies": 
                         {
+                            "Shallow Flow Type": "Pavement and small upland gullies",
                             "Length": 140,
                             "Slope": 2.00,
                         }
-                    },
+                    ],
                 "dataChannelizedFlowOpenChannel": [
                         {
                             "Base Width": 3.0,

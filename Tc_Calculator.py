@@ -94,20 +94,20 @@ stormSewerMaterialManningsNTable = {
 
 def calculateSheetFlowTravelTime(dataSheetFlow, dataExcessSheetFlow, P2_24_2):
     # dataSheetFlow (example): {
-    #    "Short grass prairie": 
     #       {
+    #         "Surface": "Short grass prairie",
     #         "Length": 250,
     #         "Overland Slope": 2.00,
     #       },
-    #    "Smooth asphalt": 
     #       {
+    #         "Surface": "Smooth asphalt",
     #         "Length": 500,
     #         "Overland Slope": 1.00,
     #       }
     # }
     # dataExcessSheetFlow (example): {
-    #    "Pavement and small upland gullies": 
     #       {
+    #         "Surface": "Pavement and small upland gullies",
     #         "Slope": 2.00,
     #       }
     #    }
@@ -118,40 +118,40 @@ def calculateSheetFlowTravelTime(dataSheetFlow, dataExcessSheetFlow, P2_24_2):
     total_length = 0.0 # feet
     total_corrected_length = 0.0 # feet
     for surface in dataSheetFlow:
-        mannings_n = sheetFlowSurfaceManningsNTable[surface]
-        limit = (100.0*math.sqrt(dataSheetFlow[surface]["Overland Slope"]/100.0))/mannings_n # feet
-        total_length += dataSheetFlow[surface]["Length"]
-        if dataSheetFlow[surface]["Length"] > limit: 
+        mannings_n = sheetFlowSurfaceManningsNTable[surface["Surface"]]
+        limit = (100.0*math.sqrt(surface["Overland Slope"]/100.0))/mannings_n # feet
+        total_length += surface["Length"]
+        if surface["Length"] > limit: 
             corrected_length = limit # feet
         else:
-            corrected_length = dataSheetFlow[surface]["Length"] # feet
+            corrected_length = surface["Length"] # feet
         total_corrected_length += corrected_length # feet
-        travel_time_sheet_flow += (0.42 / math.sqrt(P2_24_2)) * (mannings_n*corrected_length/math.sqrt((max(0.0001,dataSheetFlow[surface]["Overland Slope"])/100.0))**0.8) # minutes
+        travel_time_sheet_flow += (0.42 / math.sqrt(P2_24_2)) * (mannings_n*corrected_length/math.sqrt((max(0.0001,surface["Overland Slope"])/100.0))**0.8) # minutes
     for surface in dataExcessSheetFlow:
         length = max(0,total_length-total_corrected_length) # feet
-        velocity_constant = shallowFlowTypesTable[surface]["Velocity Constant"]
-        velocity = velocity_constant * math.sqrt(dataExcessSheetFlow[surface]["Slope"]/100) # feet per second
+        velocity_constant = shallowFlowTypesTable[surface["Surface"]]["Velocity Constant"]
+        velocity = velocity_constant * math.sqrt(surface["Slope"]/100) # feet per second
         travel_time_excess_sheet_flow += length / velocity / 60.0 # minutes
-    return travel_time_sheet_flow + travel_time_excess_sheet_flow
+    return travel_time_sheet_flow + travel_time_excess_sheet_flow # minutes
 
 def shallowConcentratedFlowTravelTime(data):
-    # data (example): {
-    #    "Short-grass pasture": 
+    # data (example): [
     #       {
+    #         "Shallow Flow Type": "Short-grass pasture",
     #         "Length": 250,
     #         "Slope": 2.00,
     #       },
-    #    "Minimum cultivation, contour or strip-cropped, and woodlands": 
     #       {
+    #         "Shallow Flow Type": "Minimum cultivation, contour or strip-cropped, and woodlands",
     #         "Length": 500,
     #         "Slope": 1.00,
     #       }
-    # }
+    # ]
     travel_time = 0.0
     for surface in data:
-        velocity_constant = shallowFlowTypesTable[surface]["Velocity Constant"]
-        velocity = velocity_constant * math.sqrt(data[surface]["Slope"]/100) # feet per second
-        travel_time += data[surface]["Length"] / velocity / 60.0 # minutes
+        velocity_constant = shallowFlowTypesTable[surface["Shallow Flow Type"]]["Velocity Constant"]
+        velocity = velocity_constant * math.sqrt(surface["Slope"]/100) # feet per second
+        travel_time += surface["Length"] / velocity / 60.0 # minutes
     return travel_time  
 
 def channelizedFlowOpenChannelTravelTime(data):
