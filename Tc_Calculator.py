@@ -221,11 +221,11 @@ def channelizedFlowStormSewerTravelTime(data):
 def channelizedFlowStormSewerOrOpenChannelUserInputVelocityTravelTime(data):
     # data (example): [
     #   {
-    #       "Length": "1000"
+    #       "Length": "1000",
     #       "Velocity": 2.00,
     #   },
     #   {
-    #       "Length": "1500"
+    #       "Length": "1500",
     #       "Velocity": 3.00,
     #   }
     # ]
