@@ -159,7 +159,7 @@ def channelizedFlowOpenChannelTravelTime(data):
     #   {
     #       "Base Width": 3.0,
     #       "Front Slope": 2.0,
-    #       "Black Slope": 3.0,
+    #       "Back Slope": 3.0,
     #       "Channel Depth": 2.0,
     #       "Length": 100,
     #       "Channel Bed Slope": 0.25,
@@ -168,7 +168,7 @@ def channelizedFlowOpenChannelTravelTime(data):
     #   {
     #       "Base Width": 3.0,
     #       "Front Slope": 2.0,
-    #       "Black Slope": 3.0,
+    #       "Back Slope": 3.0,
     #       "Channel Depth": 2.0,
     #       "Length": 200,
     #       "Channel Bed Slope": 0.25,
