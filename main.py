@@ -6,6 +6,8 @@ from pydantic import BaseModel, Field
 from SC_Synthetic_UH_Method import curveNumber, rainfallData, rainfallDistributionCurve
 from Bohman_Method_1989 import computeRuralFloodHydrographBohman1989
 from Bohman_Method_1992 import getRI2, computeUrbanFloodHydrographBohman1992
+from Tc_Calculator import lagTimeMethodTimeOfConcentration, travelTimeMethodTimeOfConcentration
+
 app = FastAPI(
     title='SC Runoff Modeling Services',
     openapi_url='/openapi.json',
@@ -122,6 +124,144 @@ class UrbanHydrographBohman1992(BaseModel):
                 "L": 0.503,
                 "S": 20.84,
                 "TIA": 4.13,
+            }
+        }
+
+class LagTimeMethodTimeOfConcentration(BaseModel):
+    length: float = Field(..., title="length of flowpath", description="length of flow path in watershed, in feet (float)", example="1250")
+    slope: float = Field(..., title="slope of flowpath", description="slope of flow path in watershed, in % (float)", example="0.50")
+    CN: float = Field(..., title="Curve Number", description="Curve Number of watershed (float)", example="67.3")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "length": 1250,
+                "slope": 0.50,
+                "CN": 67.3
+            }
+        }
+class TravelTimeMethodTimeOfConcentration(BaseModel):
+    dataSheetFlow: list = Field(..., title="Sheet Flow data", description="data corresponding to Sheet Flow section for Travel Time Method (list)")
+    dataExcessSheetFlow: list = Field(..., title="Excess Sheet Flow data", description="data corresponding to Excess Sheet Flow section for Travel Time Method (list)")
+    P2_24_2: float = Field(..., title="2-yr 24-hr Precipitation", description="output from rainfallData function; precipitation frequency estimate (inches) for 24-hour storms with an average recurrence interval of 2 years (AEP 50%) (float)", example="3.76")
+    dataShallowConcentratedFlow: list = Field(..., title="Shallow Concentrated Flow data", description="data corresponding to Shallow Concentrated Flow section for Travel Time Method (list)")
+    dataChannelizedFlowOpenChannel: list = Field(..., title="Channelized Flow - Open Channel data", description="data corresponding to Channelized Flow - Open Channel section for Travel Time Method (list)")
+    dataChannelizedFlowStormSewer: list = Field(..., title="Channelized Flow - Storm Sewer data", description="data corresponding to Channelized Flow - Storm Sewer section for Travel Time Method (list)")
+    dataChannelizedFlowStormSewerOrOpenChannelUserInputVelocity: list = Field(..., title="Channelized Flow (Storm Sewer and/or Open Channel) - User Input Velocity data", description="data corresponding to Channelized Flow (Storm Sewer and/or Open Channel) - User Input Velocity section for Travel Time Method (list)")
+    class Config:
+        schema_extra = {
+            "example": {
+                "dataSheetFlow": [
+                        {
+                            "Surface": "Light underbrush",
+                            "Length": 300,
+                            "Overland Slope": 0.33,
+                        },
+                        {
+                            "Surface": "Natural Range",
+                            "Length": 66,
+                            "Overland Slope": 3.33,
+                        },
+                        {
+                            "Surface": "Bermuda grass",
+                            "Length": 33,
+                            "Overland Slope": 0.00,
+                        }
+                ],
+                "dataExcessSheetFlow": [
+                        {
+                            "Surface": "Short-grass pasture",
+                            "Slope": 2.00,
+                        }
+                ],
+                "P2_24_2": 3.76,
+                "dataShallowConcentratedFlow": [
+                        {
+                            "Shallow Flow Type": "Nearly bare and untilled (overland flow)",
+                            "Length": 100,
+                            "Slope": 0.50,
+                        },
+                        {
+                            "Shallow Flow Type": "Cultivated straight row crops",
+                            "Length": 110,
+                            "Slope": 1.00,
+                        },
+                        {
+                            "Shallow Flow Type": "Short-grass pasture",
+                            "Length": 130,
+                            "Slope": 2.00,
+                        },
+                        {
+                            "Shallow Flow Type": "Minimum cultivation, contour or strip-cropped, and woodlands",
+                            "Length": 120,
+                            "Slope": 2.00,
+                        },
+                        {
+                            "Shallow Flow Type": "Pavement and small upland gullies",
+                            "Length": 140,
+                            "Slope": 2.00,
+                        }
+                    ],
+                "dataChannelizedFlowOpenChannel": [
+                        {
+                            "Base Width": 3.0,
+                            "Front Slope": 2.0,
+                            "Back Slope": 3.0,
+                            "Channel Depth": 2.0,
+                            "Length": 1500,
+                            "Channel Bed Slope": 0.25,
+                            "Manning n-value": 0.035,
+                        },
+                        {
+                            "Base Width": 3.0,
+                            "Front Slope": 2.0,
+                            "Back Slope": 3.0,
+                            "Channel Depth": 2.0,
+                            "Length": 1500,
+                            "Channel Bed Slope": 0.25,
+                            "Manning n-value": 0.035,
+                        }
+                    ],
+                "dataChannelizedFlowStormSewer": [
+                        {
+                            "Pipe Material": "CMP",
+                            "Diameter": 36,
+                            "Length": 300,
+                            "Slope": 0.50
+                        },
+                        {
+                            "Pipe Material": "PVC",
+                            "Diameter": 24,
+                            "Length": 300,
+                            "Slope": 0.5
+                        },
+                        {
+                            "Pipe Material": "Concrete",
+                            "Diameter": 30,
+                            "Length": 300,
+                            "Slope": 0.5
+                        },
+                        {
+                            "Pipe Material": "Steel",
+                            "Diameter": 36,
+                            "Length": 300,
+                            "Slope": 0.5
+                        }
+                    ],
+                "dataChannelizedFlowStormSewerOrOpenChannelUserInputVelocity": [
+                        {
+                            "Length": 300,
+                            "Velocity": 2.00,
+                        },
+                        {
+                            "Length": 300,
+                            "Velocity": 3.00,
+                        },
+                        {
+                            "Length": 300,
+                            "Velocity": 4.00,
+                        }
+                    ]
             }
         }
 
@@ -278,6 +418,45 @@ def urbanhydrographbohman1992(request_body: UrbanHydrographBohman1992, response:
             "weighted_runoff_volume": weightedVR,
             "time_coordinates": timeCoordinates,
             "discharge_coordinates": dischargeCoordinates
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code = 500, detail =  str(e))
+
+@app.post("/lagtimetc/")
+def lagtimetc(request_body: LagTimeMethodTimeOfConcentration, response: Response):
+
+    try: 
+        timeOfConcentration = lagTimeMethodTimeOfConcentration(
+            request_body.length,
+            request_body.slope,
+            request_body.CN
+        )
+        return {
+            "time_of_concentration": timeOfConcentration
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code = 500, detail =  str(e))
+
+@app.post("/traveltimetc/")
+def traveltimetc(request_body: TravelTimeMethodTimeOfConcentration, response: Response):
+
+    try: 
+        timeOfConcentration, warningMessage = travelTimeMethodTimeOfConcentration(
+            request_body.dataSheetFlow,
+            request_body.dataExcessSheetFlow,
+            request_body.P2_24_2,
+            request_body.dataShallowConcentratedFlow,
+            request_body.dataChannelizedFlowOpenChannel,
+            request_body.dataChannelizedFlowStormSewer,
+            request_body.dataChannelizedFlowStormSewerOrOpenChannelUserInputVelocity
+        )
+        if warningMessage is not None:
+            response.headers["X-warning"] = warningMessage
+            response.headers["Access-Control-Expose-Headers"] = "X-warning"
+        return {
+            "time_of_concentration": timeOfConcentration
         }
 
     except Exception as e:
