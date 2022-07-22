@@ -3,7 +3,7 @@ from fastapi.responses import RedirectResponse
 from starlette.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from SC_Synthetic_UH_Method import curveNumberData, PRFData, rainfallData, rainfallDistributionCurve
+from SC_Synthetic_UH_Method import curveNumberData, runoffWeightedCN, PRFData, rainfallData, rainfallDistributionCurve
 from Bohman_Method_1989 import computeRuralFloodHydrographBohman1989
 from Bohman_Method_1992 import getRI2, computeUrbanFloodHydrographBohman1992
 from Tc_Calculator import lagTimeMethodTimeOfConcentration, travelTimeMethodTimeOfConcentration
@@ -43,6 +43,29 @@ class CurveNumber(BaseModel):
             "example": {
                 "lat": 33.3946,
                 "lon": -80.3474
+            }
+        }
+
+class CurveNumberData(BaseModel):
+
+    # all fields are required
+    curveNumberData: list
+    P24hr: float
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "curveNumberData": [
+                    {
+                        "CN": 55,
+                        "Area": 50.0
+                    },
+                    {
+                        "CN": 78,
+                        "Area": 50.0
+                    }
+                ],
+                "P24hr": 5.74
             }
         }
 
@@ -301,6 +324,21 @@ def curvenumberdata(request_body: CurveNumber, response: Response):
         )
         return {
             "CN_Data": cnData,
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code = 500, detail =  str(e))
+
+@app.post("/runoffweightedCN/")
+def runoffweightedCN(request_body: CurveNumberData, response: Response):
+
+    try: 
+        runoff_weighted_CN = runoffWeightedCN(
+            request_body.curveNumberData,
+            request_body.P24hr
+        )
+        return {
+            "CN": runoff_weighted_CN,
         }
 
     except Exception as e:
