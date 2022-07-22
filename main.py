@@ -3,7 +3,7 @@ from fastapi.responses import RedirectResponse
 from starlette.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from SC_Synthetic_UH_Method import curveNumberData, rainfallData, rainfallDistributionCurve
+from SC_Synthetic_UH_Method import curveNumberData, PRFData, rainfallData, rainfallDistributionCurve
 from Bohman_Method_1989 import computeRuralFloodHydrographBohman1989
 from Bohman_Method_1992 import getRI2, computeUrbanFloodHydrographBohman1992
 from Tc_Calculator import lagTimeMethodTimeOfConcentration, travelTimeMethodTimeOfConcentration
@@ -33,6 +33,20 @@ app.add_middleware(
 #  of request body inputs, and automated API documentation
 
 class CurveNumber(BaseModel):
+
+    # all fields are required
+    lat: float
+    lon: float
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "lat": 33.3946,
+                "lon": -80.3474
+            }
+        }
+
+class PRF(BaseModel):
 
     # all fields are required
     lat: float
@@ -291,6 +305,23 @@ def curvenumberdata(request_body: CurveNumber, response: Response):
 
     except Exception as e:
         raise HTTPException(status_code = 500, detail =  str(e))
+
+@app.post("/prfdata/")
+def prfdata(request_body: PRF, response: Response):
+
+    try: 
+        PRF, Gamma_n = PRFData(
+            request_body.lat,
+            request_body.lon
+        )
+        return {
+            "PRF": PRF,
+            "Gamma_n": Gamma_n,
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code = 500, detail =  str(e))
+
 
 @app.post("/rainfalldata/")
 def rainfalldata(request_body: RainfallData, response: Response):
