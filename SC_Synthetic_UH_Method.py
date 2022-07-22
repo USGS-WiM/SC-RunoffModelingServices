@@ -1,8 +1,18 @@
 import requests
 import ast
 
-def curveNumber(lat, lon):
-    return "Hello, World!"
+def curveNumberData(lat, lon):
+    curveNumberData = [
+        {
+            "CN": 55,
+            "Area": 50.0
+        },
+        {
+            "CN": 78,
+            "Area": 50.0
+        }
+    ]
+    return curveNumberData
 
 # Retrieve rainfall data from the NOAA Precipitation Frequency Data Server
 # https://hdsc.nws.noaa.gov/hdsc/pfds/pfds_map_cont.html?bkmrk=sc

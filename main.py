@@ -3,7 +3,7 @@ from fastapi.responses import RedirectResponse
 from starlette.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from SC_Synthetic_UH_Method import curveNumber, rainfallData, rainfallDistributionCurve
+from SC_Synthetic_UH_Method import curveNumberData, rainfallData, rainfallDistributionCurve
 from Bohman_Method_1989 import computeRuralFloodHydrographBohman1989
 from Bohman_Method_1992 import getRI2, computeUrbanFloodHydrographBohman1992
 from Tc_Calculator import lagTimeMethodTimeOfConcentration, travelTimeMethodTimeOfConcentration
@@ -277,16 +277,16 @@ class TravelTimeMethodTimeOfConcentration(BaseModel):
 def docs_redirect_root():
     return RedirectResponse(url=app.docs_url)
 
-@app.post("/curvenumber/")
-def curvenumber(request_body: CurveNumber, response: Response):
+@app.post("/curvenumberdata/")
+def curvenumberdata(request_body: CurveNumber, response: Response):
 
     try: 
-        response = curveNumber(
+        cnData = curveNumberData(
             request_body.lat,
             request_body.lon
         )
         return {
-            "response": response,
+            "CN_Data": cnData,
         }
 
     except Exception as e:
