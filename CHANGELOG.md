@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - curveNumberData endpoint: returns data for curve number determination (currently returns placeholder data)
 - PRF endpoint: returns PRF and gamma N value (currently returns placeholder PRF data)
 - runoffweightedCN endpoint: calculates runoff-weighted curve number
+- areaweightedCN endpoint: calculates area-weighted curve number
 ### Changed  
 
 -

@@ -3,7 +3,7 @@ from fastapi.responses import RedirectResponse
 from starlette.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from SC_Synthetic_UH_Method import curveNumberData, runoffWeightedCN, PRFData, rainfallData, rainfallDistributionCurve
+from SC_Synthetic_UH_Method import curveNumberData, runoffWeightedCN, areaWeightedCN, PRFData, rainfallData, rainfallDistributionCurve
 from Bohman_Method_1989 import computeRuralFloodHydrographBohman1989
 from Bohman_Method_1992 import getRI2, computeUrbanFloodHydrographBohman1992
 from Tc_Calculator import lagTimeMethodTimeOfConcentration, travelTimeMethodTimeOfConcentration
@@ -339,6 +339,21 @@ def runoffweightedCN(request_body: CurveNumberData, response: Response):
         )
         return {
             "CN": runoff_weighted_CN,
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code = 500, detail =  str(e))
+
+@app.post("/areaweightedCN/")
+def areaweightedCN(request_body: CurveNumberData, response: Response):
+
+    try: 
+        area_weighted_CN = areaWeightedCN(
+            request_body.curveNumberData,
+            request_body.P24hr
+        )
+        return {
+            "CN": area_weighted_CN,
         }
 
     except Exception as e:
