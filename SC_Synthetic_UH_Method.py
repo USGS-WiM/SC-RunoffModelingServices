@@ -1,7 +1,10 @@
 import requests
 import ast
 
+# Extracts data from curve number GIS layer 
+# Corresponds to "Data for CN Determination" sheet in spreadsheet
 def curveNumberData(lat, lon):
+    # Placeholder data-- waiting on GIS data to be published
     curveNumberData = [
         {
             "CN": 55,
@@ -14,8 +17,91 @@ def curveNumberData(lat, lon):
     ]
     return curveNumberData
 
+# Extracts data from PRF GIS layer 
+# Corresponds to "PRF Calculator" sheet in spreadsheet
+def PRFData(lat, lon):
+    # Corresponds to "UH Parameters" table
+    UHParametersPRFGammaN = [
+        {
+            "PRF": 50,
+            "Gamma_n": 1.05
+        },
+        {
+            "PRF": 100,
+            "Gamma_n": 1.25
+        },
+        {
+            "PRF": 156,
+            "Gamma_n": 1.50
+        },
+        {
+            "PRF": 237,
+            "Gamma_n": 2.00
+        },
+        {
+            "PRF": 298,
+            "Gamma_n": 2.50
+        },
+        {
+            "PRF": 349,
+            "Gamma_n": 3.00
+        },
+        {
+            "PRF": 393,
+            "Gamma_n": 3.50
+        },
+        {
+            "PRF": 433,
+            "Gamma_n": 4.00
+        },
+        {
+            "PRF": 470,
+            "Gamma_n": 4.50
+        },
+        {
+            "PRF": 484,
+            "Gamma_n": 4.70
+        },
+        {
+            "PRF": 504,
+            "Gamma_n": 5.00
+        },
+        {
+            "PRF": 566,
+            "Gamma_n": 6.00
+        }
+    ]
+
+    # Placeholder data-- waiting on GIS data to be published
+    PRFData = [
+        {
+            "PRF": 180,
+            "Area": 50.0
+        },
+        {
+            "PRF": 300,
+            "Area": 50.0
+        }
+    ]
+
+    # Calculate Watershed PRF and Shape Parameter, n (also called Gamma_n)
+    total_watershed_area = 0.0
+    total_product = 0.0
+    for row in PRFData:
+        total_watershed_area += row["Area"]
+        total_product += row["PRF"] * row["Area"]
+    PRF = total_product / total_watershed_area
+    Gamma_n = None
+    for index, PRFGamma_n_pair in enumerate(UHParametersPRFGammaN):
+        if PRF < PRFGamma_n_pair["PRF"]:
+            Gamma_n = UHParametersPRFGammaN[index-1]["Gamma_n"]+((PRFGamma_n_pair["Gamma_n"]-UHParametersPRFGammaN[index-1]["Gamma_n"])/(PRFGamma_n_pair["PRF"]-UHParametersPRFGammaN[index-1]["PRF"]
+))*(PRF-UHParametersPRFGammaN[index-1]["PRF"])
+            break
+    return PRF, Gamma_n
+
 # Retrieve rainfall data from the NOAA Precipitation Frequency Data Server
 # https://hdsc.nws.noaa.gov/hdsc/pfds/pfds_map_cont.html?bkmrk=sc
+# Corresponds to "Rainfall Data" sheet in spreadsheet
 def rainfallData(lat, lon):
 
     # Request data from NOAA
@@ -83,6 +169,7 @@ def rainfallData(lat, lon):
 # Retrieve the rainfall distribution curve number from the NOAA Atlas 14 Rainfall Distributions
 # The available rainfall distribution curve letters in this map service are NOAA A, NOAA B, NOAA C, and NOAA D
 # Note: Type II and Type II Rainfall Distribution Curves are also possible but will be provided as a manual selection option in the user interface
+# Corresponds to "Rainfall Data" and "SC Rainfall Distribution Map" sheets in spreadsheet
 def rainfallDistributionCurve(lat, lon): 
 
     # Use map service to query the coordinate point with the NOAA Atlast 14 rainfall distributions map service
@@ -97,13 +184,12 @@ def rainfallDistributionCurve(lat, lon):
     
     # Translate the NOAA rainfall distribution curve letter to the rainfall distribution curve number used in the SC Synthetic UH Method spreadsheet
     # Note: Type II = 2 and Type III = 3 are two other options, but these will be provided as a manual selection option in the user interface
-    if rainfall_distribution_curve_letter == "A":
-        rainfall_distribution_curve_number = 4
-    elif rainfall_distribution_curve_letter == "B":
-        rainfall_distribution_curve_number = 5
-    elif rainfall_distribution_curve_letter == "C":
-        rainfall_distribution_curve_number = 6
-    elif rainfall_distribution_curve_letter == "D":
-        rainfall_distribution_curve_number = 7
+    rainfall_distribution_curve_letter_number = {
+        "A": 4,
+        "B": 5,
+        "C": 6,
+        "D": 7
+    }
+    rainfall_distribution_curve_number = rainfall_distribution_curve_letter_number[rainfall_distribution_curve_letter]
 
     return rainfall_distribution_curve_letter, rainfall_distribution_curve_number
