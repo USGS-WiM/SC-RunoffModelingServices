@@ -46,7 +46,7 @@ def runoffWeightedCN(curveNumberData, P24hr):
     WS_retention_S = 1000.0 / runoff_weighted_CN - 10
     initial_abstraction_Ia = 0.2 * WS_retention_S
 
-    return runoff_weighted_CN
+    return runoff_weighted_CN, WS_retention_S, initial_abstraction_Ia
 
 # Calculates Area Weighted Curve Number
 # Corresponds to "Area Weighted CN Calculator" sheet in spreadsheet
@@ -73,7 +73,7 @@ def areaWeightedCN(curveNumberData, P24hr):
     initial_abstraction_Ia = 0.2 * WS_retention_S
     Q_CN =((P24hr-initial_abstraction_Ia)**2)/(P24hr+0.8*WS_retention_S) # 24-hour Runoff Depth
 
-    return area_weighted_CN
+    return area_weighted_CN, WS_retention_S, initial_abstraction_Ia
 
 # Extracts data from PRF GIS layer 
 # Corresponds to "PRF Calculator" sheet in spreadsheet

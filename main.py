@@ -333,12 +333,14 @@ def curvenumberdata(request_body: CurveNumber, response: Response):
 def runoffweightedCN(request_body: CurveNumberData, response: Response):
 
     try: 
-        runoff_weighted_CN = runoffWeightedCN(
+        runoff_weighted_CN, WS_retention_S, initial_abstraction_Ia = runoffWeightedCN(
             request_body.curveNumberData,
             request_body.P24hr
         )
         return {
             "CN": runoff_weighted_CN,
+            "S": WS_retention_S,
+            "Ia": initial_abstraction_Ia
         }
 
     except Exception as e:
@@ -348,12 +350,14 @@ def runoffweightedCN(request_body: CurveNumberData, response: Response):
 def areaweightedCN(request_body: CurveNumberData, response: Response):
 
     try: 
-        area_weighted_CN = areaWeightedCN(
+        area_weighted_CN, WS_retention_S, initial_abstraction_Ia = areaWeightedCN(
             request_body.curveNumberData,
             request_body.P24hr
         )
         return {
             "CN": area_weighted_CN,
+            "S": WS_retention_S,
+            "Ia": initial_abstraction_Ia
         }
 
     except Exception as e:
@@ -369,7 +373,7 @@ def prfdata(request_body: PRF, response: Response):
         )
         return {
             "PRF": PRF,
-            "Gamma_n": Gamma_n,
+            "Gamma_n": Gamma_n
         }
 
     except Exception as e:
