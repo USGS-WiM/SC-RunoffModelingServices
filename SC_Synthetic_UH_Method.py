@@ -1,9 +1,12 @@
 import requests
 import ast
 
-# Extracts data from curve number GIS layer 
+# Extracts data from curve number GIS layer, then computes Runoff Weighted CN or Area Weighted CN
 # Corresponds to "Data for CN Determination" sheet in spreadsheet
-def curveNumberData(lat, lon):
+def weightedCurveNumber(lat, lon, P24hr, weightingMethod):
+    # P24hr: 24-hour Rainfall Depth (P), in inches; comes from rainfallData function for corresponding AEP
+    # weightingMethod: "runoff" or "area"
+
     # Placeholder data-- waiting on GIS data to be published
     curveNumberData = [
         {
@@ -15,7 +18,16 @@ def curveNumberData(lat, lon):
             "Area": 50.0
         }
     ]
-    return curveNumberData
+
+    if weightingMethod == "runoff":
+        weighted_CN = runoffWeightedCN(curveNumberData, P24hr)
+    elif (weightingMethod == "area"):
+        weighted_CN =  areaWeightedCN(curveNumberData, P24hr)
+
+    WS_retention_S = 1000.0 / weighted_CN - 10
+    initial_abstraction_Ia = 0.2 * WS_retention_S
+
+    return weighted_CN, WS_retention_S, initial_abstraction_Ia
 
 # Calculates Runoff Weighted Curve Number
 # Corresponds to "Runoff Weighted CN Calculator" sheet in spreadsheet
@@ -43,10 +55,8 @@ def runoffWeightedCN(curveNumberData, P24hr):
         total_areaQCN24hr += areaQCN24hr 
     Q_CN = total_areaQCN24hr / total_area # 24-hour Runoff Depth
     runoff_weighted_CN = 1000.0 / (10 + 5*P24hr + 10*Q_CN - 10*(Q_CN**2 + 1.25*P24hr*Q_CN)**0.5) if 1000 / (10 + 5*P24hr + 10*Q_CN - 10*(Q_CN**2 + 1.25*P24hr*Q_CN)**0.5)>0 else 0
-    WS_retention_S = 1000.0 / runoff_weighted_CN - 10
-    initial_abstraction_Ia = 0.2 * WS_retention_S
 
-    return runoff_weighted_CN, WS_retention_S, initial_abstraction_Ia
+    return runoff_weighted_CN
 
 # Calculates Area Weighted Curve Number
 # Corresponds to "Area Weighted CN Calculator" sheet in spreadsheet
@@ -69,15 +79,42 @@ def areaWeightedCN(curveNumberData, P24hr):
         total_area += row["Area"]
         total_areaCN += row["Area"] * row["CN"] 
     area_weighted_CN = total_areaCN / total_area
-    WS_retention_S = 1000.0 / area_weighted_CN - 10
-    initial_abstraction_Ia = 0.2 * WS_retention_S
-    Q_CN =((P24hr-initial_abstraction_Ia)**2)/(P24hr+0.8*WS_retention_S) # 24-hour Runoff Depth
 
-    return area_weighted_CN, WS_retention_S, initial_abstraction_Ia
+    return area_weighted_CN
 
 # Extracts data from PRF GIS layer 
 # Corresponds to "PRF Calculator" sheet in spreadsheet
 def PRFData(lat, lon):
+    
+
+    # Placeholder data-- waiting on GIS data to be published
+    PRFData = [
+        {
+            "PRF": 180,
+            "Area": 50.0
+        },
+        {
+            "PRF": 300,
+            "Area": 50.0
+        }
+    ]
+
+    # Calculate Watershed PRF and Shape Parameter, n (also called Gamma_n)
+    total_watershed_area = 0.0
+    total_product = 0.0
+    for row in PRFData:
+        total_watershed_area += row["Area"]
+        total_product += row["PRF"] * row["Area"]
+    PRF = total_product / total_watershed_area
+
+    return PRF
+
+
+# Calculates the Gamma n value for a given PRF value
+# Corresponds to "PRF Calculator" sheet in spreadsheet
+def gammaN(PRF):
+    # PRF: Peak Rate Factor, output from PRFData function or user input
+
     # Corresponds to "UH Parameters" table
     UHParametersPRFGammaN = [
         {
@@ -130,32 +167,14 @@ def PRFData(lat, lon):
         }
     ]
 
-    # Placeholder data-- waiting on GIS data to be published
-    PRFData = [
-        {
-            "PRF": 180,
-            "Area": 50.0
-        },
-        {
-            "PRF": 300,
-            "Area": 50.0
-        }
-    ]
-
-    # Calculate Watershed PRF and Shape Parameter, n (also called Gamma_n)
-    total_watershed_area = 0.0
-    total_product = 0.0
-    for row in PRFData:
-        total_watershed_area += row["Area"]
-        total_product += row["PRF"] * row["Area"]
-    PRF = total_product / total_watershed_area
     Gamma_n = None
     for index, PRFGamma_n_pair in enumerate(UHParametersPRFGammaN):
         if PRF < PRFGamma_n_pair["PRF"]:
             Gamma_n = UHParametersPRFGammaN[index-1]["Gamma_n"]+((PRFGamma_n_pair["Gamma_n"]-UHParametersPRFGammaN[index-1]["Gamma_n"])/(PRFGamma_n_pair["PRF"]-UHParametersPRFGammaN[index-1]["PRF"]
-))*(PRF-UHParametersPRFGammaN[index-1]["PRF"])
+    ))*(PRF-UHParametersPRFGammaN[index-1]["PRF"])
             break
-    return PRF, Gamma_n
+
+    return Gamma_n
 
 # Retrieve rainfall data from the NOAA Precipitation Frequency Data Server
 # https://hdsc.nws.noaa.gov/hdsc/pfds/pfds_map_cont.html?bkmrk=sc
