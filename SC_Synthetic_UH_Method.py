@@ -78,6 +78,36 @@ def areaWeightedCN(curveNumberData, P24hr):
 # Extracts data from PRF GIS layer 
 # Corresponds to "PRF Calculator" sheet in spreadsheet
 def PRFData(lat, lon):
+    
+
+    # Placeholder data-- waiting on GIS data to be published
+    PRFData = [
+        {
+            "PRF": 180,
+            "Area": 50.0
+        },
+        {
+            "PRF": 300,
+            "Area": 50.0
+        }
+    ]
+
+    # Calculate Watershed PRF and Shape Parameter, n (also called Gamma_n)
+    total_watershed_area = 0.0
+    total_product = 0.0
+    for row in PRFData:
+        total_watershed_area += row["Area"]
+        total_product += row["PRF"] * row["Area"]
+    PRF = total_product / total_watershed_area
+
+    return PRF
+
+
+# Calculates the Gamma n value for a given PRF value
+# Corresponds to "PRF Calculator" sheet in spreadsheet
+def gammaN(PRF):
+    # PRF: Peak Rate Factor, output from PRFData function or user input
+
     # Corresponds to "UH Parameters" table
     UHParametersPRFGammaN = [
         {
@@ -130,32 +160,14 @@ def PRFData(lat, lon):
         }
     ]
 
-    # Placeholder data-- waiting on GIS data to be published
-    PRFData = [
-        {
-            "PRF": 180,
-            "Area": 50.0
-        },
-        {
-            "PRF": 300,
-            "Area": 50.0
-        }
-    ]
-
-    # Calculate Watershed PRF and Shape Parameter, n (also called Gamma_n)
-    total_watershed_area = 0.0
-    total_product = 0.0
-    for row in PRFData:
-        total_watershed_area += row["Area"]
-        total_product += row["PRF"] * row["Area"]
-    PRF = total_product / total_watershed_area
     Gamma_n = None
     for index, PRFGamma_n_pair in enumerate(UHParametersPRFGammaN):
         if PRF < PRFGamma_n_pair["PRF"]:
             Gamma_n = UHParametersPRFGammaN[index-1]["Gamma_n"]+((PRFGamma_n_pair["Gamma_n"]-UHParametersPRFGammaN[index-1]["Gamma_n"])/(PRFGamma_n_pair["PRF"]-UHParametersPRFGammaN[index-1]["PRF"]
-))*(PRF-UHParametersPRFGammaN[index-1]["PRF"])
+    ))*(PRF-UHParametersPRFGammaN[index-1]["PRF"])
             break
-    return PRF, Gamma_n
+
+    return Gamma_n
 
 # Retrieve rainfall data from the NOAA Precipitation Frequency Data Server
 # https://hdsc.nws.noaa.gov/hdsc/pfds/pfds_map_cont.html?bkmrk=sc

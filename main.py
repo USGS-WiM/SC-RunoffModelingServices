@@ -367,13 +367,12 @@ def areaweightedCN(request_body: CurveNumberData, response: Response):
 def prfdata(request_body: PRF, response: Response):
 
     try: 
-        PRF, Gamma_n = PRFData(
+        PRF = PRFData(
             request_body.lat,
             request_body.lon
         )
         return {
-            "PRF": PRF,
-            "Gamma_n": Gamma_n
+            "PRF": PRF
         }
 
     except Exception as e:
