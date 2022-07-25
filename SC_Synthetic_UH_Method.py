@@ -1,5 +1,7 @@
 import requests
 import ast
+import numpy as np
+from Rainfall_Data_Curves import rainfall_data_curves
 
 # Extracts data from curve number GIS layer, then computes Runoff Weighted CN or Area Weighted CN
 # Corresponds to "Data for CN Determination" sheet in spreadsheet
@@ -270,3 +272,87 @@ def rainfallDistributionCurve(lat, lon):
     rainfall_distribution_curve_number = rainfall_distribution_curve_letter_number[rainfall_distribution_curve_letter]
 
     return rainfall_distribution_curve_letter, rainfall_distribution_curve_number
+
+def SCSyntheticUnitHydrograph(lat, lon, AEP, CNModificationMethod, Area, Tc, RainfallDistributionCurve, PRF, CN, S, Ia):
+    P10_1,P10_2,P10_3,P10_6,P10_12,P10_24,P25_1,P25_2,P25_3,P25_6,P25_12,P25_24,P50_1,P50_2,P50_3,P50_6,P50_12,P50_24,P100_1,P100_2,P100_3,P100_6,P100_12,P100_24,P2_24_1,P2_24_2,P2_24_5,P2_24_10,P2_24_25,P2_24_50,P2_24_100 = rainfallData(lat,lon)
+
+    if AEP == 10:
+        rainfall_depths = [P10_1,P10_2,P10_3,P10_6,P10_12,P10_24]
+    elif AEP == 4:
+        rainfall_depths = [P25_1,P25_2,P25_3,P25_6,P25_12,P25_24]
+    elif AEP == 2:
+        rainfall_depths = [P50_1,P50_2,P50_3,P50_6,P50_12,P50_24]
+    elif AEP == 1:
+        rainfall_depths = [P100_1,P100_2,P100_3,P100_6,P100_12,P100_24]
+
+    storm_duration = [1, 2, 3, 6, 12, 24]
+    
+
+    # Adjust CN when D < 24-hr
+    CN_adjusted_for_rainfall_duration = []
+    S_values = []
+    Ia_values = []
+    if CNModificationMethod == "McCuen":
+        for rainfall_depth, D in zip(rainfall_depths, storm_duration):
+            Gamma_D_hr = 10+0.00256*((98-CN)**(5.0/3.0))*(24-D)**0.5
+            S_D_hr = 1000.0 / CN - Gamma_D_hr
+            S_values.append(S_D_hr)
+            Ia_D_hr = 0.2 * S_D_hr
+            Q_CN_D_hr = ((rainfall_depth-0.2*S_D_hr)**2)/(rainfall_depth+0.8*S_D_hr)
+            CN_adjusted_for_rainfall_duration.append(Q_CN_D_hr)
+            Ia_values.append(0.2*(1000/Q_CN_D_hr-10))
+    elif CNModificationMethod == "Merkel":
+        for rainfall_depth, D in zip(rainfall_depths, storm_duration):
+            Gamma_D_hr = 10+0.00256*((98-CN)**(5.0/3.0))*(24-D)**0.5
+            S_D_hr = 1000.0 / CN - Gamma_D_hr
+            S_values.append(S_D_hr)
+            Q_CN_24_hr =((rainfall_depth-Ia)**2)/(rainfall_depth+0.8*S)
+            P_Ia_Q_CN = rainfall_depth - Ia - Q_CN_24_hr
+            Infiltration_Rate_24_hr = P_Ia_Q_CN / 24.0
+            Infiltration_1_hr = D * Infiltration_Rate_24_hr
+            Infiltration_1_hr_Plus_Ia = Infiltration_1_hr + Ia
+            Runoff_1_hr = rainfall_depth - Infiltration_1_hr_Plus_Ia
+            Q_CN_D_hr = 1000 / (10 + 5*rainfall_depth + 10*Runoff_1_hr - 10*(Runoff_1_hr**2 + 1.25*rainfall_depth*Runoff_1_hr)**0.5)
+            if Q_CN_D_hr < 0:
+                Q_CN_D_hr = 0
+            CN_adjusted_for_rainfall_duration.append(Q_CN_D_hr)
+            Ia_values.append(0.2*(1000/Q_CN_D_hr-10))
+
+    # P(t) Distribution
+    runoff_volume_Q_CN = []
+    Q_CN_t_values = []
+    burst_duration = 6 # minutes
+
+    for rainfall_depth, D, Ia_value, S_value in zip(rainfall_depths, storm_duration, Ia_values, S_values):
+        times = np.arange(0,(D*60)+burst_duration,burst_duration).tolist()
+        # print(times)
+        index = 0
+        for time in times:
+            P_P1 = rainfall_data_curves[RainfallDistributionCurve][D][index]
+            P_t = P_P1 * rainfall_depth
+            Numerator = max(P_t-Ia_value,0)
+            Q_CN_t = Numerator*Numerator/(P_t+0.8*S_value)
+            Q_CN_t_values.append(Q_CN_t)
+            index += 1
+    
+        # print("")
+        # print(Q_CN_t_values)
+        runoff_volume_Q_CN.append(Q_CN_t_values[-1])
+        Inc_QCN_values = []
+        index = 0
+        for Q_CN_t_value in Q_CN_t_values:
+            # print(Q_CN_t_value)
+            if index > 0:
+                Inc_QCN_values.append(Q_CN_t_value - Q_CN_t_values[index-1])
+            index += 1 
+        burst_increments = Inc_QCN_values
+
+    runoff_results_table = {
+        "storm_duration": storm_duration,
+        "rainfall_depth": rainfall_depths,
+        "CN_adjusted_for_rainfall_duration": CN_adjusted_for_rainfall_duration,
+        "runoff_volume_Q_CN": runoff_volume_Q_CN
+    }
+    # print(runoff_results_table)
+    # return runoff_results_table
+    return True
