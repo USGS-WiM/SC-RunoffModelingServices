@@ -35,8 +35,8 @@ app.add_middleware(
 class CurveNumber(BaseModel):
 
     # all fields are required
-    lat: float
-    lon: float
+    lat: float = Field(..., title="latitude", description="latitude coordinate of the drainage point (float)", example="33.3946")
+    lon: float = Field(..., title="longitude", description="longitude coordinate of the drainage point (float)", example="-80.3474")
 
     class Config:
         schema_extra = {
@@ -49,8 +49,8 @@ class CurveNumber(BaseModel):
 class CurveNumberData(BaseModel):
 
     # all fields are required
-    curveNumberData: list
-    P24hr: float
+    curveNumberData: list = Field(..., title="Curve Number Data", description="A list of dictionary elements with 'CN' (float) and 'Area' (float) for land uses that comprise the Curve Number calculation (list)")
+    P24hr: float = Field(..., title="24-hour Rainfall Depth", description="24-hour Rainfall Depth for the associated Annual Exceedance Probability (AEP), inches (float)", example="5.74")
 
     class Config:
         schema_extra = {
@@ -72,8 +72,8 @@ class CurveNumberData(BaseModel):
 class PRF(BaseModel):
 
     # all fields are required
-    lat: float
-    lon: float
+    lat: float = Field(..., title="latitude", description="latitude coordinate of the drainage point (float)", example="33.3946")
+    lon: float = Field(..., title="longitude", description="longitude coordinate of the drainage point (float)", example="-80.3474")
 
     class Config:
         schema_extra = {
@@ -86,8 +86,8 @@ class PRF(BaseModel):
 class RainfallData(BaseModel):
 
     # all fields are required
-    lat: float
-    lon: float
+    lat: float = Field(..., title="latitude", description="latitude coordinate of the drainage point (float)", example="33.3946")
+    lon: float = Field(..., title="longitude", description="longitude coordinate of the drainage point (float)", example="-80.3474")
 
     class Config:
         schema_extra = {
@@ -100,8 +100,8 @@ class RainfallData(BaseModel):
 class RainfallDistributionCurve(BaseModel):
 
     # all fields are required
-    lat: float
-    lon: float
+    lat: float = Field(..., title="latitude", description="latitude coordinate of the drainage point (float)", example="33.3946")
+    lon: float = Field(..., title="longitude", description="longitude coordinate of the drainage point (float)", example="-80.3474")
 
     class Config:
         schema_extra = {
