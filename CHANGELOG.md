@@ -11,10 +11,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - lagtimetc endpoint: computes Time of Concentration by the Lag Time Equation Method
 - traveltimetc endpoint: computes Time of Concentration by the Travel Time Method
-- curveNumberData endpoint: returns data for curve number determination (currently returns placeholder data)
-- PRF endpoint: returns PRF and gamma N value (currently returns placeholder PRF data)
-- runoffweightedCN endpoint: calculates runoff-weighted curve number
-- areaweightedCN endpoint: calculates area-weighted curve number
+- weightedcurvenumber endpoint: calculates area-weighted or runoff-weighted curve number data (currently contains placeholder raw curve number data)
+- PRF endpoint: returns Peak Rate Factor data (currently returns placeholder PRF data)
 ### Changed  
 
 -
