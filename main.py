@@ -37,38 +37,18 @@ class CurveNumber(BaseModel):
     # all fields are required
     lat: float = Field(..., title="latitude", description="latitude coordinate of the drainage point (float)", example="33.3946")
     lon: float = Field(..., title="longitude", description="longitude coordinate of the drainage point (float)", example="-80.3474")
+    P24hr: float = Field(..., title="24-hour rainfall depth", description="24-hour rainfall depth for the associated Annual Exceedance Probability (AEP), inches (float)", example="5.74")
+    weightingMethod: str = Field(..., title="weighting method", description="weighting method for Standard CN ('runoff' or 'area')", example="runoff")
 
     class Config:
         schema_extra = {
             "example": {
                 "lat": 33.3946,
-                "lon": -80.3474
+                "lon": -80.3474,
+                "P24hr": 5.74,
+                "weightingMethod": "runoff"
             }
         }
-
-class CurveNumberData(BaseModel):
-
-    # all fields are required
-    curveNumberData: list = Field(..., title="Curve Number Data", description="A list of dictionary elements with 'CN' (float) and 'Area' (float) for land uses that comprise the Curve Number calculation (list)")
-    P24hr: float = Field(..., title="24-hour Rainfall Depth", description="24-hour Rainfall Depth for the associated Annual Exceedance Probability (AEP), inches (float)", example="5.74")
-
-    class Config:
-        schema_extra = {
-            "example": {
-                "curveNumberData": [
-                    {
-                        "CN": 55,
-                        "Area": 50.0
-                    },
-                    {
-                        "CN": 78,
-                        "Area": 50.0
-                    }
-                ],
-                "P24hr": 5.74
-            }
-        }
-
 class PRF(BaseModel):
 
     # all fields are required
@@ -314,48 +294,18 @@ class TravelTimeMethodTimeOfConcentration(BaseModel):
 def docs_redirect_root():
     return RedirectResponse(url=app.docs_url)
 
-@app.post("/curvenumberdata/")
+@app.post("/weightedcurvenumber/")
 def curvenumberdata(request_body: CurveNumber, response: Response):
 
     try: 
-        cnData = curveNumberData(
+        runoff_weighted_CN, WS_retention_S, initial_abstraction_Ia = curveNumberData(
             request_body.lat,
-            request_body.lon
-        )
-        return {
-            "CN_Data": cnData,
-        }
-
-    except Exception as e:
-        raise HTTPException(status_code = 500, detail =  str(e))
-
-@app.post("/runoffweightedCN/")
-def runoffweightedCN(request_body: CurveNumberData, response: Response):
-
-    try: 
-        runoff_weighted_CN, WS_retention_S, initial_abstraction_Ia = runoffWeightedCN(
-            request_body.curveNumberData,
-            request_body.P24hr
+            request_body.lon,
+            request_body.P24hr,
+            request_body.weightingMethod
         )
         return {
             "CN": runoff_weighted_CN,
-            "S": WS_retention_S,
-            "Ia": initial_abstraction_Ia
-        }
-
-    except Exception as e:
-        raise HTTPException(status_code = 500, detail =  str(e))
-
-@app.post("/areaweightedCN/")
-def areaweightedCN(request_body: CurveNumberData, response: Response):
-
-    try: 
-        area_weighted_CN, WS_retention_S, initial_abstraction_Ia = areaWeightedCN(
-            request_body.curveNumberData,
-            request_body.P24hr
-        )
-        return {
-            "CN": area_weighted_CN,
             "S": WS_retention_S,
             "Ia": initial_abstraction_Ia
         }
