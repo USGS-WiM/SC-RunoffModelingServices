@@ -363,7 +363,7 @@ def areaweightedCN(request_body: CurveNumberData, response: Response):
     except Exception as e:
         raise HTTPException(status_code = 500, detail =  str(e))
 
-@app.post("/prfdata/")
+@app.post("/prf/")
 def prfdata(request_body: PRF, response: Response):
 
     try: 
