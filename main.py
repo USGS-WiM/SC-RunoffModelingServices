@@ -3,7 +3,7 @@ from fastapi.responses import RedirectResponse
 from starlette.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from SC_Synthetic_UH_Method import curveNumberData, runoffWeightedCN, areaWeightedCN, PRFData, rainfallData, rainfallDistributionCurve
+from SC_Synthetic_UH_Method import weightedCurveNumber, PRFData, rainfallData, rainfallDistributionCurve
 from Bohman_Method_1989 import computeRuralFloodHydrographBohman1989
 from Bohman_Method_1992 import getRI2, computeUrbanFloodHydrographBohman1992
 from Tc_Calculator import lagTimeMethodTimeOfConcentration, travelTimeMethodTimeOfConcentration
@@ -295,10 +295,10 @@ def docs_redirect_root():
     return RedirectResponse(url=app.docs_url)
 
 @app.post("/weightedcurvenumber/")
-def curvenumberdata(request_body: CurveNumber, response: Response):
+def weighted(request_body: CurveNumber, response: Response):
 
     try: 
-        runoff_weighted_CN, WS_retention_S, initial_abstraction_Ia = curveNumberData(
+        runoff_weighted_CN, WS_retention_S, initial_abstraction_Ia = weightedCurveNumber(
             request_body.lat,
             request_body.lon,
             request_body.P24hr,

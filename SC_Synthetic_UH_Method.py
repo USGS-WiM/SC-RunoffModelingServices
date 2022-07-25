@@ -3,9 +3,7 @@ import ast
 
 # Extracts data from curve number GIS layer, then computes Runoff Weighted CN or Area Weighted CN
 # Corresponds to "Data for CN Determination" sheet in spreadsheet
-# Corresponds to "Runoff Weighted CN Calculator" sheet in spreadsheet
-# Corresponds to "Area Weighted CN Calculator" sheet in spreadsheet
-def weightedCN(lat, lon, P24hr, weightingMethod):
+def weightedCurveNumber(lat, lon, P24hr, weightingMethod):
     # P24hr: 24-hour Rainfall Depth (P), in inches; comes from rainfallData function for corresponding AEP
     # weightingMethod: "runoff" or "area"
 
@@ -25,22 +23,6 @@ def weightedCN(lat, lon, P24hr, weightingMethod):
         return runoffWeightedCN(curveNumberData, P24hr)
     elif (weightingMethod == "area"):
         return areaWeightedCN(curveNumberData, P24hr)
-
-# Extracts data from curve number GIS layer 
-# Corresponds to "Data for CN Determination" sheet in spreadsheet
-def curveNumberData(lat, lon):
-    # Placeholder data-- waiting on GIS data to be published
-    curveNumberData = [
-        {
-            "CN": 55,
-            "Area": 50.0
-        },
-        {
-            "CN": 78,
-            "Area": 50.0
-        }
-    ]
-    return curveNumberData
 
 # Calculates Runoff Weighted Curve Number
 # Corresponds to "Runoff Weighted CN Calculator" sheet in spreadsheet
