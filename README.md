@@ -96,7 +96,7 @@ In the spirit of open source, please cite any re-use of the source code stored i
 
 ## Internal documentation
 
-Detailed internal documentation can be found in the [StreamStats guide](https://doimspp.sharepoint.com/sites/GS-UMidWIM/_layouts/OneNote.aspx?id=%2Fsites%2FGS-UMidWIM%2FShared%20Documents%2FProjects%2FStreamstats%20Ecosystem%2FKJ%27s%20Guide%20to%20StreamStats%201&wd=target%28Introduction.one%7CFA6D5C1D-D7FB-4D35-B339-992EF3438208%2FRunoff%20Modeling%20Services%7C3C3FF549-F709-4E55-B005-19903B30253B%2F%29.
+Detailed internal documentation can be found in the [StreamStats guide](https://doimspp.sharepoint.com/sites/GS-UMidWIM/_layouts/OneNote.aspx?id=%2Fsites%2FGS-UMidWIM%2FShared%20Documents%2FProjects%2FStreamstats%20Ecosystem%2FKJ%27s%20Guide%20to%20StreamStats%201&wd=target%28Introduction.one%7CFA6D5C1D-D7FB-4D35-B339-992EF3438208%2FRunoff%20Modeling%20Services%7C3C3FF549-F709-4E55-B005-19903B30253B%2F%29).
 
 ## About WIM
 
