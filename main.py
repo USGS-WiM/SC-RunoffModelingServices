@@ -3,7 +3,7 @@ from fastapi.responses import RedirectResponse
 from starlette.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from SC_Synthetic_UH_Method import curveNumberData, PRFData, rainfallData, rainfallDistributionCurve
+from SC_Synthetic_UH_Method import curveNumberData, runoffWeightedCN, areaWeightedCN, PRFData, rainfallData, rainfallDistributionCurve
 from Bohman_Method_1989 import computeRuralFloodHydrographBohman1989
 from Bohman_Method_1992 import getRI2, computeUrbanFloodHydrographBohman1992
 from Tc_Calculator import lagTimeMethodTimeOfConcentration, travelTimeMethodTimeOfConcentration
@@ -43,6 +43,29 @@ class CurveNumber(BaseModel):
             "example": {
                 "lat": 33.3946,
                 "lon": -80.3474
+            }
+        }
+
+class CurveNumberData(BaseModel):
+
+    # all fields are required
+    curveNumberData: list
+    P24hr: float
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "curveNumberData": [
+                    {
+                        "CN": 55,
+                        "Area": 50.0
+                    },
+                    {
+                        "CN": 78,
+                        "Area": 50.0
+                    }
+                ],
+                "P24hr": 5.74
             }
         }
 
@@ -306,6 +329,40 @@ def curvenumberdata(request_body: CurveNumber, response: Response):
     except Exception as e:
         raise HTTPException(status_code = 500, detail =  str(e))
 
+@app.post("/runoffweightedCN/")
+def runoffweightedCN(request_body: CurveNumberData, response: Response):
+
+    try: 
+        runoff_weighted_CN, WS_retention_S, initial_abstraction_Ia = runoffWeightedCN(
+            request_body.curveNumberData,
+            request_body.P24hr
+        )
+        return {
+            "CN": runoff_weighted_CN,
+            "S": WS_retention_S,
+            "Ia": initial_abstraction_Ia
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code = 500, detail =  str(e))
+
+@app.post("/areaweightedCN/")
+def areaweightedCN(request_body: CurveNumberData, response: Response):
+
+    try: 
+        area_weighted_CN, WS_retention_S, initial_abstraction_Ia = areaWeightedCN(
+            request_body.curveNumberData,
+            request_body.P24hr
+        )
+        return {
+            "CN": area_weighted_CN,
+            "S": WS_retention_S,
+            "Ia": initial_abstraction_Ia
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code = 500, detail =  str(e))
+
 @app.post("/prfdata/")
 def prfdata(request_body: PRF, response: Response):
 
@@ -316,7 +373,7 @@ def prfdata(request_body: PRF, response: Response):
         )
         return {
             "PRF": PRF,
-            "Gamma_n": Gamma_n,
+            "Gamma_n": Gamma_n
         }
 
     except Exception as e:

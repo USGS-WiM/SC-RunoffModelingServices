@@ -17,6 +17,64 @@ def curveNumberData(lat, lon):
     ]
     return curveNumberData
 
+# Calculates Runoff Weighted Curve Number
+# Corresponds to "Runoff Weighted CN Calculator" sheet in spreadsheet
+def runoffWeightedCN(curveNumberData, P24hr):
+    #curveNumberData (example): [
+    #     {
+    #         "CN": 55,
+    #         "Area": 50.0
+    #     },
+    #     {
+    #         "CN": 78,
+    #         "Area": 50.0
+    #     }
+    # ]
+    # P24hr: 24-hour Rainfall Depth (P), in inches; comes from rainfallData function for corresponding AEP
+
+    total_areaQCN24hr = 0.0 # Sum of Area * Q_CN
+    total_area = 0.0
+    for row in curveNumberData:
+        total_area += row["Area"]
+        S = 1000.0 / row["CN"] - 10 if row["CN"] > 0 else 0 # Watershed Retention
+        Ia = 0.2 * S # Initial Abstraction
+        QCN24hr = ((P24hr-Ia)**2)/(P24hr + 0.8 * S) if row["CN"] > 0 else 0 # 24-hr Q_CN
+        areaQCN24hr = row["Area"] * QCN24hr # Area * Q_CN
+        total_areaQCN24hr += areaQCN24hr 
+    Q_CN = total_areaQCN24hr / total_area # 24-hour Runoff Depth
+    runoff_weighted_CN = 1000.0 / (10 + 5*P24hr + 10*Q_CN - 10*(Q_CN**2 + 1.25*P24hr*Q_CN)**0.5) if 1000 / (10 + 5*P24hr + 10*Q_CN - 10*(Q_CN**2 + 1.25*P24hr*Q_CN)**0.5)>0 else 0
+    WS_retention_S = 1000.0 / runoff_weighted_CN - 10
+    initial_abstraction_Ia = 0.2 * WS_retention_S
+
+    return runoff_weighted_CN, WS_retention_S, initial_abstraction_Ia
+
+# Calculates Area Weighted Curve Number
+# Corresponds to "Area Weighted CN Calculator" sheet in spreadsheet
+def areaWeightedCN(curveNumberData, P24hr):
+    #curveNumberData (example): [
+    #     {
+    #         "CN": 55,
+    #         "Area": 50.0
+    #     },
+    #     {
+    #         "CN": 78,
+    #         "Area": 50.0
+    #     }
+    # ]
+    # P24hr: 24-hour Rainfall Depth (P), in inches; comes from rainfallData function for corresponding AEP
+
+    total_areaCN = 0.0 # Sum of Area * CN
+    total_area = 0.0
+    for row in curveNumberData:
+        total_area += row["Area"]
+        total_areaCN += row["Area"] * row["CN"] 
+    area_weighted_CN = total_areaCN / total_area
+    WS_retention_S = 1000.0 / area_weighted_CN - 10
+    initial_abstraction_Ia = 0.2 * WS_retention_S
+    Q_CN =((P24hr-initial_abstraction_Ia)**2)/(P24hr+0.8*WS_retention_S) # 24-hour Runoff Depth
+
+    return area_weighted_CN, WS_retention_S, initial_abstraction_Ia
+
 # Extracts data from PRF GIS layer 
 # Corresponds to "PRF Calculator" sheet in spreadsheet
 def PRFData(lat, lon):
