@@ -380,7 +380,7 @@ def prfdata(request_body: PRF, response: Response):
         raise HTTPException(status_code = 500, detail =  str(e))
 
 
-@app.post("/rainfalldata/")
+@app.post("/rainfall/")
 def rainfalldata(request_body: RainfallData, response: Response):
 
     try: 
