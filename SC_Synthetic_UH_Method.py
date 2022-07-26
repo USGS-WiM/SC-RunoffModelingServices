@@ -1,8 +1,54 @@
+from pyparsing import null_debug_action
 import requests
 import ast
 import numpy as np
 from Rainfall_Data_Curves import rainfall_data_curves
 import math
+from Tc_Calculator import lagTimeMethodTimeOfConcentration, travelTimeMethodTimeOfConcentration
+
+
+# Combines rainfallDistributionCurve, PRFData, weightedCurveNumber, and travelTimeMethodTimeOfConcentration or lagTimeMethodTimeOfConcentration (depending on TcMethod) into single function.
+def calcuateMissingParameters(lat, lon, curveNumberMethod, TcMethod=None, length=None, slope=None, dataSheetFlow=None, dataExcessSheetFlow=None, dataShallowConcentratedFlow=None, dataChannelizedFlowOpenChannel=None, dataChannelizedFlowStormSewer=None, dataChannelizedFlowStormSewerOrOpenChannelUserInputVelocity=None):
+    
+    # The endpoint will use the following functions:
+
+    # rainfallDistributionCurve - return rainfall_distribution_curve_letter, rainfall_distribution_curve_number
+    # travelTimeMethodTimeOfConcentration - return time_of_concentration, warningMessage
+    # lagTimeMethodTimeOfConcentration - return time_of_concentration
+    # PRFData - PRF
+    # weightedCurveNumber - return weighted_CN, WS_retention_S, initial_abstraction_Ia
+    
+
+    rainfall_distribution_curve = rainfallDistributionCurve(lat, lon) # Get from rainfallDistributionCurve function
+    rainfall_distribution_curve_letter = rainfall_distribution_curve[0]
+
+    if curveNumberMethod.lower() == "traveltime":
+        if all(v is not None for v in [dataSheetFlow, dataExcessSheetFlow, dataShallowConcentratedFlow, dataChannelizedFlowStormSewer, dataChannelizedFlowStormSewerOrOpenChannelUserInputVelocity]):
+            P2_24_2 = rainfallData(lat, lon)[25]
+            Tc = travelTimeMethodTimeOfConcentration(dataSheetFlow, dataExcessSheetFlow, P2_24_2,
+                                        dataShallowConcentratedFlow,
+                                        dataChannelizedFlowOpenChannel,
+                                        dataChannelizedFlowStormSewer,
+                                        dataChannelizedFlowStormSewerOrOpenChannelUserInputVelocity)
+        else:
+            raise Exception("Not all parameters for traveltime were entered.")
+    elif curveNumberMethod.lower() == "lagtime":
+        if all(v is not None for v in [length, slope]):
+            rainfall_distribution_curve_number = rainfall_distribution_curve[1]
+            Tc = lagTimeMethodTimeOfConcentration(length, slope, rainfall_distribution_curve_number)
+        else:
+            raise Exception("Not all parameters for lagtime were entered.")
+    else:
+        raise Exception("Not valid curveNumberMethod")
+
+    PRF = None # Get from PRFData function
+    CN = None
+    S = None 
+    la = None
+
+    #print(rainfall_distribution_curve_letter, Tc, PRF, CN, S, la)
+
+    return rainfall_distribution_curve_letter, Tc, PRF, CN, S, la
 
 # Extracts data from curve number GIS layer, then computes Runoff Weighted CN or Area Weighted CN
 # Corresponds to "Data for CN Determination" sheet in spreadsheet
