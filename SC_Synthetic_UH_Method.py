@@ -2,6 +2,7 @@ import requests
 import ast
 import numpy as np
 from Rainfall_Data_Curves import rainfall_data_curves
+import math
 
 # Extracts data from curve number GIS layer, then computes Runoff Weighted CN or Area Weighted CN
 # Corresponds to "Data for CN Determination" sheet in spreadsheet
@@ -323,6 +324,10 @@ def SCSyntheticUnitHydrograph(lat, lon, AEP, CNModificationMethod, Area, Tc, Rai
     Q_CN_t_values = []
     burst_duration = 6 # minutes
 
+    summations = []
+    peak_runoff_Qp = []
+    time_of_peak_runoff = [] 
+
     for rainfall_depth, D, Ia_value, S_value in zip(rainfall_depths, storm_duration, Ia_values, S_values):
         times = np.arange(0,(D*60)+burst_duration,burst_duration).tolist()
         # print(times)
@@ -345,14 +350,61 @@ def SCSyntheticUnitHydrograph(lat, lon, AEP, CNModificationMethod, Area, Tc, Rai
             if index > 0:
                 Inc_QCN_values.append(Q_CN_t_value - Q_CN_t_values[index-1])
             index += 1 
+
+        # Q_AEP_D-hour sheet
+        Gamma_n = gammaN(PRF)
+        AdjTc = burst_duration*(math.floor((Tc+burst_duration/2.0)/burst_duration))
+        UH_Tp = burst_duration*(math.floor((0.6*AdjTc+burst_duration)/burst_duration))
+        UH_Qp =(PRF*Area*60.0)/(UH_Tp*640.0)
         burst_increments = Inc_QCN_values
+        # print(burst_increments)
+        # print(burst_increments)
+        # print(burst_increments[0])
+        UH = []
+        times = np.arange(0,2*24*60,burst_duration).tolist()
+        for time in times:
+            UH.append(UH_Qp*((time/UH_Tp)*math.exp(1.0-time/UH_Tp))**(Gamma_n-1.0))
+        # print(UH)
+        bursts = []
+        number_of_bursts = D * 10
+        for number_burst in np.arange(number_of_bursts):
+            this_burst = []
+            for idx in np.arange(number_burst):
+                this_burst.append(0.0)
+            for UH_value in UH:
+                this_burst.append(UH_value * burst_increments[number_burst])
+            bursts.append(this_burst)
+        summation = [0.0] * len(times) 
+        index = 0
+        for time in times:
+            for burst in bursts:
+                summation[index] += burst[index]
+            index += 1 
+        summations.append(summation)
+        peak_runoff_Qp.append(max(summation))
+        index_max = np.argmax(summation)
+        time_of_peak_runoff.append(times[index_max])
+
+    print(peak_runoff_Qp)
+    print(time_of_peak_runoff)
 
     runoff_results_table = {
         "storm_duration": storm_duration,
         "rainfall_depth": rainfall_depths,
         "CN_adjusted_for_rainfall_duration": CN_adjusted_for_rainfall_duration,
-        "runoff_volume_Q_CN": runoff_volume_Q_CN
+        "runoff_volume_Q_CN": runoff_volume_Q_CN,
+        "peak_runoff_Qp": peak_runoff_Qp,
+        "time_of_peak_runoff": time_of_peak_runoff
     }
-    # print(runoff_results_table)
-    # return runoff_results_table
-    return True
+
+    hydrograph_ordinates_table = {
+        "time": np.arange(0,(2*24*60)+burst_duration,burst_duration).tolist(),
+        "flow_1_hour": summations[0],
+        "flow_2_hour": summations[1],
+        "flow_3_hour": summations[2],
+        "flow_6_hour": summations[3],
+        "flow_12_hour": summations[4],
+        "flow_24_hour": summations[5]
+    }
+
+    return runoff_results_table, hydrograph_ordinates_table
