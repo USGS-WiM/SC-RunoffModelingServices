@@ -288,7 +288,6 @@ def SCSyntheticUnitHydrograph(lat, lon, AEP, CNModificationMethod, Area, Tc, Rai
 
     storm_duration = [1, 2, 3, 6, 12, 24]
     
-
     # Adjust CN when D < 24-hr
     CN_adjusted_for_rainfall_duration = []
     S_values = []
@@ -298,7 +297,6 @@ def SCSyntheticUnitHydrograph(lat, lon, AEP, CNModificationMethod, Area, Tc, Rai
             Gamma_D_hr = 10+0.00256*((98-CN)**(5.0/3.0))*(24-D)**0.5
             S_D_hr = 1000.0 / CN - Gamma_D_hr
             S_values.append(S_D_hr)
-            Ia_D_hr = 0.2 * S_D_hr
             Q_CN_D_hr = ((rainfall_depth-0.2*S_D_hr)**2)/(rainfall_depth+0.8*S_D_hr)
             CN_adjusted_for_rainfall_duration.append(Q_CN_D_hr)
             Ia_values.append(0.2*(1000/Q_CN_D_hr-10))
@@ -321,7 +319,7 @@ def SCSyntheticUnitHydrograph(lat, lon, AEP, CNModificationMethod, Area, Tc, Rai
 
     # P(t) Distribution
     runoff_volume_Q_CN = []
-    burst_duration = 6 # minutes
+    burst_duration = 6
 
     summations = []
     peak_runoff_Qp = []
@@ -330,7 +328,6 @@ def SCSyntheticUnitHydrograph(lat, lon, AEP, CNModificationMethod, Area, Tc, Rai
     for rainfall_depth, D, Ia_value, S_value in zip(rainfall_depths, storm_duration, Ia_values, S_values):
         Q_CN_t_values = []
         times = np.arange(0,(D*60)+burst_duration,burst_duration).tolist()
-        # print(times)
         index = 0
         for time in times:
             P_P1 = rainfall_data_curves[RainfallDistributionCurve][D][index]
@@ -340,33 +337,23 @@ def SCSyntheticUnitHydrograph(lat, lon, AEP, CNModificationMethod, Area, Tc, Rai
             Q_CN_t_values.append(Q_CN_t)
             index += 1
     
-        # print("")
-        # print(Q_CN_t_values)
         runoff_volume_Q_CN.append(Q_CN_t_values[-1])
         Inc_QCN_values = []
         index = 0
         for Q_CN_t_value in Q_CN_t_values:
-            # print(Q_CN_t_value)
             if index > 0:
                 Inc_QCN_values.append(Q_CN_t_value - Q_CN_t_values[index-1])
             index += 1 
 
-        # if D == 1:
-        #     print(Inc_QCN_values)
-        # Q_AEP_D-hour sheet
         Gamma_n = gammaN(PRF)
         AdjTc = burst_duration*(math.floor((Tc+burst_duration/2.0)/burst_duration))
         UH_Tp = burst_duration*(math.floor((0.6*AdjTc+burst_duration)/burst_duration))
         UH_Qp =(PRF*Area*60.0)/(UH_Tp*640.0)
         burst_increments = Inc_QCN_values
-        # print(burst_increments)
-        # print(burst_increments)
-        # print(burst_increments[0])
         UH = []
         times = np.arange(0,2*24*60,burst_duration).tolist()
         for time in times:
             UH.append(UH_Qp*((time/UH_Tp)*math.exp(1.0-time/UH_Tp))**(Gamma_n-1.0))
-        # print(UH)
         bursts = []
         number_of_bursts = D * 10
         for number_burst in np.arange(number_of_bursts):
@@ -386,9 +373,36 @@ def SCSyntheticUnitHydrograph(lat, lon, AEP, CNModificationMethod, Area, Tc, Rai
         peak_runoff_Qp.append(max(summation))
         index_max = np.argmax(summation)
         time_of_peak_runoff.append(times[index_max])
+    
+    
+    index_max = np.argmax(runoff_volume_Q_CN)
+    max_runoff_volume = storm_duration[index_max]
 
-    # print(peak_runoff_Qp)
-    # print(time_of_peak_runoff)
+    index_max = np.argmax(peak_runoff_Qp)
+    max_peak_runoff = storm_duration[index_max]
+
+    watershed_data = {
+        "Latitude": lat,
+        "Longitude": lon,
+        "Area": Area,
+        "Tc": Tc,
+        "PRF": PRF,
+        "Standard CN": CN,
+        "Watershed Retention S": S,
+        "Initial Abstraction Ia": Ia
+    }
+
+    unit_hydrograph_data = {
+        "Annual Exceedance Probability (AEP)": AEP,
+        "Design Storm Return Period": np.floor(100 / AEP),
+        "Curve Number Modification Method": CNModificationMethod,
+        "Burst Duration": burst_duration,
+        "Gamma_n": Gamma_n,
+        "Lag time": 0.6 * Tc,
+        "Adjusted Tc": AdjTc,
+        "UH_Tp": UH_Tp,
+        "UH_Qp": UH_Qp
+    }
 
     runoff_results_table = {
         "storm_duration": storm_duration,
@@ -396,7 +410,9 @@ def SCSyntheticUnitHydrograph(lat, lon, AEP, CNModificationMethod, Area, Tc, Rai
         "CN_adjusted_for_rainfall_duration": CN_adjusted_for_rainfall_duration,
         "runoff_volume_Q_CN": runoff_volume_Q_CN,
         "peak_runoff_Qp": peak_runoff_Qp,
-        "time_of_peak_runoff": time_of_peak_runoff
+        "time_of_peak_runoff": time_of_peak_runoff,
+        "max_runoff_volume_storm_duration": max_runoff_volume,
+        "max_peak_runoff_storm_duration": max_peak_runoff
     }
 
     hydrograph_ordinates_table = {
@@ -409,4 +425,5 @@ def SCSyntheticUnitHydrograph(lat, lon, AEP, CNModificationMethod, Area, Tc, Rai
         "flow_24_hour": summations[5]
     }
 
-    return runoff_results_table, hydrograph_ordinates_table
+    # return runoff_results_table
+    return watershed_data, unit_hydrograph_data, runoff_results_table, hydrograph_ordinates_table
