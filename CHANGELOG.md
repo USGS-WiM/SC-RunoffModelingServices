@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - traveltimetc endpoint: computes Time of Concentration by the Travel Time Method
 - weightedcurvenumber endpoint: calculates area-weighted or runoff-weighted curve number data (currently contains placeholder raw curve number data)
 - PRF endpoint: returns Peak Rate Factor data (currently returns placeholder PRF data)
+- scsyntheticunithydrograph endpoint: computes SC Synthetic Unit Hydrograph data
 ### Changed  
 
 -
