@@ -321,7 +321,6 @@ def SCSyntheticUnitHydrograph(lat, lon, AEP, CNModificationMethod, Area, Tc, Rai
 
     # P(t) Distribution
     runoff_volume_Q_CN = []
-    Q_CN_t_values = []
     burst_duration = 6 # minutes
 
     summations = []
@@ -329,6 +328,7 @@ def SCSyntheticUnitHydrograph(lat, lon, AEP, CNModificationMethod, Area, Tc, Rai
     time_of_peak_runoff = [] 
 
     for rainfall_depth, D, Ia_value, S_value in zip(rainfall_depths, storm_duration, Ia_values, S_values):
+        Q_CN_t_values = []
         times = np.arange(0,(D*60)+burst_duration,burst_duration).tolist()
         # print(times)
         index = 0
@@ -351,6 +351,8 @@ def SCSyntheticUnitHydrograph(lat, lon, AEP, CNModificationMethod, Area, Tc, Rai
                 Inc_QCN_values.append(Q_CN_t_value - Q_CN_t_values[index-1])
             index += 1 
 
+        # if D == 1:
+        #     print(Inc_QCN_values)
         # Q_AEP_D-hour sheet
         Gamma_n = gammaN(PRF)
         AdjTc = burst_duration*(math.floor((Tc+burst_duration/2.0)/burst_duration))
@@ -385,8 +387,8 @@ def SCSyntheticUnitHydrograph(lat, lon, AEP, CNModificationMethod, Area, Tc, Rai
         index_max = np.argmax(summation)
         time_of_peak_runoff.append(times[index_max])
 
-    print(peak_runoff_Qp)
-    print(time_of_peak_runoff)
+    # print(peak_runoff_Qp)
+    # print(time_of_peak_runoff)
 
     runoff_results_table = {
         "storm_duration": storm_duration,
