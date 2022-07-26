@@ -3,7 +3,7 @@ from fastapi.responses import RedirectResponse
 from starlette.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from SC_Synthetic_UH_Method import weightedCurveNumber, PRFData, rainfallData, rainfallDistributionCurve
+from SC_Synthetic_UH_Method import weightedCurveNumber, PRFData, rainfallData, rainfallDistributionCurve, computeSCSyntheticUnitHydrograph
 from Bohman_Method_1989 import computeRuralFloodHydrographBohman1989
 from Bohman_Method_1992 import getRI2, computeUrbanFloodHydrographBohman1992
 from Tc_Calculator import lagTimeMethodTimeOfConcentration, travelTimeMethodTimeOfConcentration
@@ -282,6 +282,36 @@ class TravelTimeMethodTimeOfConcentration(BaseModel):
             }
         }
 
+class SCSyntheticUnitHydrograph(BaseModel):
+    lat: float = Field(..., title="latitude", description="latitude coordinate of the drainage point (float)", example="33.3946")
+    lon: float = Field(..., title="longitude", description="longitude coordinate of the drainage point (float)", example="-80.3474")
+    AEP: float = Field(..., title="Annual Exceedance Probability", description="Annual Exceedance Probability (%); options are 10, 4, 2, 1, which correspond to 10-yr, 25-yr, 50-yr, and 100-yr storms (int)", example="4")
+    CNModificationMethod: str = Field(..., title="Curve Number Modification Method", description="method used to modify the Curve Number; options are 'McCuen' or 'Merkel' (string)", example="Merkel")
+    Area: float = Field(..., title="Area", description="drainage area of delineated basin (float)", example="100.0")
+    Tc: float = Field(..., title="Time of Concentration", description="Time of Concentration as computed by Travel Time Method or Lag Time Equation (float)", example="64.5")
+    RainfallDistributionCurve: str = Field(..., title="Rainfall Distribution Curve", description="rainfall distribution curve letter; options are 'II', 'III', 'A', 'B', 'C', 'D' (string)", example="II")
+    PRF: float = Field(..., title="Peak Rate Factor (float)", description="", example="240")
+    CN: float = Field(..., title="Curve Number", description="weighted Curve Number (float)", example="67.3")
+    S: float = Field(..., title="Watershed Retention", description="watershed Retention, S (float)", example="4.86")
+    Ia: float = Field(..., title="Initial Abstraction", description="Initial Abstraction, Ia (float)", example="0.97")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "lat": 33.3946,
+                "lon": -80.3474,
+                "AEP": 4,
+                "CNModificationMethod": "Merkel",
+                "Area": 100.0,
+                "Tc": 64.5,
+                "RainfallDistributionCurve": "II",
+                "PRF": 240,
+                "CN": 67.3,
+                "S": 4.86,
+                "Ia": 0.97
+            }
+        }
+
 ######
 ##
 ## API Endpoints
@@ -494,6 +524,33 @@ def traveltimetc(request_body: TravelTimeMethodTimeOfConcentration, response: Re
             response.headers["Access-Control-Expose-Headers"] = "X-warning"
         return {
             "time_of_concentration": timeOfConcentration
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code = 500, detail =  str(e))
+
+@app.post("/scsyntheticunithydrograph/")
+def scsyntheticunithydrograph(request_body: SCSyntheticUnitHydrograph, response: Response):
+
+    try: 
+        watershed_data, unit_hydrograph_data, runoff_results_table, hydrograph_ordinates_table = computeSCSyntheticUnitHydrograph(
+            request_body.lat,
+            request_body.lon,
+            request_body.AEP,
+            request_body.CNModificationMethod,
+            request_body.Area,
+            request_body.Tc,
+            request_body.RainfallDistributionCurve,
+            request_body.PRF,
+            request_body.CN,
+            request_body.S,
+            request_body.Ia
+        )
+        return {
+            "watershed_data": watershed_data,
+            "unit_hydrograph_data": unit_hydrograph_data,
+            "runoff_results_table": runoff_results_table,
+            "hydrograph_ordinates_table": hydrograph_ordinates_table
         }
 
     except Exception as e:

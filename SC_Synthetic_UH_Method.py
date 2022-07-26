@@ -275,10 +275,10 @@ def rainfallDistributionCurve(lat, lon):
     return rainfall_distribution_curve_letter, rainfall_distribution_curve_number
 
 # Compute the South Carolina Synthetic Unit Hydrograph Method
-def SCSyntheticUnitHydrograph(lat, lon, AEP, CNModificationMethod, Area, Tc, RainfallDistributionCurve, PRF, CN, S, Ia):
+def computeSCSyntheticUnitHydrograph(lat, lon, AEP, CNModificationMethod, Area, Tc, RainfallDistributionCurve, PRF, CN, S, Ia):
     # lat: latitude of delineation point
     # lon: longitude of delineation point
-    # AEP: Annual Exceedance Probability (%): options are 10, 4, 2, 1, which correspond to 10-yr, 25-yr, 50-yr, and 100-yr Storms
+    # AEP: Annual Exceedance Probability (%): options are 10, 4, 2, 1, which correspond to 10-yr, 25-yr, 50-yr, and 100-yr storms
     # CNModificationMethod: modification method for Curve Number; options are "McCuen" or "Merkel"
     # Area: drainage area of delineated basin
     # Tc: Time of Concentration as computed by Travel Time Method or Lag Time Equation
