@@ -3,7 +3,7 @@ from fastapi.responses import RedirectResponse
 from starlette.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from SC_Synthetic_UH_Method import weightedCurveNumber, PRFData, rainfallData, rainfallDistributionCurve, computeSCSyntheticUnitHydrograph, calcuateMissingParameters
+from SC_Synthetic_UH_Method import weightedCurveNumber, PRFData, rainfallData, rainfallDistributionCurve, computeSCSyntheticUnitHydrograph, calculateMissingParameters
 from Bohman_Method_1989 import computeRuralFloodHydrographBohman1989
 from Bohman_Method_1992 import getRI2, computeUrbanFloodHydrographBohman1992
 from Tc_Calculator import lagTimeMethodTimeOfConcentration, travelTimeMethodTimeOfConcentration
@@ -309,7 +309,7 @@ class SCSyntheticUnitHydrograph(BaseModel):
             }
         }
 
-class CalcuateMissingParameters(BaseModel):
+class CalculateMissingParameters(BaseModel):
     lat: float = Field(..., title="latitude", description="latitude coordinate of the drainage point (float)", example="33.3946")
     lon: float = Field(..., title="longitude", description="longitude coordinate of the drainage point (float)", example="-80.3474")
     AEP: float = Field(..., title="Annual Exceedance Probability", description="Annual Exceedance Probability (%); options are 10, 4, 2, 1, which correspond to 10-yr, 25-yr, 50-yr, and 100-yr storms (int)", example="4")
@@ -688,11 +688,11 @@ def scsyntheticunithydrograph(request_body: SCSyntheticUnitHydrograph, response:
     except Exception as e:
         raise HTTPException(status_code = 500, detail =  str(e))
 
-@app.post("/calcuatemissingparameters/")
-def calcuatemissingparameters(request_body: CalcuateMissingParameters, response: Response):
+@app.post("/calculatemissingparameters/")
+def calculatemissingparameters(request_body: CalculateMissingParameters, response: Response):
 
     try: 
-        rainfall_distribution_curve_letter, Tc, PRF, CN, S, Ia = calcuateMissingParameters(
+        rainfall_distribution_curve_letter, Tc, PRF, CN, S, Ia = calculateMissingParameters(
             request_body.lat,
             request_body.lon,
             request_body.AEP,
