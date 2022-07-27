@@ -10,17 +10,16 @@ from Tc_Calculator import lagTimeMethodTimeOfConcentration, travelTimeMethodTime
 # Combines rainfallDistributionCurve, PRFData, weightedCurveNumber, and travelTimeMethodTimeOfConcentration or lagTimeMethodTimeOfConcentration (depending on TcMethod) into single function.
 def calcuateMissingParameters(lat, lon, AEP, curveNumberMethod, TcMethod, length=None, slope=None, dataSheetFlow=None, dataExcessSheetFlow=None, dataShallowConcentratedFlow=None, dataChannelizedFlowOpenChannel=None, dataChannelizedFlowStormSewer=None, dataChannelizedFlowStormSewerOrOpenChannelUserInputVelocity=None):
     # AEP: 10 - 10 year return period, 4 - 25 year return period, 2 - 50 year return period, 1 - 100 year return period
-    # curveNumberMethod
-    # TcMethod
-
-
-    # The endpoint will use the following functions:
-    # rainfallDistributionCurve - return rainfall_distribution_curve_letter
-    # travelTimeMethodTimeOfConcentration - return time_of_concentration, warningMessage
-    # lagTimeMethodTimeOfConcentration - return time_of_concentration
-    # PRFData - return PRF
-    # weightedCurveNumber - return weighted_CN, WS_retention_S, initial_abstraction_Ia
-    
+    # curveNumberMethod: "runoff" or "area"
+    # TcMethod: 'lagtime' or 'traveltime'
+    # length: flow path length in feet
+    # slope: flow path slope in %
+    # dataSheetFlow: data corresponding to Sheet Flow section for Travel Time Method
+    # dataExcessSheetFlow: data corresponding to Excess Sheet Flow section for Travel Time Method 
+    # dataShallowConcentratedFlow: data corresponding to Shallow Concentrated Flow section for Travel Time Method
+    # dataChannelizedFlowOpenChannel: data corresponding to Channelized Flow - Open Channel section for Travel Time Method
+    # dataChannelizedFlowStormSewer: data corresponding to Channelized Flow - Storm Sewer section for Travel Time Method
+    # dataChannelizedFlowStormSewerOrOpenChannelUserInputVelocity: data corresponding to Channelized Flow (Storm Sewer and/or Open Channel) - User Input Velocity section for Travel Time Method
 
     # Get Rainfall Distribution Curve letter
     rainfall_distribution_curve = rainfallDistributionCurve(lat, lon) # Get from rainfallDistributionCurve function
@@ -31,7 +30,7 @@ def calcuateMissingParameters(lat, lon, AEP, curveNumberMethod, TcMethod, length
 
     # Get Tc
     if TcMethod.lower() == "traveltime":
-        if all(v is not None for v in [dataSheetFlow, dataExcessSheetFlow, dataShallowConcentratedFlow, dataChannelizedFlowStormSewer, dataChannelizedFlowStormSewerOrOpenChannelUserInputVelocity]):
+        if all([dataSheetFlow, dataExcessSheetFlow, dataShallowConcentratedFlow, dataChannelizedFlowStormSewer, dataChannelizedFlowStormSewerOrOpenChannelUserInputVelocity]):
             P2_24_2 = rainfall_data[25]
             Tc = travelTimeMethodTimeOfConcentration(dataSheetFlow, dataExcessSheetFlow, P2_24_2,
                                         dataShallowConcentratedFlow,
@@ -41,7 +40,7 @@ def calcuateMissingParameters(lat, lon, AEP, curveNumberMethod, TcMethod, length
         else:
             raise Exception("Not all parameters for traveltime were entered.")
     elif TcMethod.lower() == "lagtime":
-        if all(v is not None for v in [length, slope]):
+        if all([length, slope]):
             rainfall_distribution_curve_number = rainfall_distribution_curve[1]
             Tc = lagTimeMethodTimeOfConcentration(length, slope, rainfall_distribution_curve_number)
         else:
