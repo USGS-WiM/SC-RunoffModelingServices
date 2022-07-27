@@ -8,23 +8,31 @@ from Tc_Calculator import lagTimeMethodTimeOfConcentration, travelTimeMethodTime
 
 
 # Combines rainfallDistributionCurve, PRFData, weightedCurveNumber, and travelTimeMethodTimeOfConcentration or lagTimeMethodTimeOfConcentration (depending on TcMethod) into single function.
-def calcuateMissingParameters(lat, lon, curveNumberMethod, TcMethod=None, length=None, slope=None, dataSheetFlow=None, dataExcessSheetFlow=None, dataShallowConcentratedFlow=None, dataChannelizedFlowOpenChannel=None, dataChannelizedFlowStormSewer=None, dataChannelizedFlowStormSewerOrOpenChannelUserInputVelocity=None):
-    
-    # The endpoint will use the following functions:
+def calcuateMissingParameters(lat, lon, AEP, curveNumberMethod, TcMethod, length=None, slope=None, dataSheetFlow=None, dataExcessSheetFlow=None, dataShallowConcentratedFlow=None, dataChannelizedFlowOpenChannel=None, dataChannelizedFlowStormSewer=None, dataChannelizedFlowStormSewerOrOpenChannelUserInputVelocity=None):
+    # AEP: 10 - 10 year return period, 4 - 25 year return period, 2 - 50 year return period, 1 - 100 year return period
+    # curveNumberMethod
+    # TcMethod
 
-    # rainfallDistributionCurve - return rainfall_distribution_curve_letter, rainfall_distribution_curve_number
+
+    # The endpoint will use the following functions:
+    # rainfallDistributionCurve - return rainfall_distribution_curve_letter
     # travelTimeMethodTimeOfConcentration - return time_of_concentration, warningMessage
     # lagTimeMethodTimeOfConcentration - return time_of_concentration
-    # PRFData - PRF
+    # PRFData - return PRF
     # weightedCurveNumber - return weighted_CN, WS_retention_S, initial_abstraction_Ia
     
 
+    # Get Rainfall Distribution Curve letter
     rainfall_distribution_curve = rainfallDistributionCurve(lat, lon) # Get from rainfallDistributionCurve function
     rainfall_distribution_curve_letter = rainfall_distribution_curve[0]
+    
+    # Get rainfallData
+    rainfall_data = rainfallData(lat, lon)
 
-    if curveNumberMethod.lower() == "traveltime":
+    # Get Tc
+    if TcMethod.lower() == "traveltime":
         if all(v is not None for v in [dataSheetFlow, dataExcessSheetFlow, dataShallowConcentratedFlow, dataChannelizedFlowStormSewer, dataChannelizedFlowStormSewerOrOpenChannelUserInputVelocity]):
-            P2_24_2 = rainfallData(lat, lon)[25]
+            P2_24_2 = rainfall_data[25]
             Tc = travelTimeMethodTimeOfConcentration(dataSheetFlow, dataExcessSheetFlow, P2_24_2,
                                         dataShallowConcentratedFlow,
                                         dataChannelizedFlowOpenChannel,
@@ -32,23 +40,32 @@ def calcuateMissingParameters(lat, lon, curveNumberMethod, TcMethod=None, length
                                         dataChannelizedFlowStormSewerOrOpenChannelUserInputVelocity)
         else:
             raise Exception("Not all parameters for traveltime were entered.")
-    elif curveNumberMethod.lower() == "lagtime":
+    elif TcMethod.lower() == "lagtime":
         if all(v is not None for v in [length, slope]):
             rainfall_distribution_curve_number = rainfall_distribution_curve[1]
             Tc = lagTimeMethodTimeOfConcentration(length, slope, rainfall_distribution_curve_number)
         else:
             raise Exception("Not all parameters for lagtime were entered.")
     else:
-        raise Exception("Not valid curveNumberMethod")
+        raise Exception("Time of concentration method not valid.")
+    
+    # Get PRF
+    PRF = PRFData (lat, lon)
+    
+    # Get Curve Number, S, Ia
+    if curveNumberMethod.lower() == "runoff" or curveNumberMethod.lower() == "area":
+        if AEP == 1 or AEP == 2 or AEP == 4 or AEP == 10:
+            if AEP == 1:  P24hr = rainfall_data[23]
+            if AEP == 2:  P24hr = rainfall_data[17]
+            if AEP == 4:  P24hr = rainfall_data[11]
+            if AEP == 10:  P24hr = rainfall_data[5]
+            CN, S, Ia = weightedCurveNumber(lat, lon, P24hr, curveNumberMethod)
+        else:
+            raise Exception("AEP not valid.")
+    else:
+        raise Exception("Curve number method not valid.")
 
-    PRF = None # Get from PRFData function
-    CN = None
-    S = None 
-    la = None
-
-    #print(rainfall_distribution_curve_letter, Tc, PRF, CN, S, la)
-
-    return rainfall_distribution_curve_letter, Tc, PRF, CN, S, la
+    return rainfall_distribution_curve_letter, Tc, PRF, CN, S, Ia
 
 # Extracts data from curve number GIS layer, then computes Runoff Weighted CN or Area Weighted CN
 # Corresponds to "Data for CN Determination" sheet in spreadsheet
