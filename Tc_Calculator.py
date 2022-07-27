@@ -184,7 +184,7 @@ def channelizedFlowOpenChannelTravelTime(data):
         length = channel["Length"]
         channel_bed_slope = channel["Channel Bed Slope"]
         manning_n_value = channel["Manning n-value"]
-        # wetted_perimeter = (math.sqrt(((channel_depth**2)+((channel_depth*front_slope)**2))))+(math.sqrt(((channel_depth**2)+((channel_depth*back_slope)^2))))+base_width # feet
+        wetted_perimeter = (math.sqrt(((channel_depth**2)+((channel_depth*front_slope)**2))))+(math.sqrt(((channel_depth**2)+((channel_depth*back_slope)**2))))+base_width # feet
         cross_sectional_area = ((0.5*channel_depth**2)*(front_slope+back_slope))+(base_width*channel_depth) # square feet
         stream_flow = (1.49/manning_n_value)*cross_sectional_area*((cross_sectional_area/(base_width+2*channel_depth*math.sqrt(1+front_slope*back_slope)))**(2/3))*math.sqrt(channel_bed_slope/100) # cubic feet per second
         velocity = stream_flow / cross_sectional_area # feet per second
