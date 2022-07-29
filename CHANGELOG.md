@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added 
 
--
+-  
 
 ### Changed  
 
@@ -30,7 +30,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Security  
 
 
+- 
 
+## [v0.2.0](https://github.com/USGS-WiM/SC-RunoffModelingServices/releases/tag/v0.2.0) - 2022-07-29
+### Added
+
+- lagtimetc endpoint: computes Time of Concentration by the Lag Time Equation Method
+- traveltimetc endpoint: computes Time of Concentration by the Travel Time Method
+- weightedcurvenumber endpoint: calculates area-weighted or runoff-weighted curve number data (currently contains placeholder raw curve number data)
+- PRF endpoint: returns Peak Rate Factor data (currently returns placeholder PRF data)
+- scsyntheticunithydrograph endpoint: computes SC Synthetic Unit Hydrograph data
+- calculateMissingParametersSCSUH endpoint: combines rainfallDistributionCurve, PRFData, weightedCurveNumber, and travelTimeMethodTimeOfConcentration or lagTimeMethodTimeOfConcentration (depending on TcMethod) into single function
+  
 ## [v0.1.1](https://github.com/USGS-WiM/SC-RunoffModelingServices/releases/tag/v0.1.1) - 2022-06-30
 ### Fixed  
 
