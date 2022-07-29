@@ -3,7 +3,7 @@
     "name": "SC-RunoffModelingServices",
     "organization": "U.S. Geological Survey",
     "description": "FastAPI Python services for South Carolina Runoff Modeling Services to support South Carolina StreamStats Phase II",
-    "version": "v0.1.1",
+    "version": "v0.2.0",
     "status": "Development",
 
     "permissions": {
