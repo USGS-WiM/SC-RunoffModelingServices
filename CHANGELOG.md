@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - weightedcurvenumber endpoint: calculates area-weighted or runoff-weighted curve number data (currently contains placeholder raw curve number data)
 - PRF endpoint: returns Peak Rate Factor data (currently returns placeholder PRF data)
 - scsyntheticunithydrograph endpoint: computes SC Synthetic Unit Hydrograph data
+- calculateMissingParametersSCSUH endpoint: combines rainfallDistributionCurve, PRFData, weightedCurveNumber, and travelTimeMethodTimeOfConcentration or lagTimeMethodTimeOfConcentration (depending on TcMethod) into single function
+
 ### Changed  
 
 -
