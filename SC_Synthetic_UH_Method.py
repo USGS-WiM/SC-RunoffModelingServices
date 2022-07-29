@@ -7,7 +7,7 @@ from Rainfall_Data_Curves import rainfall_data_curves
 
 
 # Combines rainfallDistributionCurve, PRFData, weightedCurveNumber, and travelTimeMethodTimeOfConcentration or lagTimeMethodTimeOfConcentration (depending on TcMethod) into single function.
-def calculateMissingParameters (lat, lon, AEP, curveNumberMethod, TcMethod, length=None, slope=None, dataSheetFlow=None, dataExcessSheetFlow=None, dataShallowConcentratedFlow=None, dataChannelizedFlowOpenChannel=None, dataChannelizedFlowStormSewer=None, dataChannelizedFlowStormSewerOrOpenChannelUserInputVelocity=None):
+def calculateMissingParametersSCSUH(lat, lon, AEP, curveNumberMethod, TcMethod, length=None, slope=None, dataSheetFlow=None, dataExcessSheetFlow=None, dataShallowConcentratedFlow=None, dataChannelizedFlowOpenChannel=None, dataChannelizedFlowStormSewer=None, dataChannelizedFlowStormSewerOrOpenChannelUserInputVelocity=None):
     # AEP: 10 - 10 year return period, 4 - 25 year return period, 2 - 50 year return period, 1 - 100 year return period
     # curveNumberMethod: "runoff" or "area"
     # TcMethod: 'lagtime' or 'traveltime'
@@ -36,12 +36,15 @@ def calculateMissingParameters (lat, lon, AEP, curveNumberMethod, TcMethod, leng
                                         dataChannelizedFlowOpenChannel,
                                         dataChannelizedFlowStormSewer,
                                         dataChannelizedFlowStormSewerOrOpenChannelUserInputVelocity)
+            Tc = {'value': Tc[0],'warningMessage': Tc[1] }
         else:
             raise Exception("Not all parameters for traveltime were entered.")
     elif TcMethod.lower() == "lagtime":
         if all([length, slope]):
             rainfall_distribution_curve_number = rainfall_distribution_curve[1]
             Tc = lagTimeMethodTimeOfConcentration(length, slope, rainfall_distribution_curve_number)
+            Tc = {'value': Tc,'warningMessage': None }
+
         else:
             raise Exception("Not all parameters for lagtime were entered.")
     else:
