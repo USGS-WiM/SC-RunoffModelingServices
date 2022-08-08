@@ -688,7 +688,7 @@ def scsyntheticunithydrograph(request_body: SCSyntheticUnitHydrograph, response:
     except Exception as e:
         raise HTTPException(status_code = 500, detail =  str(e))
 
-@app.post("/calculatemissingparametersSCSUH /")
+@app.post("/calculatemissingparametersSCSUH/")
 def calculatemissingparametersSCSUH(request_body: CalculateMissingParametersSCSUH, response: Response):
 
     try: 
