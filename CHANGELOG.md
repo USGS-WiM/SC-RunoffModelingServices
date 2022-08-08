@@ -30,7 +30,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Security  
 
 
-- 
+
+
+## [v0.2.1](https://github.com/USGS-WiM/SC-RunoffModelingServices/releases/tag/v0.2.1) - 2022-08-08
+
+### Fixed  
+
+- Removed blank space after "calculatemissingparametersSCSUH" endpoint name
 
 ## [v0.2.0](https://github.com/USGS-WiM/SC-RunoffModelingServices/releases/tag/v0.2.0) - 2022-07-29
 ### Added
