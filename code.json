@@ -16,7 +16,7 @@
       ]
     },
 
-    "homepageURL": "https://sc-runoffmodelingservices.streamstats.usgs.gov/docs",
+    "homepageURL": "https://streamstats.usgs.gov/local/scrunoffservices/docs",
     "downloadURL": "https://github.com/USGS-WiM/SC-RunoffModelingServices/archive/master.zip",
     "disclaimerURL": "https://github.com/USGS-WiM/SC-RunoffModelingServices/blob/master/DISCLAIMER%20(preliminary).md",
     "repositoryUrl": "https://github.com/USGS-WiM/SC-RunoffModelingServices",
