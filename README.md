@@ -2,7 +2,7 @@
 
 # South Carolina StreamStats Runoff Modeling Services
 
-This is the FastAPI setup of runoff modeling services for South Carolina StreamStats Phase II. These runoff modeling services will allow a user to compute hydrographs for the USGS SC Flood Hydrograph for Rural Watersheds, USGS SC Flood Hydrograph for Urban Watersheds, and SC Synthetic Unit Hydrograph. Service documentation for the `master` branch can be found at https://sc-runoffmodelingservices.streamstats.usgs.gov/docs.
+This is the FastAPI setup of runoff modeling services for South Carolina StreamStats Phase II. These runoff modeling services will allow a user to compute hydrographs for the USGS SC Flood Hydrograph for Rural Watersheds, USGS SC Flood Hydrograph for Urban Watersheds, and SC Synthetic Unit Hydrograph. Services for the `master` branch can be found at https://streamstats.usgs.gov/local/scrunoffservices and documentation can be found at https://streamstats.usgs.gov/local/scrunoffservices/docs.
 
 ## Getting Started
 
@@ -64,7 +64,7 @@ Once the above code has been run successfully, the service documentation will be
  4. Go to the app directory: `cd /var/www/SC-RunoffModelingServices`
  5. Pull the latest code: `sudo git pull origin master`
  6. Restart the daemon: `sudo systemctl restart SC-RunoffModelingServices`
- 7. Check that the services were updated: https://sc-runoffmodelingservices.streamstats.usgs.gov/docs
+ 7. Check that the services were updated: https://streamstats.usgs.gov/local/scrunoffservices/docs
  8. Exit when finished: `exit`
 
 ## Authors
