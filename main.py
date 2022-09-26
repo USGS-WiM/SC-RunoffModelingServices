@@ -642,7 +642,7 @@ def lagtimetc(request_body: LagTimeMethodTimeOfConcentration, response: Response
 def traveltimetc(request_body: TravelTimeMethodTimeOfConcentration, response: Response):
 
     try: 
-        timeOfConcentration, warningMessage = travelTimeMethodTimeOfConcentration(
+        timeOfConcentration = travelTimeMethodTimeOfConcentration(
             request_body.dataSheetFlow,
             request_body.dataExcessSheetFlow,
             request_body.P2_24_2,
@@ -651,9 +651,6 @@ def traveltimetc(request_body: TravelTimeMethodTimeOfConcentration, response: Re
             request_body.dataChannelizedFlowStormSewer,
             request_body.dataChannelizedFlowStormSewerOrOpenChannelUserInputVelocity
         )
-        if warningMessage is not None:
-            response.headers["X-warning"] = warningMessage
-            response.headers["Access-Control-Expose-Headers"] = "X-warning"
         return {
             "time_of_concentration": timeOfConcentration
         }

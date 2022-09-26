@@ -36,14 +36,14 @@ def calculateMissingParametersSCSUH(lat, lon, AEP, curveNumberMethod, TcMethod, 
                                         dataChannelizedFlowOpenChannel,
                                         dataChannelizedFlowStormSewer,
                                         dataChannelizedFlowStormSewerOrOpenChannelUserInputVelocity)
-            Tc = {'value': Tc[0],'warningMessage': Tc[1] }
+            Tc = {'value': Tc }
         else:
             raise Exception("Not all parameters for traveltime were entered.")
     elif TcMethod.lower() == "lagtime":
         if all([length, slope]):
             rainfall_distribution_curve_number = rainfall_distribution_curve[1]
             Tc = lagTimeMethodTimeOfConcentration(length, slope, rainfall_distribution_curve_number)
-            Tc = {'value': Tc,'warningMessage': None }
+            Tc = {'value': Tc }
 
         else:
             raise Exception("Not all parameters for lagtime were entered.")
