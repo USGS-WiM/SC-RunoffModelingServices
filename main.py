@@ -51,14 +51,21 @@ class CurveNumber(BaseModel):
 
 class PRF(BaseModel):
     # all fields are required
-    lat: float = Field(..., title="latitude", description="latitude coordinate of the drainage point (float)", example="33.3946")
-    lon: float = Field(..., title="longitude", description="longitude coordinate of the drainage point (float)", example="-80.3474")
+    prfData: list = Field(..., title="PRF Data", description="data corresponding to PRF values (list)")
 
     class Config:
         schema_extra = {
             "example": {
-                "lat": 33.3946,
-                "lon": -80.3474
+                "prfData":[
+                    {
+                        "PRF": 180,
+                        "Area": 50.0
+                    },
+                    {
+                        "PRF": 300,
+                        "Area": 50.0
+                    }
+                ]   
             }
         }
 
@@ -312,6 +319,7 @@ class SCSyntheticUnitHydrograph(BaseModel):
 class CalculateMissingParametersSCSUH(BaseModel):
     lat: float = Field(..., title="latitude", description="latitude coordinate of the drainage point (float)", example="33.3946")
     lon: float = Field(..., title="longitude", description="longitude coordinate of the drainage point (float)", example="-80.3474")
+    prfData: list = Field(..., title="PRF Data", description="data corresponding to PRF values (list)")
     AEP: float = Field(..., title="Annual Exceedance Probability", description="Annual Exceedance Probability (%); options are 10, 4, 2, 1, which correspond to 10-yr, 25-yr, 50-yr, and 100-yr storms (int)", example="4")
     curveNumberMethod: str = Field(..., title="weighting method", description="weighting method for Standard CN ('runoff' or 'area')", example="runoff")
     TcMethod: str = Field(default=None, title="time of concentration method", description="time of concentration ('lagtime' or 'traveltime')", example="traveltime")
@@ -329,6 +337,16 @@ class CalculateMissingParametersSCSUH(BaseModel):
             "example": {
                 "lat": 33.3946,
                 "lon": -80.3474,
+                "prfData":[
+                    {
+                        "PRF": 180,
+                        "Area": 50.0
+                    },
+                    {
+                        "PRF": 300,
+                        "Area": 50.0
+                    }
+                ],
                 "AEP": 4,
                 "curveNumberMethod": "runoff",
                 "TcMethod": "traveltime",
@@ -480,8 +498,7 @@ def prfdata(request_body: PRF, response: Response):
 
     try: 
         PRF = PRFData(
-            request_body.lat,
-            request_body.lon
+            request_body.prfData
         )
         return {
             "PRF": PRF
@@ -695,6 +712,7 @@ def calculatemissingparametersSCSUH(request_body: CalculateMissingParametersSCSU
         rainfall_distribution_curve_letter, Tc, PRF, CN, S, Ia = calculateMissingParametersSCSUH(
             request_body.lat,
             request_body.lon,
+            request_body.prfData,
             request_body.AEP,
             request_body.curveNumberMethod,
             request_body.TcMethod,        
