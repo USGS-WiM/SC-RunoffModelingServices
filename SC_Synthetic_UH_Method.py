@@ -7,7 +7,7 @@ from Rainfall_Data_Curves import rainfall_data_curves
 
 
 # Combines rainfallDistributionCurve, PRFData, weightedCurveNumber, and travelTimeMethodTimeOfConcentration or lagTimeMethodTimeOfConcentration (depending on TcMethod) into single function.
-def calculateMissingParametersSCSUH(lat, lon, AEP, curveNumberMethod, TcMethod, length=None, slope=None, dataSheetFlow=None, dataExcessSheetFlow=None, dataShallowConcentratedFlow=None, dataChannelizedFlowOpenChannel=None, dataChannelizedFlowStormSewer=None, dataChannelizedFlowStormSewerOrOpenChannelUserInputVelocity=None):
+def calculateMissingParametersSCSUH(lat, lon, prfData, AEP, curveNumberMethod, TcMethod, length=None, slope=None, dataSheetFlow=None, dataExcessSheetFlow=None, dataShallowConcentratedFlow=None, dataChannelizedFlowOpenChannel=None, dataChannelizedFlowStormSewer=None, dataChannelizedFlowStormSewerOrOpenChannelUserInputVelocity=None):
     # AEP: 10 - 10 year return period, 4 - 25 year return period, 2 - 50 year return period, 1 - 100 year return period
     # curveNumberMethod: "runoff" or "area"
     # TcMethod: 'lagtime' or 'traveltime'
@@ -51,7 +51,7 @@ def calculateMissingParametersSCSUH(lat, lon, AEP, curveNumberMethod, TcMethod, 
         raise Exception("Time of concentration method not valid.")
     
     # Get PRF
-    PRF = PRFData (lat, lon)
+    PRF = PRFData (prfData)
     
     # Get Curve Number, S, Ia
     if curveNumberMethod.lower() == "runoff" or curveNumberMethod.lower() == "area":
@@ -151,25 +151,12 @@ def areaWeightedCN(curveNumberData, P24hr):
 
 # Extracts data from PRF GIS layer 
 # Corresponds to "PRF Calculator" sheet in spreadsheet
-def PRFData(lat, lon):
-    
-
-    # Placeholder data-- waiting on GIS data to be published
-    PRFData = [
-        {
-            "PRF": 180,
-            "Area": 50.0
-        },
-        {
-            "PRF": 300,
-            "Area": 50.0
-        }
-    ]
+def PRFData(prfData):
 
     # Calculate Watershed PRF and Shape Parameter, n (also called Gamma_n)
     total_watershed_area = 0.0
     total_product = 0.0
-    for row in PRFData:
+    for row in prfData:
         total_watershed_area += row["Area"]
         total_product += row["PRF"] * row["Area"]
     PRF = total_product / total_watershed_area
