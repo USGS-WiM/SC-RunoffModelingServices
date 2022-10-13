@@ -10,8 +10,9 @@ from Tc_Calculator import lagTimeMethodTimeOfConcentration, travelTimeMethodTime
 
 app = FastAPI(
     title='SC Runoff Modeling Services',
-    openapi_url='/openapi.json',
-    docs_url='/docs'
+    root_path='/scrunoffservices'
+    #openapi_url='/openapi.json',
+    #docs_url='/docs'
 )
 
 app.add_middleware(
@@ -471,8 +472,10 @@ class CalculateMissingParametersSCSUH(BaseModel):
 
 # redirect root and /settings.SERVICE_NAME to the docs
 @app.get("/", include_in_schema=False)
-def docs_redirect_root():
-    return RedirectResponse(url=app.docs_url)
+#def docs_redirect_root():
+#    return RedirectResponse(url=app.docs_url)
+async def root():
+    return {"message": "Hello World"}
 
 @app.post("/weightedcurvenumber/")
 def weighted(request_body: CurveNumber, response: Response):
