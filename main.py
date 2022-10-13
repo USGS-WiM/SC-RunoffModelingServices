@@ -10,7 +10,7 @@ from Tc_Calculator import lagTimeMethodTimeOfConcentration, travelTimeMethodTime
 
 app = FastAPI(
     title='SC Runoff Modeling Services',
-    root_path='/scrunoffservices'
+    root_path='/local/scrunoffservices'
     #openapi_url='/openapi.json',
     #docs_url='/docs'
 )
