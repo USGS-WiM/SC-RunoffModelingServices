@@ -3,7 +3,7 @@
     "name": "SC-RunoffModelingServices",
     "organization": "U.S. Geological Survey",
     "description": "FastAPI Python services for South Carolina Runoff Modeling Services to support South Carolina StreamStats Phase II",
-    "version": "v0.2.1",
+    "version": "v0.3.0",
     "status": "Development",
 
     "permissions": {
@@ -16,7 +16,7 @@
       ]
     },
 
-    "homepageURL": "https://sc-runoffmodelingservices.streamstats.usgs.gov/docs",
+    "homepageURL": "https://streamstats.usgs.gov/local/scrunoffservices/docs",
     "downloadURL": "https://github.com/USGS-WiM/SC-RunoffModelingServices/archive/master.zip",
     "disclaimerURL": "https://github.com/USGS-WiM/SC-RunoffModelingServices/blob/master/DISCLAIMER%20(preliminary).md",
     "repositoryUrl": "https://github.com/USGS-WiM/SC-RunoffModelingServices",

@@ -248,9 +248,5 @@ def travelTimeMethodTimeOfConcentration(dataSheetFlow, dataExcessSheetFlow, P2_2
         channelizedFlowStormSewerTravelTime(dataChannelizedFlowStormSewer) + \
         channelizedFlowStormSewerOrOpenChannelUserInputVelocityTravelTime(dataChannelizedFlowStormSewerOrOpenChannelUserInputVelocity)
     
-    warningMessage = None
-    for shallowFlow in dataShallowConcentratedFlow:
-        if shallowFlow["Length"] > 1000:
-            warningMessage = "Guidance from the SC NRCS is to limit shallow concentrated flow to 1000 ft. except for areas of the sand hills with high infiltration sands without noticeable channels and in areas with rocky outcroppings or pavements that prevent the formation of channels."
-    return time_of_concentration, warningMessage
+    return time_of_concentration
 

@@ -11,9 +11,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 -  
 
-### Changed  
+# Changed
 
--
+- 
 
 ### Deprecated 
 
@@ -30,7 +30,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Security  
 
 
+## [v0.3.0](https://github.com/USGS-WiM/SC-RunoffModelingServices/releases/tag/v0.3.1) - 2022-10-11
 
+### Changed  
+
+- Service URL changed from https://sc-runoffmodelingservices.streamstats.usgs.gov/ to https://streamstats.usgs.gov/local/scrunoffservices
+- Changed PRF endpoint to take a list of PRF and Area inputs to calculate PRF value
+
+### Removed 
+
+- Removed warning messages from travelTimeMethodTimeOfConcentration
 
 ## [v0.2.1](https://github.com/USGS-WiM/SC-RunoffModelingServices/releases/tag/v0.2.1) - 2022-08-08
 
