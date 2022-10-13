@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 # Changed
 
-- 
+- Deployment instructions in README.md
 
 ### Deprecated 
 
@@ -25,7 +25,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed  
 
-- 
+- Options in main.py so application runs on server properly
 
 ### Security  
 

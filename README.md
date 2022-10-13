@@ -61,9 +61,9 @@ Once the above code has been run successfully, the service documentation will be
      - Connection type: SSH
      - In the sidebar, Connection > SSH > Auth: "Private key file for authentication:" click "Browse" to upload your private key file
      - Click "Open" to connect
- 4. Go to the app directory: `cd /var/www/SC-RunoffModelingServices`
+ 4. Go to the app directory: `cd 	/var/www/scrunoffservices/`
  5. Pull the latest code: `sudo git pull origin master`
- 6. Restart the daemon: `sudo systemctl restart SC-RunoffModelingServices`
+ 6. Restart the daemon: `sudo systemctl restart scrunoffservices`
  7. Check that the services were updated: https://streamstats.usgs.gov/local/scrunoffservices/docs
  8. Exit when finished: `exit`
 
