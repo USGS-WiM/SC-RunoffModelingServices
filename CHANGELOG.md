@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixed  
 
 - Options in main.py so application runs on server properly
+- Bug that caused return of incorrect number of flow values for SC Synthetic Unit Hydrograph
 
 ### Security  
 

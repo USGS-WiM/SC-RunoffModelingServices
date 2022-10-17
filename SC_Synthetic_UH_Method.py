@@ -425,7 +425,7 @@ def computeSCSyntheticUnitHydrograph(lat, lon, AEP, CNModificationMethod, Area, 
 
         # Compute unit hydrograph from the "Q[100/AEP]_[D]" sheets
         burst_increments = Inc_QCN_values
-        times = np.arange(0,2*24*60,burst_duration).tolist()
+        times = np.arange(0,(2*24*60)+burst_duration,burst_duration).tolist()
         UH = []
         for time in times:
             UH.append(UH_Qp*((time/UH_Tp)*math.exp(1.0-time/UH_Tp))**(Gamma_n-1.0))
