@@ -18,7 +18,9 @@ If any ScienceBase map services have not been published, you will need to use an
 
 ### Running locally
 
-Run the following in your Windows command prompt:
+To run the services locally, first change `root_path` in main.py to be equal to `root_path=''`.
+
+Then, run the following in your Windows command prompt:
 
 ```bash
 # create a virtual environment
@@ -50,6 +52,8 @@ uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 Once the above code has been run successfully, the service documentation will be available at http://127.0.0.1:8000/docs/.
+
+If an error such as "An attempt was made to access a socket in a way forbidden by its access permissions" occurs when running `uvicorn main:app --host 0.0.0.0 --port 8000`, try a different port number. For example, try port 7000: use this command `uvicorn main:app --host 0.0.0.0 --port 7000` and use this URL http://127.0.0.1:7000/docs/.
 
 ## Deployment
 
