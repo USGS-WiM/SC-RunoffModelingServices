@@ -29,7 +29,15 @@ def calculateMissingParametersSCSUH(lat, lon, prfData, AEP, curveNumberMethod, T
 
     # Get Tc
     if TcMethod.lower() == "traveltime":
-        if all([dataSheetFlow, dataExcessSheetFlow, dataShallowConcentratedFlow, dataChannelizedFlowStormSewer, dataChannelizedFlowStormSewerOrOpenChannelUserInputVelocity]):
+
+        dataSheetFlow = [] if dataSheetFlow is None else dataSheetFlow
+        dataExcessSheetFlow = [] if dataExcessSheetFlow is None else dataExcessSheetFlow
+        dataShallowConcentratedFlow = [] if dataShallowConcentratedFlow is None else dataShallowConcentratedFlow
+        dataChannelizedFlowOpenChannel = [] if dataChannelizedFlowOpenChannel is None else dataChannelizedFlowOpenChannel
+        dataChannelizedFlowStormSewer = [] if dataChannelizedFlowStormSewer is None else dataChannelizedFlowStormSewer
+        dataChannelizedFlowStormSewerOrOpenChannelUserInputVelocity = [] if dataChannelizedFlowStormSewerOrOpenChannelUserInputVelocity is None else dataChannelizedFlowStormSewerOrOpenChannelUserInputVelocity
+
+        if (len(dataSheetFlow) + len(dataExcessSheetFlow) + len(dataShallowConcentratedFlow) + len(dataChannelizedFlowStormSewer) + len(dataChannelizedFlowStormSewerOrOpenChannelUserInputVelocity)) > 0:
             P2_24_2 = rainfall_data[25]
             Tc = travelTimeMethodTimeOfConcentration(dataSheetFlow, dataExcessSheetFlow, P2_24_2,
                                         dataShallowConcentratedFlow,
@@ -38,7 +46,7 @@ def calculateMissingParametersSCSUH(lat, lon, prfData, AEP, curveNumberMethod, T
                                         dataChannelizedFlowStormSewerOrOpenChannelUserInputVelocity)
             Tc = {'value': Tc }
         else:
-            raise Exception("Not all parameters for traveltime were entered.")
+            raise Exception("At least one flow segment must be provided for the Travel Time method.")
     elif TcMethod.lower() == "lagtime":
         if all([length, slope]):
             rainfall_distribution_curve_number = rainfall_distribution_curve[1]
