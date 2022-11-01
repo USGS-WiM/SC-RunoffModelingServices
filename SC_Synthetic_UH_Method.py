@@ -244,7 +244,7 @@ def gammaN(PRF):
 def rainfallData(lat, lon):
 
     # Request data from NOAA
-    requestURL = "https://hdsc.nws.noaa.gov/cgi-bin/hdsc/new/cgi_readH5.py?lat={}&lon={}".format(lat, lon)
+    requestURL = "https://hdsc.nws.noaa.gov/cgi-bin/new/cgi_readH5.py?lat={}&lon={}".format(lat, lon)
     response = requests.get(requestURL)
     if response.status_code == 200:
         response_content = response.content.decode('utf-8')
@@ -315,7 +315,7 @@ def rainfallDistributionCurve(lat, lon):
     requestURL = "https://gis.streamstats.usgs.gov/arcgis/rest/services/runoffmodeling/SC_rainfallcurve/MapServer/0/query?geometry={}%2C{}&geometryType=esriGeometryPoint&returnGeometry=false&f=pjson".format(lon,lat)
     response = requests.get(requestURL)
     if response.status_code != 200:
-        raise Exception("Request to rainfall distribution curve map servivce failed")
+        raise Exception("Request to rainfall distribution curve map service failed")
 
     # Extract the NOAA rainfall distribution curve letter from the map service response
     response_content = response.json()
