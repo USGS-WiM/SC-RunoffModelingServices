@@ -244,7 +244,7 @@ def gammaN(PRF):
 def rainfallData(lat, lon):
 
     # Request data from NOAA
-    requestURL = "https://hdsc.nws.noaa.gov/cgi-bin/hdsc/new/cgi_readH5.py?lat={}&lon={}".format(lat, lon)
+    requestURL = "https://hdsc.nws.noaa.gov/cgi-bin/new/cgi_readH5.py?lat={}&lon={}".format(lat, lon)
     response = requests.get(requestURL)
     if response.status_code == 200:
         response_content = response.content.decode('utf-8')
