@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Deployment instructions in README.md
 - Allow just one flow segment for calculateMissingParametersSCSUH endpoint
+- Changed travel_time_sheet_flow equation to match newest spreadsheet
 
 ### Deprecated 
 

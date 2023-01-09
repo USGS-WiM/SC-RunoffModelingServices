@@ -126,7 +126,7 @@ def calculateSheetFlowTravelTime(dataSheetFlow, dataExcessSheetFlow, P2_24_2):
         else:
             corrected_length = surface["Length"] # feet
         total_corrected_length += corrected_length # feet
-        travel_time_sheet_flow += (0.42 / math.sqrt(P2_24_2)) * (mannings_n*corrected_length/math.sqrt((max(0.0001,surface["Overland Slope"])/100.0))**0.8) # minutes
+        travel_time_sheet_flow += (0.42 / math.sqrt(P2_24_2)) * ((mannings_n*corrected_length/math.sqrt((surface["Overland Slope"])/100.0))**0.8) # minutes
     for surface in dataExcessSheetFlow:
         length = max(0,total_length-total_corrected_length) # feet
         velocity_constant = shallowFlowTypesTable[surface["Surface"]]["Velocity Constant"]
