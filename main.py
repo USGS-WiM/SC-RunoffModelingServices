@@ -189,7 +189,7 @@ class TravelTimeMethodTimeOfConcentration(BaseModel):
                         {
                             "Surface": "Bermuda grass",
                             "Length": 33,
-                            "Overland Slope": 0.00,
+                            "Overland Slope": 0.000001,
                         }
                 ],
                 "dataExcessSheetFlow": [
