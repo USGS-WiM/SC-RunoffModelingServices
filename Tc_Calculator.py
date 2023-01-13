@@ -118,6 +118,8 @@ def calculateSheetFlowTravelTime(dataSheetFlow, dataExcessSheetFlow, P2_24_2):
     total_length = 0.0 # feet
     total_corrected_length = 0.0 # feet
     for surface in dataSheetFlow:
+        if surface["Overland Slope"] <= 0:
+           raise Exception("Overland Slope must be greater than 0.")
         mannings_n = sheetFlowSurfaceManningsNTable[surface["Surface"]]
         limit = (100.0*math.sqrt(surface["Overland Slope"]/100.0))/mannings_n # feet
         total_length += surface["Length"]

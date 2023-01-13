@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added 
 
--  
+-  Exception if user enters a value for Overland Slope that is less than or eqaul to 0
 
 # Changed
 
