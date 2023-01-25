@@ -5,6 +5,12 @@ import math
 from Tc_Calculator import lagTimeMethodTimeOfConcentration, travelTimeMethodTimeOfConcentration
 from Rainfall_Data_Curves import rainfall_data_curves
 
+# TODO update requirements.txt
+from rasterstats import zonal_stats
+import json
+import fiona
+from pathlib import Path
+
 
 # Combines rainfallDistributionCurve, PRFData, weightedCurveNumber, and travelTimeMethodTimeOfConcentration or lagTimeMethodTimeOfConcentration (depending on TcMethod) into single function.
 def calculateMissingParametersSCSUH(lat, lon, prfData, AEP, curveNumberMethod, TcMethod, length=None, slope=None, dataSheetFlow=None, dataExcessSheetFlow=None, dataShallowConcentratedFlow=None, dataChannelizedFlowOpenChannel=None, dataChannelizedFlowStormSewer=None, dataChannelizedFlowStormSewerOrOpenChannelUserInputVelocity=None):
@@ -78,21 +84,53 @@ def calculateMissingParametersSCSUH(lat, lon, prfData, AEP, curveNumberMethod, T
 
 # Extracts data from curve number GIS layer, then computes Runoff Weighted CN or Area Weighted CN
 # Corresponds to "Data for CN Determination" sheet in spreadsheet
-def weightedCurveNumber(lat, lon, P24hr, weightingMethod):
+def weightedCurveNumber(watershedFeatures, P24hr, weightingMethod):
+    # watershedFeatures: TODO!
     # P24hr: 24-hour Rainfall Depth (P), in inches; comes from rainfallData function for corresponding AEP
     # weightingMethod: "runoff" or "area"
 
-    # Placeholder data-- waiting on GIS data to be published
-    curveNumberData = [
-        {
-            "CN": 55,
-            "Area": 50.0
-        },
-        {
-            "CN": 78,
-            "Area": 50.0
-        }
-    ]
+    crs = {'proj': 'longlat', 'ellps': 'WGS84', 'datum': 'WGS84', 'no_defs': True}  # https://gis.stackexchange.com/questions/302851/creating-shapefile-file-with-fiona-and-geopandas
+    output_file = "temp/watershed.shp"
+
+    schema = {"geometry": "Polygon", "properties": {}}
+
+    with fiona.open(output_file, "w", driver="ESRI Shapefile", crs=crs, schema=schema) as shapefile:
+        for feature in watershedFeatures:
+            shapefile.write(feature)
+
+    curveNumberData = []
+
+    # TODO create temp folder if it doesn't already exist
+    # TODO refer to SC_RCN_LU_CO_p.tif remotely instead of locally:
+        # https://www.sciencebase.gov/catalog/item/6241fcc0d34e915b67eae16a
+        # https://www.sciencebase.gov/catalog/file/get/6241fcc0d34e915b67eae16a?f=__disk__22%2Fb3%2F89%2F22b3894be24b29e6e957c5985192d4bafaecbaa2
+        # https://github.com/usgs/sciencebasepy
+
+    # TODO consider removing the SC_RCN_LU_CO_p files that aren't .tif 
+    stats = zonal_stats("temp/watershed.shp", "assets/SC_RCN_LU_CO_p.tif", stats="unique", categorical=True)
+    for result in stats:
+        for curveNumber in result:
+            if (curveNumber != 'unique'):
+                curveNumberData.append({
+                    "CN": curveNumber,
+                    "Area": result[curveNumber] * 900.0 / 43560 # Convert number of 30 feet x 30 feet (900 sq feet) cells to total area in acres
+                })
+
+    # Old placeholder data-- waiting on GIS data to be published
+    # curveNumberData = [
+    #     {
+    #         "CN": 55,
+    #         "Area": 50.0
+    #     },
+    #     {
+    #         "CN": 78,
+    #         "Area": 50.0
+    #     }
+    # ]
+
+
+    # TODO confirm that curveNumberData is correct; consider changing projection of one of the GIS files (geojson or the CN file)
+    # print(curveNumberData)
 
     if weightingMethod == "runoff":
         weighted_CN = runoffWeightedCN(curveNumberData, P24hr)
@@ -101,6 +139,11 @@ def weightedCurveNumber(lat, lon, P24hr, weightingMethod):
 
     WS_retention_S = 1000.0 / weighted_CN - 10
     initial_abstraction_Ia = 0.2 * WS_retention_S
+
+    # Delete temporary files
+    [f.unlink() for f in Path("temp").glob("*") if f.is_file()] 
+
+    # TODO delete temp folder
 
     return weighted_CN, WS_retention_S, initial_abstraction_Ia
 
