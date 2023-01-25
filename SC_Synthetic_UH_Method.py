@@ -126,8 +126,6 @@ def weightedCurveNumber(watershedFeatures, P24hr, weightingMethod):
                     "Area": result[curveNumber] * 900.0 / 43560 # Convert number of 30 feet x 30 feet (900 sq feet) cells to total area in acres
                 })
 
-    # TODO confirm that curveNumberData is correct
-
     # Compute weighted Curve Number using requested method
     if weightingMethod == "runoff":
         weighted_CN = runoffWeightedCN(curveNumberData, P24hr)
