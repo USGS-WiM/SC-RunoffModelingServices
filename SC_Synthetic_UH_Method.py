@@ -1,19 +1,16 @@
-import requests
 import ast
-import numpy as np
+import fiona
+import geopandas
 import math
+import numpy as np
+import os
+import requests
+import sciencebasepy
+import shutil
 from Tc_Calculator import lagTimeMethodTimeOfConcentration, travelTimeMethodTimeOfConcentration
 from Rainfall_Data_Curves import rainfall_data_curves
-
-# TODO update requirements.txt
 from rasterstats import zonal_stats
-import json
-import fiona
-from pathlib import Path
-import os
-import shutil
-import sciencebasepy
-import geopandas
+
 
 
 # Combines rainfallDistributionCurve, PRFData, weightedCurveNumber, and travelTimeMethodTimeOfConcentration or lagTimeMethodTimeOfConcentration (depending on TcMethod) into single function.
