@@ -10,6 +10,10 @@ from rasterstats import zonal_stats
 import json
 import fiona
 from pathlib import Path
+import os
+import shutil
+import sciencebasepy
+import geopandas
 
 
 # Combines rainfallDistributionCurve, PRFData, weightedCurveNumber, and travelTimeMethodTimeOfConcentration or lagTimeMethodTimeOfConcentration (depending on TcMethod) into single function.
@@ -85,29 +89,35 @@ def calculateMissingParametersSCSUH(lat, lon, prfData, AEP, curveNumberMethod, T
 # Extracts data from curve number GIS layer, then computes Runoff Weighted CN or Area Weighted CN
 # Corresponds to "Data for CN Determination" sheet in spreadsheet
 def weightedCurveNumber(watershedFeatures, P24hr, weightingMethod):
-    # watershedFeatures: TODO!
+    # watershedFeatures: list of "features" of delineated watershed returned by StreamStatsServices
     # P24hr: 24-hour Rainfall Depth (P), in inches; comes from rainfallData function for corresponding AEP
     # weightingMethod: "runoff" or "area"
 
+    # Create a temporary directory
+    if not os.path.exists("temp"):
+        os.makedirs("temp")
+
+    # Save watershedFeatures as a shapefile
+    watershed_shapefile = "temp/watershed.shp"
     crs = {'proj': 'longlat', 'ellps': 'WGS84', 'datum': 'WGS84', 'no_defs': True}  # https://gis.stackexchange.com/questions/302851/creating-shapefile-file-with-fiona-and-geopandas
-    output_file = "temp/watershed.shp"
-
     schema = {"geometry": "Polygon", "properties": {}}
-
-    with fiona.open(output_file, "w", driver="ESRI Shapefile", crs=crs, schema=schema) as shapefile:
+    with fiona.open(watershed_shapefile, "w", driver="ESRI Shapefile", crs=crs, schema=schema) as shapefile:
         for feature in watershedFeatures:
             shapefile.write(feature)
 
+    # Reproject the shapefile to the same coordinate system as SC_RCN_LU_CO_p.tif (NAD_1983_StatePlane_South_Carolina_FIPS_3900_Feet_Intl; EPSG 2273)
+    watershed_shapefile_reprojected = geopandas.read_file(watershed_shapefile)
+    watershed_shapefile_reprojected = watershed_shapefile_reprojected.to_crs(epsg=2273)
+    watershed_shapefile_reprojected.to_file("temp/watershed_reproject.shp")
+
+    # Download SC_RCN_LU_CO_p.tif from ScienceBase: https://www.sciencebase.gov/catalog/item/6241fcc0d34e915b67eae16a
+    sb = sciencebasepy.SbSession()
+    item_json = sb.get_item('6241fcc0d34e915b67eae16a')
+    sb.get_item_files(item_json, "temp") 
+
+    # Compute zonal statistics for the Curve Number data that overlaps the reprojected watershed
     curveNumberData = []
-
-    # TODO create temp folder if it doesn't already exist
-    # TODO refer to SC_RCN_LU_CO_p.tif remotely instead of locally:
-        # https://www.sciencebase.gov/catalog/item/6241fcc0d34e915b67eae16a
-        # https://www.sciencebase.gov/catalog/file/get/6241fcc0d34e915b67eae16a?f=__disk__22%2Fb3%2F89%2F22b3894be24b29e6e957c5985192d4bafaecbaa2
-        # https://github.com/usgs/sciencebasepy
-
-    # TODO consider removing the SC_RCN_LU_CO_p files that aren't .tif 
-    stats = zonal_stats("temp/watershed.shp", "assets/SC_RCN_LU_CO_p.tif", stats="unique", categorical=True)
+    stats = zonal_stats("temp/watershed_reproject.shp", "temp/SC_RCN_LU_CO.tif", stats="unique", categorical=True)
     for result in stats:
         for curveNumber in result:
             if (curveNumber != 'unique'):
@@ -116,22 +126,9 @@ def weightedCurveNumber(watershedFeatures, P24hr, weightingMethod):
                     "Area": result[curveNumber] * 900.0 / 43560 # Convert number of 30 feet x 30 feet (900 sq feet) cells to total area in acres
                 })
 
-    # Old placeholder data-- waiting on GIS data to be published
-    # curveNumberData = [
-    #     {
-    #         "CN": 55,
-    #         "Area": 50.0
-    #     },
-    #     {
-    #         "CN": 78,
-    #         "Area": 50.0
-    #     }
-    # ]
+    # TODO confirm that curveNumberData is correct
 
-
-    # TODO confirm that curveNumberData is correct; consider changing projection of one of the GIS files (geojson or the CN file)
-    # print(curveNumberData)
-
+    # Compute weighted Curve Number using requested method
     if weightingMethod == "runoff":
         weighted_CN = runoffWeightedCN(curveNumberData, P24hr)
     elif (weightingMethod == "area"):
@@ -140,10 +137,8 @@ def weightedCurveNumber(watershedFeatures, P24hr, weightingMethod):
     WS_retention_S = 1000.0 / weighted_CN - 10
     initial_abstraction_Ia = 0.2 * WS_retention_S
 
-    # Delete temporary files
-    [f.unlink() for f in Path("temp").glob("*") if f.is_file()] 
-
-    # TODO delete temp folder
+    # Delete temp directory
+    shutil.rmtree("temp")
 
     return weighted_CN, WS_retention_S, initial_abstraction_Ia
 
