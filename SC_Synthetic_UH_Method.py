@@ -1,13 +1,21 @@
-import requests
 import ast
-import numpy as np
+import fiona
+import geopandas
 import math
+import numpy as np
+import os
+import requests
+import sciencebasepy
+import shutil
 from Tc_Calculator import lagTimeMethodTimeOfConcentration, travelTimeMethodTimeOfConcentration
 from Rainfall_Data_Curves import rainfall_data_curves
+from rasterstats import zonal_stats
+from pathlib import Path
 
 
 # Combines rainfallDistributionCurve, PRFData, weightedCurveNumber, and travelTimeMethodTimeOfConcentration or lagTimeMethodTimeOfConcentration (depending on TcMethod) into single function.
-def calculateMissingParametersSCSUH(lat, lon, prfData, AEP, curveNumberMethod, TcMethod, length=None, slope=None, dataSheetFlow=None, dataExcessSheetFlow=None, dataShallowConcentratedFlow=None, dataChannelizedFlowOpenChannel=None, dataChannelizedFlowStormSewer=None, dataChannelizedFlowStormSewerOrOpenChannelUserInputVelocity=None):
+def calculateMissingParametersSCSUH(lat, lon, watershedFeatures, prfData, AEP, curveNumberMethod, TcMethod, length=None, slope=None, dataSheetFlow=None, dataExcessSheetFlow=None, dataShallowConcentratedFlow=None, dataChannelizedFlowOpenChannel=None, dataChannelizedFlowStormSewer=None, dataChannelizedFlowStormSewerOrOpenChannelUserInputVelocity=None):
+    # watershedFeatures: list of "features" of delineated watershed returned by StreamStatsServices
     # AEP: 10 - 10 year return period, 4 - 25 year return period, 2 - 50 year return period, 1 - 100 year return period
     # curveNumberMethod: "runoff" or "area"
     # TcMethod: 'lagtime' or 'traveltime'
@@ -68,7 +76,7 @@ def calculateMissingParametersSCSUH(lat, lon, prfData, AEP, curveNumberMethod, T
             if AEP == 2:  P24hr = rainfall_data[17]
             if AEP == 4:  P24hr = rainfall_data[11]
             if AEP == 10:  P24hr = rainfall_data[5]
-            CN, S, Ia = weightedCurveNumber(lat, lon, P24hr, curveNumberMethod)
+            CN, S, Ia = weightedCurveNumber(watershedFeatures, P24hr, curveNumberMethod)
         else:
             raise Exception("AEP not valid.")
     else:
@@ -78,22 +86,55 @@ def calculateMissingParametersSCSUH(lat, lon, prfData, AEP, curveNumberMethod, T
 
 # Extracts data from curve number GIS layer, then computes Runoff Weighted CN or Area Weighted CN
 # Corresponds to "Data for CN Determination" sheet in spreadsheet
-def weightedCurveNumber(lat, lon, P24hr, weightingMethod):
+def weightedCurveNumber(watershedFeatures, P24hr, weightingMethod):
+    # watershedFeatures: list of "features" of delineated watershed returned by StreamStatsServices
     # P24hr: 24-hour Rainfall Depth (P), in inches; comes from rainfallData function for corresponding AEP
     # weightingMethod: "runoff" or "area"
 
-    # Placeholder data-- waiting on GIS data to be published
-    curveNumberData = [
-        {
-            "CN": 55,
-            "Area": 50.0
-        },
-        {
-            "CN": 78,
-            "Area": 50.0
-        }
-    ]
+    # Delete temp directory if it already exists
+    if os.path.exists("temp"):
+        shutil.rmtree("temp")
+    # Create empty temp directory 
+    os.makedirs("temp")
 
+    # Save watershedFeatures as a shapefile
+    watershed_shapefile = "temp/watershed.shp"
+    crs = {'proj': 'longlat', 'ellps': 'WGS84', 'datum': 'WGS84', 'no_defs': True}  # https://gis.stackexchange.com/questions/302851/creating-shapefile-file-with-fiona-and-geopandas
+    schema = {"geometry": "Polygon", "properties": {}}
+    with fiona.open(watershed_shapefile, "w", driver="ESRI Shapefile", crs=crs, schema=schema) as shapefile:
+        for feature in watershedFeatures:
+            shapefile.write(feature)
+
+    # Reproject the shapefile to the same coordinate system as SC_RCN_LU_CO_p.tif (NAD_1983_StatePlane_South_Carolina_FIPS_3900_Feet_Intl; EPSG 2273)
+    watershed_shapefile_reprojected = geopandas.read_file(watershed_shapefile)
+    watershed_shapefile_reprojected = watershed_shapefile_reprojected.to_crs(epsg=2273)
+    watershed_shapefile_reprojected.to_file("temp/watershed_reproject.shp")
+
+    ## Download the SC_RCN_LU_CO_p.tif file
+    # This file cannot be uploaded to the code repository due to large size 
+    # This file will be manually loaded to the FastAPI server
+    # Please download SC_RCN_LU_CO_p.tif to the /assets folder: https://www.sciencebase.gov/catalog/item/6241fcc0d34e915b67eae16a
+    # Or, run this code to download it programmatically: 
+
+    # sb = sciencebasepy.SbSession()
+    # sbFiles = sb.get_item('6241fcc0d34e915b67eae16a')
+    # sb.get_item_files(sbFiles, "assets") 
+    # os.remove("/assets/SC_RCN_LU_CO.tif-ColorRamp.SLD")
+    # os.remove("/assets/SC_RCN_LU.PNG")
+    # os.remove("/assets/SC_RCN.xml")
+
+    # Compute zonal statistics for the Curve Number data that overlaps the reprojected watershed
+    curveNumberData = []
+    stats = zonal_stats("temp/watershed_reproject.shp", "assets/SC_RCN_LU_CO.tif", stats="unique", categorical=True)
+    for result in stats:
+        for curveNumber in result:
+            if (curveNumber != 'unique'):
+                curveNumberData.append({
+                    "CN": curveNumber,
+                    "Area": result[curveNumber] * 900.0 / 43560 # Convert number of 30 feet x 30 feet (900 sq feet) cells to total area in acres
+                })
+
+    # Compute weighted Curve Number using requested method
     if weightingMethod == "runoff":
         weighted_CN = runoffWeightedCN(curveNumberData, P24hr)
     elif (weightingMethod == "area"):
@@ -101,6 +142,9 @@ def weightedCurveNumber(lat, lon, P24hr, weightingMethod):
 
     WS_retention_S = 1000.0 / weighted_CN - 10
     initial_abstraction_Ia = 0.2 * WS_retention_S
+
+    # Delete temp directory
+    shutil.rmtree("temp")
 
     return weighted_CN, WS_retention_S, initial_abstraction_Ia
 

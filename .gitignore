@@ -59,3 +59,9 @@ Thumbs.db
 
 # Secrets
 secrets.py
+
+# Temp files
+/temp
+
+# Large assets
+/assets/SC_RCN_LU_CO.tif
