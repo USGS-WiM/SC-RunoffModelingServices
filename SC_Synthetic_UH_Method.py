@@ -14,7 +14,8 @@ from pathlib import Path
 
 
 # Combines rainfallDistributionCurve, PRFData, weightedCurveNumber, and travelTimeMethodTimeOfConcentration or lagTimeMethodTimeOfConcentration (depending on TcMethod) into single function.
-def calculateMissingParametersSCSUH(lat, lon, prfData, AEP, curveNumberMethod, TcMethod, length=None, slope=None, dataSheetFlow=None, dataExcessSheetFlow=None, dataShallowConcentratedFlow=None, dataChannelizedFlowOpenChannel=None, dataChannelizedFlowStormSewer=None, dataChannelizedFlowStormSewerOrOpenChannelUserInputVelocity=None):
+def calculateMissingParametersSCSUH(lat, lon, watershedFeatures, prfData, AEP, curveNumberMethod, TcMethod, length=None, slope=None, dataSheetFlow=None, dataExcessSheetFlow=None, dataShallowConcentratedFlow=None, dataChannelizedFlowOpenChannel=None, dataChannelizedFlowStormSewer=None, dataChannelizedFlowStormSewerOrOpenChannelUserInputVelocity=None):
+    # watershedFeatures: list of "features" of delineated watershed returned by StreamStatsServices
     # AEP: 10 - 10 year return period, 4 - 25 year return period, 2 - 50 year return period, 1 - 100 year return period
     # curveNumberMethod: "runoff" or "area"
     # TcMethod: 'lagtime' or 'traveltime'
@@ -75,7 +76,7 @@ def calculateMissingParametersSCSUH(lat, lon, prfData, AEP, curveNumberMethod, T
             if AEP == 2:  P24hr = rainfall_data[17]
             if AEP == 4:  P24hr = rainfall_data[11]
             if AEP == 10:  P24hr = rainfall_data[5]
-            CN, S, Ia = weightedCurveNumber(lat, lon, P24hr, curveNumberMethod)
+            CN, S, Ia = weightedCurveNumber(watershedFeatures, P24hr, curveNumberMethod)
         else:
             raise Exception("AEP not valid.")
     else:
