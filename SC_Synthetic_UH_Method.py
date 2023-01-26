@@ -10,7 +10,7 @@ import shutil
 from Tc_Calculator import lagTimeMethodTimeOfConcentration, travelTimeMethodTimeOfConcentration
 from Rainfall_Data_Curves import rainfall_data_curves
 from rasterstats import zonal_stats
-
+from pathlib import Path
 
 
 # Combines rainfallDistributionCurve, PRFData, weightedCurveNumber, and travelTimeMethodTimeOfConcentration or lagTimeMethodTimeOfConcentration (depending on TcMethod) into single function.
@@ -90,9 +90,11 @@ def weightedCurveNumber(watershedFeatures, P24hr, weightingMethod):
     # P24hr: 24-hour Rainfall Depth (P), in inches; comes from rainfallData function for corresponding AEP
     # weightingMethod: "runoff" or "area"
 
-    # Create a temporary directory
-    if not os.path.exists("temp"):
-        os.makedirs("temp")
+    # Delete temp directory if it already exists
+    if os.path.exists("temp"):
+        shutil.rmtree("temp")
+    # Create empty temp directory 
+    os.makedirs("temp")
 
     # Save watershedFeatures as a shapefile
     watershed_shapefile = "temp/watershed.shp"
@@ -107,14 +109,22 @@ def weightedCurveNumber(watershedFeatures, P24hr, weightingMethod):
     watershed_shapefile_reprojected = watershed_shapefile_reprojected.to_crs(epsg=2273)
     watershed_shapefile_reprojected.to_file("temp/watershed_reproject.shp")
 
-    # Download SC_RCN_LU_CO_p.tif from ScienceBase: https://www.sciencebase.gov/catalog/item/6241fcc0d34e915b67eae16a
-    sb = sciencebasepy.SbSession()
-    item_json = sb.get_item('6241fcc0d34e915b67eae16a')
-    sb.get_item_files(item_json, "temp") 
+    ## Download the SC_RCN_LU_CO_p.tif file
+    # This file cannot be uploaded to GitHub due to large size 
+    # This file will be manually loaded to the FastAPI server
+    # Please download SC_RCN_LU_CO_p.tif to /assets folder: https://www.sciencebase.gov/catalog/item/6241fcc0d34e915b67eae16a
+    # Or, run this code to download it programmatically: 
+
+    # sb = sciencebasepy.SbSession()
+    # sbFiles = sb.get_item('6241fcc0d34e915b67eae16a')
+    # sb.get_item_files(sbFiles, "assets") 
+    # os.remove("/assets/SC_RCN_LU_CO.tif-ColorRamp.SLD")
+    # os.remove("/assets/SC_RCN_LU.PNG")
+    # os.remove("/assets/SC_RCN.xml")
 
     # Compute zonal statistics for the Curve Number data that overlaps the reprojected watershed
     curveNumberData = []
-    stats = zonal_stats("temp/watershed_reproject.shp", "temp/SC_RCN_LU_CO.tif", stats="unique", categorical=True)
+    stats = zonal_stats("temp/watershed_reproject.shp", "assets/SC_RCN_LU_CO.tif", stats="unique", categorical=True)
     for result in stats:
         for curveNumber in result:
             if (curveNumber != 'unique'):
