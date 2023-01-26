@@ -11,10 +11,9 @@ These instructions will get you a copy of the project up and running on your loc
 ### Prerequisites
 
 - Python 3
+### Assets file
 
-### Secrets file
-
-If any ScienceBase map services have not been published, you will need to use and update a secrets file to access these files. [Download the file here](https://doimspp.sharepoint.com/:u:/r/sites/GS-UMidWIM/Shared%20Documents/Projects/Streamstats%20Ecosystem/South%20Carolina%20Customizations/secrets.py?csf=1&web=1&e=N5bf8W) and follow the instructions in the file. 
+To run the `weightedcurvenumber` endpoint, you must download SC_RCN_LU_CO_p.tif to the /assets folder. You can download the file from https://www.sciencebase.gov/catalog/item/6241fcc0d34e915b67eae16a or use the programmatic instructions in [SC_Synthetic_UH_Method.py](SC_Synthetic_UH_Method.py). 
 
 ### Running locally
 

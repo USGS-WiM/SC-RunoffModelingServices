@@ -112,7 +112,7 @@ def weightedCurveNumber(watershedFeatures, P24hr, weightingMethod):
     ## Download the SC_RCN_LU_CO_p.tif file
     # This file cannot be uploaded to the code repository due to large size 
     # This file will be manually loaded to the FastAPI server
-    # Please download SC_RCN_LU_CO_p.tif to /assets folder: https://www.sciencebase.gov/catalog/item/6241fcc0d34e915b67eae16a
+    # Please download SC_RCN_LU_CO_p.tif to the /assets folder: https://www.sciencebase.gov/catalog/item/6241fcc0d34e915b67eae16a
     # Or, run this code to download it programmatically: 
 
     # sb = sciencebasepy.SbSession()
