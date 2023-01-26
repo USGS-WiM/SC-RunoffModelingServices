@@ -35,7 +35,6 @@ app.add_middleware(
 # These schemas provide format and data type validation
 #  of request body inputs, and automated API documentation
 
-## TODO make sure the changes to the CurveNumber class didn't mess anything else up
 class CurveNumber(BaseModel):
     # all fields are required
     watershedFeatures: list = Field(..., title="watershed features", description="list of features of delineated watershed returned by StreamStatsServices")
