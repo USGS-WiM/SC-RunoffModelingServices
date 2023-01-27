@@ -58,7 +58,7 @@ def computeUrbanFloodHydrographBohman1992(lat, lon, region3PercentArea, region4P
 
     # Check that Region_3_Urban_2014_5030 or Region_4_Urban_2014_5030 has some area
     if region3PercentArea + region4PercentArea == 0:
-        raise Exception("No area in Region_3_Urban_2014_5030 or Region_4_Urban_2014_5030.")
+        raise Exception("No area in SC_Bohman_1992_Piedmont_Upper_Coastal_Plain or SC_Bohman_1992_Lower_Coastal_Plain.")
 
     # Calculate the fraction area of each region
     region3FractionArea = region3PercentArea / 100.0
