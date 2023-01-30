@@ -31,10 +31,9 @@ def getRI2(lat, lon):
 # Report: https://doi.org/10.3133/wri924040
 def computeUrbanFloodHydrographBohman1992(lat, lon, region3PercentArea, region4PercentArea, Qp, A, L, S, TIA):
     # lat, lon: coordinates of the drainage point (float)
-    # region3PercentArea: percent area of the basin that is in Region_3_Urban_2014_5030: Piedmont-upper Coastal Plain (%, float)
-    # region4PercentArea: percent area of the basin that is in Region_4_Urban_2014_5030: lower Coastal Plain (%, float)
-    # region3Qp: flow statistic for the AEP of interest (ex. "UPK50AEP") in Region_3_Urban_2014_5030 (cubic feet per second, float)
-    # region4Qp: flow statistic for the AEP of interest (ex. "UPK50AEP") in Region_4_Urban_2014_5030 (cubic feet per second, float)
+    # region3PercentArea: percent area of the basin that is in SC_Bohman_1992_Piedmont_Upper_Coastal_Plain (GC1938): Piedmont-upper Coastal Plain (%, float)
+    # region4PercentArea: percent area of the basin that is in SC_Bohman_1992_Lower_Coastal_Plain (GC1937): lower Coastal Plain (%, float)
+    # Qp: area-weighted flow statistic for the AEP of interest (cubic feet per second, float)
     # A: drainage area (square miles, float)
     # L: main channel length (miles, float)
     # S: main channel slope (feet per mile, float)
