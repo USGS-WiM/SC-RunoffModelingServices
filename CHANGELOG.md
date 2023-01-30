@@ -18,7 +18,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - travel_time_sheet_flow equation to match newest spreadsheet
 - traveltimetc example request
 - weightedCurveNumber function now processes published Curve Number data
-- computeUrbanFloodHydrographBohman1992 now intakes a weighted Qp value instead of region3Qp and region4Qp
 
 ### Deprecated 
 

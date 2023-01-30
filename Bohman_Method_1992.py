@@ -29,11 +29,12 @@ def getRI2(lat, lon):
 
 # Compute flood hydrographs for urban watersheds based on the Bohman 1992 method
 # Report: https://doi.org/10.3133/wri924040
-def computeUrbanFloodHydrographBohman1992(lat, lon, region3PercentArea, region4PercentArea, Qp, A, L, S, TIA):
+def computeUrbanFloodHydrographBohman1992(lat, lon, region3PercentArea, region4PercentArea, region3Qp, region4Qp, A, L, S, TIA):
     # lat, lon: coordinates of the drainage point (float)
-    # region3PercentArea: percent area of the basin that is in SC_Bohman_1992_Piedmont_Upper_Coastal_Plain (GC1938): Piedmont-upper Coastal Plain (%, float)
-    # region4PercentArea: percent area of the basin that is in SC_Bohman_1992_Lower_Coastal_Plain (GC1937): lower Coastal Plain (%, float)
-    # Qp: area-weighted flow statistic for the AEP of interest (cubic feet per second, float)
+    # region3PercentArea: percent area of the basin that is in Region_3_Urban_2014_5030: Piedmont-upper Coastal Plain (%, float)
+    # region4PercentArea: percent area of the basin that is in Region_4_Urban_2014_5030: lower Coastal Plain (%, float)
+    # region3Qp: flow statistic for the AEP of interest (ex. "UPK50AEP") in Region_3_Urban_2014_5030 (cubic feet per second, float)
+    # region4Qp: flow statistic for the AEP of interest (ex. "UPK50AEP") in Region_4_Urban_2014_5030 (cubic feet per second, float)
     # A: drainage area (square miles, float)
     # L: main channel length (miles, float)
     # S: main channel slope (feet per mile, float)
@@ -58,7 +59,7 @@ def computeUrbanFloodHydrographBohman1992(lat, lon, region3PercentArea, region4P
 
     # Check that Region_3_Urban_2014_5030 or Region_4_Urban_2014_5030 has some area
     if region3PercentArea + region4PercentArea == 0:
-        raise Exception("No area in SC_Bohman_1992_Piedmont_Upper_Coastal_Plain or SC_Bohman_1992_Lower_Coastal_Plain.")
+        raise Exception("No area in Region_3_Urban_2014_5030 or Region_4_Urban_2014_5030.")
 
     # Calculate the fraction area of each region
     region3FractionArea = region3PercentArea / 100.0
@@ -66,13 +67,14 @@ def computeUrbanFloodHydrographBohman1992(lat, lon, region3PercentArea, region4P
 
     RI2 = getRI2(lat, lon) # 2-year 2-hour rainfall amount (%)
     LT = 20.2 * ((L/S**0.5)**0.623) * (TIA ** -0.919) * (RI2 ** 1.129) # Average basin lag time (hours), Equation 5
+    weightedQp = (region3Qp * region3FractionArea) + (region4Qp * region4FractionArea) # Weighted peak flow (cubic feet per second)
 
-    region3VR = 0.001525 * (A ** -1.038) * (Qp ** 1.013) * (LT ** 1.030) # Average runoff volume (inches), Equation 6
-    region4VR = 0.001648 * (A ** -1.038) * (Qp ** 1.013) * (LT ** 1.030) # Average runoff volume (inches), Equation 7
+    region3VR = 0.001525 * (A ** -1.038) * (weightedQp ** 1.013) * (LT ** 1.030) # Average runoff volume (inches), Equation 6
+    region4VR = 0.001648 * (A ** -1.038) * (weightedQp ** 1.013) * (LT ** 1.030) # Average runoff volume (inches), Equation 7
     weightedVR = (region3VR * region3FractionArea) + (region4VR * region4FractionArea) # Weighted average runoff volume for an urban basin (inches)
     
-    region3F = 0.967 * (A ** -0.038) * (Qp ** 0.013) * (LT ** 0.030) # Lag-time correction factor, Equation 10
-    region4F = 0.934 * (A ** -0.038) * (Qp ** 0.013) * (LT ** 0.030) # Lag-time correction factor, Equation 11
+    region3F = 0.967 * (A ** -0.038) * (weightedQp ** 0.013) * (LT ** 0.030) # Lag-time correction factor, Equation 10
+    region4F = 0.934 * (A ** -0.038) * (weightedQp ** 0.013) * (LT ** 0.030) # Lag-time correction factor, Equation 11
     weightedF = (region3F * region3FractionArea) + (region4F * region4FractionArea) # Weighted lag-time correction factor
 
     LTA = weightedF * LT # Adjusted lag time
@@ -116,7 +118,7 @@ def computeUrbanFloodHydrographBohman1992(lat, lon, region3PercentArea, region4P
 
     # Calculate coordinates for the urban flood hydrograph
     timeCoordinates = timeRatio * LTA
-    dischargeCoordinates = dischargeRatio * Qp
+    dischargeCoordinates = dischargeRatio * weightedQp
 
     # Show the scatter plot of the rural flood hydrograph (for testing)
     # plt.scatter(timeCoordinates, dischargeCoordinates)
@@ -132,7 +134,7 @@ def computeUrbanFloodHydrographBohman1992(lat, lon, region3PercentArea, region4P
     warningMessageVR = "One or more of the parameters is outside the suggested range; runoff volume was estimated with unknown errors. "
     if A < 0.18 or A > 9.05:
         warningMessageVREnabled = True
-    if Qp < 33.1 or Qp > 1144:
+    if weightedQp < 33.1 or weightedQp > 1144:
         warningMessageVREnabled = True
     if LT < 0.27 or LT > 3.10:
         warningMessageVREnabled = True
