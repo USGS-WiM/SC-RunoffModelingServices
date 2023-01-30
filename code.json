@@ -3,7 +3,7 @@
     "name": "SC-RunoffModelingServices",
     "organization": "U.S. Geological Survey",
     "description": "FastAPI Python services for South Carolina Runoff Modeling Services to support South Carolina StreamStats Phase II",
-    "version": "v0.3.0",
+    "version": "0.3.0",
     "status": "Development",
 
     "permissions": {
@@ -22,7 +22,7 @@
     "repositoryUrl": "https://github.com/USGS-WiM/SC-RunoffModelingServices",
     "vcs": "git",
 
-    "laborHours": null,
+    "laborHours": 0,
 
     "tags": [
       "service",
@@ -39,7 +39,7 @@
     },
 
     "date": {
-      "metadataLastUpdated": "2022-06-29"
+      "metadataLastUpdated": "2023-01-27"
     }
   }
 ]

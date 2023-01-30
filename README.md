@@ -11,10 +11,6 @@ These instructions will get you a copy of the project up and running on your loc
 ### Prerequisites
 
 - Python 3
-### Assets file
-
-To run the `weightedcurvenumber` endpoint, you must download SC_RCN_LU_CO_p.tif to the /assets folder. You can download the file from https://www.sciencebase.gov/catalog/item/6241fcc0d34e915b67eae16a or use the programmatic instructions in [SC_Synthetic_UH_Method.py](SC_Synthetic_UH_Method.py). 
-
 ### Running locally
 
 To run the services locally, first change `root_path` in main.py to be equal to `root_path=''`.
@@ -52,8 +48,9 @@ uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
 Once the above code has been run successfully, the service documentation will be available at http://127.0.0.1:8000/docs/.
 
-
 If an error such as "An attempt was made to access a socket in a way forbidden by its access permissions" occurs when running `uvicorn main:app --host 0.0.0.0 --port 8000`, try a different port number. For example, try port 7000: use this command `uvicorn main:app --host 0.0.0.0 --port 7000` and use this URL http://127.0.0.1:7000/docs/.
+
+To run the `weightedcurvenumber` endpoint, you must download SC_RCN_LU_CO_p.tif to the /assets folder. You can download the file from https://www.sciencebase.gov/catalog/item/6241fcc0d34e915b67eae16a or use the programmatic instructions in [SC_Synthetic_UH_Method.py](SC_Synthetic_UH_Method.py). 
 
 ## Deployment
 
@@ -65,11 +62,20 @@ If an error such as "An attempt was made to access a socket in a way forbidden b
      - Connection type: SSH
      - In the sidebar, Connection > SSH > Auth: "Private key file for authentication:" click "Browse" to upload your private key file
      - Click "Open" to connect
- 4. Go to the app directory: `cd 	/var/www/scrunoffservices/`
+ 4. Go to the app directory: `cd ../../var/www/scrunoffservices/`
  5. Pull the latest code: `sudo git pull origin master`
- 6. Restart the daemon: `sudo systemctl restart scrunoffservices`
- 7. Check that the services were updated: https://streamstats.usgs.gov/local/scrunoffservices/docs
- 8. Exit when finished: `exit`
+ 6. Update packages if necessary:
+   
+    ```
+    sudo su
+    source env/bin/activate
+    pip install -r requirements.txt
+    deactivate
+    ```
+ 7. Restart the daemon: `sudo systemctl restart scrunoffservices`
+ 8. Check that the services were updated: https://streamstats.usgs.gov/local/scrunoffservices/docs
+ 9.  Exit when finished: `exit`
+
 
 ## Authors
 
@@ -84,13 +90,17 @@ This project is licensed under the Creative Commons CC0 1.0 Universal License - 
 
 ## Scientific Documentation
 
-This project implements methodology described in the following reports:
+This project implements methodology described in the following reports and data releases:
 
 [Bohman, L.R., 1989, Determination of flood hydrographs for streams in South Carolina: Volume 1. Simulation of flood hydrographs for rural watersheds in South Carolina: U.S. Geological Survey Water-Resources Investigations Report 89-4087, 79 p.](https://pubs.er.usgs.gov/publication/wri894087)
 
 [Bohman, L.R., 1992, Determination of flood hydrographs for streams in South Carolina: Volume 2. Estimation of peak-discharge frequency, runoff volumes, and flood hydrographs for urban watersheds: U.S. Geological Survey Water-Resources Investigations Report 92-4040, 79 p.](https://pubs.er.usgs.gov/publication/wri924040)
 
-[Meadows, M.E., 2020, South Carolina Unit Hydrograph Method Applications Manual: South Carolina Department of Transportation FHWA-SC-20-02, 139 p.](https://www.scdot.org/business/technicalPDFs/hydraulic/SPR-738-SC-UH-Method-Application-Manual-May-2020.pdf)                                 
+[Meadows, M.E., 2020, South Carolina Unit Hydrograph Method Applications Manual: South Carolina Department of Transportation FHWA-SC-20-02, 139 p.](https://www.scdot.org/business/technicalPDFs/hydraulic/SPR-738-SC-UH-Method-Application-Manual-May-2020.pdf)      
+
+[Musser, J.W., and Kolb, K.R., 2022, Region layers for USGS South Carolina Bohman method hydrograph in StreamStats: U.S. Geological Survey data release, https://doi.org/10.5066/P93G318W.](https://doi.org/10.5066/P93G318W)
+
+[Swain, J.P., and Nardi, M.R., 2022, Gridded South Carolina StreamStats Runoff Curve Numbers by NLCD Landcover and SSURGO Soils Class: U.S. Geological Survey data release, https://doi.org/10.5066/P90O294J.](https://doi.org/10.5066/P90O294J)
 
 ## Suggested Citation
 
