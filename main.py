@@ -288,7 +288,7 @@ class TravelTimeMethodTimeOfConcentration(BaseModel):
 class SCSyntheticUnitHydrograph(BaseModel):
     lat: float = Field(..., title="latitude", description="latitude coordinate of the drainage point (float)", example="33.3946")
     lon: float = Field(..., title="longitude", description="longitude coordinate of the drainage point (float)", example="-80.3474")
-    AEP: float = Field(..., title="Annual Exceedance Probability", description="Annual Exceedance Probability (%); options are 10, 4, 2, 1, which correspond to 10-yr, 25-yr, 50-yr, and 100-yr storms (int)", example="4")
+    AEP: float = Field(..., title="Annual Exceedance Probability", description="Annual Exceedance Probability (%); options are 100 50, 20, 10, 4, 2, 1, which correspond to 1-yr, 2-yr, 5-yr, 10-yr, 25-yr, 50-yr, and 100-yr storms (int)", example="4")
     CNModificationMethod: str = Field(..., title="Curve Number Modification Method", description="method used to modify the Curve Number; options are 'McCuen' or 'Merkel' (string)", example="Merkel")
     Area: float = Field(..., title="Area", description="drainage area of delineated basin (float)", example="100.0")
     Tc: float = Field(..., title="Time of Concentration", description="Time of Concentration as computed by Travel Time Method or Lag Time Equation (float)", example="64.5")
@@ -320,7 +320,7 @@ class CalculateMissingParametersSCSUH(BaseModel):
     lon: float = Field(..., title="longitude", description="longitude coordinate of the drainage point (float)", example="-80.3474")
     watershedFeatures: list = Field(..., title="watershed features", description="list of features of delineated watershed returned by StreamStatsServices")
     prfData: list = Field(..., title="PRF Data", description="data corresponding to PRF values (list)")
-    AEP: float = Field(..., title="Annual Exceedance Probability", description="Annual Exceedance Probability (%); options are 10, 4, 2, 1, which correspond to 10-yr, 25-yr, 50-yr, and 100-yr storms (int)", example="4")
+    AEP: float = Field(..., title="Annual Exceedance Probability", description="Annual Exceedance Probability (%); options are 100, 50,20, 10, 4, 2, 1, which correspond to 1-yr, 2-yr, 5-yr, 10-yr, 25-yr, 50-yr, and 100-yr storms (int)", example="4")
     curveNumberMethod: str = Field(..., title="weighting method", description="weighting method for Standard CN ('runoff' or 'area')", example="runoff")
     TcMethod: str = Field(default=None, title="time of concentration method", description="time of concentration ('lagtime' or 'traveltime')", example="traveltime")
     length: float = Field(default=None, title="length of flowpath", description="length of flow path in watershed, in feet (float)", example="1250")
@@ -514,12 +514,30 @@ def prfdata(request_body: PRF, response: Response):
 def rainfalldata(request_body: RainfallData, response: Response):
 
     try: 
-        P10_1,P10_2,P10_3,P10_6,P10_12,P10_24,P25_1,P25_2,P25_3,P25_6,P25_12,P25_24,P50_1,P50_2,P50_3,P50_6,P50_12,P50_24,P100_1,P100_2,P100_3,P100_6,P100_12,P100_24,P2_24_1,P2_24_2,P2_24_5,P2_24_10,P2_24_25,P2_24_50,P2_24_100 = rainfallData(
+        P1_1,P1_2,P1_3,P1_6,P1_12,P1_24,P2_1,P2_2,P2_3,P2_6,P2_12,P2_24,P5_1,P5_2,P5_3,P5_6,P5_12,P5_24,P10_1,P10_2,P10_3,P10_6,P10_12,P10_24,P25_1,P25_2,P25_3,P25_6,P25_12,P25_24,P50_1,P50_2,P50_3,P50_6,P50_12,P50_24,P100_1,P100_2,P100_3,P100_6,P100_12,P100_24,P2_24_1,P2_24_2,P2_24_5,P2_24_10,P2_24_25,P2_24_50,P2_24_100 = rainfallData(
             request_body.lat,
             request_body.lon
         )
 
         return {
+            "P1_1": P1_1, 
+            "P1_2": P1_2,
+            "P1_3": P1_3,
+            "P1_6": P1_6,
+            "P1_12": P1_12,
+            "P1_24": P1_24,
+            "P2_1": P2_1, 
+            "P2_2": P2_2,
+            "P2_3": P2_3,
+            "P2_6": P2_6,
+            "P2_12": P2_12,
+            "P2_24": P2_24,
+            "P5_1": P5_1, 
+            "P5_2": P5_2,
+            "P5_3": P5_3,
+            "P5_6": P5_6,
+            "P5_12": P5_12,
+            "P5_24": P5_24,
             "P10_1": P10_1, 
             "P10_2": P10_2,
             "P10_3": P10_3,

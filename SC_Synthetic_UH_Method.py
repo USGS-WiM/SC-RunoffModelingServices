@@ -16,7 +16,7 @@ from pathlib import Path
 # Combines rainfallDistributionCurve, PRFData, weightedCurveNumber, and travelTimeMethodTimeOfConcentration or lagTimeMethodTimeOfConcentration (depending on TcMethod) into single function.
 def calculateMissingParametersSCSUH(lat, lon, watershedFeatures, prfData, AEP, curveNumberMethod, TcMethod, length=None, slope=None, dataSheetFlow=None, dataExcessSheetFlow=None, dataShallowConcentratedFlow=None, dataChannelizedFlowOpenChannel=None, dataChannelizedFlowStormSewer=None, dataChannelizedFlowStormSewerOrOpenChannelUserInputVelocity=None):
     # watershedFeatures: list of "features" of delineated watershed returned by StreamStatsServices
-    # AEP: 10 - 10 year return period, 4 - 25 year return period, 2 - 50 year return period, 1 - 100 year return period
+    # AEP: Annual Exceedance Probability (%); options are 100, 50,20, 10, 4, 2, 1, which correspond to 1-yr, 2-yr, 5-yr, 10-yr, 25-yr, 50-yr, and 100-yr storms
     # curveNumberMethod: "runoff" or "area"
     # TcMethod: 'lagtime' or 'traveltime'
     # length: flow path length in feet
@@ -71,11 +71,21 @@ def calculateMissingParametersSCSUH(lat, lon, watershedFeatures, prfData, AEP, c
     
     # Get Curve Number, S, Ia
     if curveNumberMethod.lower() == "runoff" or curveNumberMethod.lower() == "area":
-        if AEP == 1 or AEP == 2 or AEP == 4 or AEP == 10:
-            if AEP == 1:  P24hr = rainfall_data[23]
-            if AEP == 2:  P24hr = rainfall_data[17]
-            if AEP == 4:  P24hr = rainfall_data[11]
-            if AEP == 10:  P24hr = rainfall_data[5]
+        if AEP == 1 or AEP == 2 or AEP == 4 or AEP == 10 or AEP == 20 or AEP == 50 or AEP == 100:
+            if AEP == 1:  
+                P24hr = rainfall_data[41]
+            elif AEP == 2:  
+                P24hr = rainfall_data[35]
+            elif AEP == 4:  
+                P24hr = rainfall_data[29]
+            elif AEP == 10:  
+                P24hr = rainfall_data[23]
+            elif AEP == 20:
+                P24hr = rainfall_data[17]
+            elif AEP == 50:
+                P24hr = rainfall_data[11]
+            elif AEP == 100:
+                P24hr = rainfall_data[5]
             CN, S, Ia = weightedCurveNumber(watershedFeatures, P24hr, curveNumberMethod)
         else:
             raise Exception("AEP not valid.")
@@ -299,6 +309,7 @@ def rainfallData(lat, lon):
     data_string = response_content[response_content.index("quantiles = ")+len("quantiles = "):response_content.index("upper")-2] # String of data
     data_lists = ast.literal_eval(data_string) # Convert string to list of lists
     results = [list(map(float, sublist)) for sublist in data_lists] # Convert string values to floating point
+    print(results[4])
 
     # Precipitation frequency estimates (inches) by duration of storms (hours): 1, 2, 3, 6, 12, 24
     # Columns correspond to average recurrence interval (years): 1, 2, 5, 10, 25, 50, 100, 200, 500, 1000
@@ -308,8 +319,30 @@ def rainfallData(lat, lon):
     results_6hr = results[7]
     results_12hr = results[8]
     results_24hr = results[9]
-    # Save values of interest: these values coorespond to Names in the Spreadsheet for the SC Synethic Unit Hydrograph Method
+
+    # Save values of interest: these values correspond to Names in the Spreadsheet for the SC Synthetic Unit Hydrograph Method
     # Variable naming schema: ex. P50_12 refers to the precipitation frequency estimate (inches) for 12-hour storms with an average recurrence interval of 50 years (AEP 2%)
+    P1_1 = results_1hr[0]
+    P1_2 = results_2hr[0]
+    P1_3 = results_3hr[0]
+    P1_6 = results_6hr[0]
+    P1_12 = results_12hr[0]
+    P1_24 = results_24hr[0]
+    
+    P2_1 = results_1hr[1]
+    P2_2 = results_2hr[1]
+    P2_3 = results_3hr[1]
+    P2_6 = results_6hr[1]
+    P2_12 = results_12hr[1]
+    P2_24 = results_24hr[1]
+    
+    P5_1 = results_1hr[2]
+    P5_2 = results_2hr[2]
+    P5_3 = results_3hr[2]
+    P5_6 = results_6hr[2]
+    P5_12 = results_12hr[2]
+    P5_24 = results_24hr[2]
+    
     P10_1 = results_1hr[3]
     P10_2 = results_2hr[3]
     P10_3 = results_3hr[3]
@@ -347,7 +380,7 @@ def rainfallData(lat, lon):
     P2_24_50 = results_24hr[5]
     P2_24_100 = results_24hr[6]
 
-    return P10_1,P10_2,P10_3,P10_6,P10_12,P10_24,P25_1,P25_2,P25_3,P25_6,P25_12,P25_24,P50_1,P50_2,P50_3,P50_6,P50_12,P50_24,P100_1,P100_2,P100_3,P100_6,P100_12,P100_24,P2_24_1,P2_24_2,P2_24_5,P2_24_10,P2_24_25,P2_24_50,P2_24_100
+    return P1_1,P1_2,P1_3,P1_6,P1_12,P1_24,P2_1,P2_2,P2_3,P2_6,P2_12,P2_24,P5_1,P5_2,P5_3,P5_6,P5_12,P5_24,P10_1,P10_2,P10_3,P10_6,P10_12,P10_24,P25_1,P25_2,P25_3,P25_6,P25_12,P25_24,P50_1,P50_2,P50_3,P50_6,P50_12,P50_24,P100_1,P100_2,P100_3,P100_6,P100_12,P100_24,P2_24_1,P2_24_2,P2_24_5,P2_24_10,P2_24_25,P2_24_50,P2_24_100
 
 # Retrieve the rainfall distribution curve number from the NOAA Atlas 14 Rainfall Distributions
 # The available rainfall distribution curve letters in this map service are NOAA A, NOAA B, NOAA C, and NOAA D
@@ -381,7 +414,7 @@ def rainfallDistributionCurve(lat, lon):
 def computeSCSyntheticUnitHydrograph(lat, lon, AEP, CNModificationMethod, Area, Tc, RainfallDistributionCurve, PRF, CN, S, Ia):
     # lat: latitude of delineation point
     # lon: longitude of delineation point
-    # AEP: Annual Exceedance Probability (%): options are 10, 4, 2, 1, which correspond to 10-yr, 25-yr, 50-yr, and 100-yr storms
+    # AEP: Annual Exceedance Probability (%): options are 100, 50, 20, 10, 4, 2, 1, which correspond to 1-yr, 2-yr, 5-yr, 10-yr, 25-yr, 50-yr, and 100-yr storms
     # CNModificationMethod: modification method for Curve Number; options are "McCuen" or "Merkel"
     # Area: drainage area of delineated basin
     # Tc: Time of Concentration as computed by Travel Time Method or Lag Time Equation
@@ -394,8 +427,14 @@ def computeSCSyntheticUnitHydrograph(lat, lon, AEP, CNModificationMethod, Area, 
     storm_duration = [1, 2, 3, 6, 12, 24] # hours, referred to as a D-hour storm
 
     # Retrieve rainfall depths for the AEP of interest
-    P10_1,P10_2,P10_3,P10_6,P10_12,P10_24,P25_1,P25_2,P25_3,P25_6,P25_12,P25_24,P50_1,P50_2,P50_3,P50_6,P50_12,P50_24,P100_1,P100_2,P100_3,P100_6,P100_12,P100_24,P2_24_1,P2_24_2,P2_24_5,P2_24_10,P2_24_25,P2_24_50,P2_24_100 = rainfallData(lat,lon)
-    if AEP == 10: 
+    P1_1,P1_2,P1_3,P1_6,P1_12,P1_24,P2_1,P2_2,P2_3,P2_6,P2_12,P2_24,P5_1,P5_2,P5_3,P5_6,P5_12,P5_24,P10_1,P10_2,P10_3,P10_6,P10_12,P10_24,P25_1,P25_2,P25_3,P25_6,P25_12,P25_24,P50_1,P50_2,P50_3,P50_6,P50_12,P50_24,P100_1,P100_2,P100_3,P100_6,P100_12,P100_24,P2_24_1,P2_24_2,P2_24_5,P2_24_10,P2_24_25,P2_24_50,P2_24_100 = rainfallData(lat,lon)
+    if AEP == 100:
+        rainfall_depths = [P1_1,P1_2,P1_3,P1_6,P1_12,P1_24]
+    elif AEP == 50:
+        rainfall_depths = [P2_1,P2_2,P2_3,P2_6,P2_12,P2_24]
+    elif AEP == 20:
+        rainfall_depths = [P5_1,P5_2,P5_3,P5_6,P5_12,P5_24]
+    elif AEP == 10: 
         rainfall_depths = [P10_1,P10_2,P10_3,P10_6,P10_12,P10_24]
     elif AEP == 4:
         rainfall_depths = [P25_1,P25_2,P25_3,P25_6,P25_12,P25_24]
