@@ -309,7 +309,6 @@ def rainfallData(lat, lon):
     data_string = response_content[response_content.index("quantiles = ")+len("quantiles = "):response_content.index("upper")-2] # String of data
     data_lists = ast.literal_eval(data_string) # Convert string to list of lists
     results = [list(map(float, sublist)) for sublist in data_lists] # Convert string values to floating point
-    print(results[4])
 
     # Precipitation frequency estimates (inches) by duration of storms (hours): 1, 2, 3, 6, 12, 24
     # Columns correspond to average recurrence interval (years): 1, 2, 5, 10, 25, 50, 100, 200, 500, 1000

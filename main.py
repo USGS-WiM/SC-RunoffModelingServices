@@ -7,12 +7,13 @@ from SC_Synthetic_UH_Method import weightedCurveNumber, PRFData, rainfallData, r
 from Bohman_Method_1989 import computeRuralFloodHydrographBohman1989
 from Bohman_Method_1992 import getRI2, computeUrbanFloodHydrographBohman1992
 from Tc_Calculator import lagTimeMethodTimeOfConcentration, travelTimeMethodTimeOfConcentration
+from Storm_Ponds import calcponds
 
 app = FastAPI(
     title='SC Runoff Modeling Services',
-    root_path='/local/scrunoffservices'
+    #root_path='/local/scrunoffservices'
     # To run locally use
-    # root_path=''
+    root_path=''
     # To run in production use
     #    root_path='/local/scrunoffservices'
 )
@@ -753,3 +754,19 @@ def calculatemissingparametersSCSUH(request_body: CalculateMissingParametersSCSU
 
     except Exception as e:
         raise HTTPException(status_code = 500, detail =  str(e))
+    
+
+
+@app.post("/ponds/")
+def ponds():
+
+    try: 
+        runoff_and_ponding_results, pond_inflow_and_outflow_ordinates = calcponds()
+        return {
+            "runoff_and_ponding_results": runoff_and_ponding_results,
+            "pond_inflow_and_outflow_ordinates": pond_inflow_and_outflow_ordinates        
+        }        
+
+    except Exception as e:
+        raise HTTPException(status_code = 500, detail =  str(e))
+
