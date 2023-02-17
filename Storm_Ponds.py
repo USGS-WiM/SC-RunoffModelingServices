@@ -6,16 +6,20 @@ from SC_Synthetic_UH_Method import computeSCSyntheticUnitHydrograph
 def calcponds():
     
     
+    # Fixed Variables
     storm_duration = [1, 2, 3, 6, 12, 24] # hours, referred to as a D-hour storm
     burst_duration = 6
     max_depth = 10
 
+    # Initialize output arrays
     pond_peak_inflow = []
     time_of_pond_peak_inflow = []
     pond_peak_outflow = []
     time_of_pond_peak_outflow = []
 
-    unitHydrograph = computeSCSyntheticUnitHydrograph(33.3946, -80.3474, 4, "Merkel", 100.0, 78, "II", 240, 66.9, 4.94, 0.99)
+
+    # TODO: These all need to be upper inputs
+    unitHydrograph = computeSCSyntheticUnitHydrograph(33.3946, -80.3474, 10, "Merkel", 100.0, 78, "II", 240, 66.9, 4.94, 0.99)
 
     #pond 1
     length = 200
@@ -48,16 +52,17 @@ def calcponds():
     Seepage_Bottom = 2
     Seepage_Side = 4
 
-# Iterate over all the D-hour storms
-    
-    Q = []
-    S = []
-    Total_L = []
-    Total_W1 = []
-    Total_W2 = []
-    A = []
-    change_S = []
-    
+    # Initalize arrays used in 
+    Q = [] # Pond_X hr, 2S_Dt, Y-Q (1) 
+    S = [] # Pond_X, 2S_Dt+Q, Y-S (1)
+    Total_L = [] # Y-S (1)
+    Total_W1 = [] # Y-S (1)
+    Total_W2 = [] # Y-S (1)
+    A = [] # Y-S (1)
+    change_S = [] # Pond_1 hr
+    twoS_dtplusQ = [] # Y-S (1)
+
+    # Caluclate values in Y-Q (1) sheet
     Orif1_A = 3.14159*((Orif1_Dia/12)**2)/4
     Orif2_A = 3.14159*((Orif2_Dia/12)**2)/4
     for Y in range(0, max_depth+1):
@@ -77,7 +82,7 @@ def calcponds():
         # Overflow Spillway Q
         OS_H = max(0,Y-OS_Crest_EL)
         OS_Q = OS_BCWeir_Coeff*OS_Length*OS_H**OS_Weir_Ex
-        # Calculate Seepage in cfs
+        # Seepage in cfs
         if Y == 0:
             Total_L.append(length+2*bottom_slope*(h-pond_bottom_elev))
             Total_W1.append(w1+2*side_slope_z*(h-pond_bottom_elev))
@@ -95,24 +100,50 @@ def calcponds():
         else:
             Seepage_Bottom_CFS = A1*Seepage_Bottom/(12*3600)
             Seepage_Side_CFS = (A[Y]-A1)*Seepage_Side/(12*3600)
-
+        
+        # Calculate Q in 2S_Dt+Q & Pond_X hr sheets
         Outflow_Q = Orif1_total_flow+Orif2_total_flow+Rec_Stage_total_flow+OS_Q+Seepage_Bottom_CFS+Seepage_Side_CFS
         Q.append(Outflow_Q) 
-
+        # Calculate S in 2S_Dt+Q & Pond_X hr sheets; Calculate change in S from Y-S (1) sheet 
         if Y == 0:
             S.append(0)
             change_S.append(0)
         else:
             change_S.append(((A[Y-1]+A[Y])/2)*(1)) # not sure if it will always be (1)
             S.append(S[Y-1] + change_S[Y])
+        # Calculate 2S/dt+Q in 2S_Dt+Q & Pond_X hr sheets
+        twoS_dtplusQ.append((2*S[Y]/(60*burst_duration))+Q[Y])
+
         
 
     print(Q) 
     print(S)
+    print(twoS_dtplusQ)
    
 
-    
-        
+    # TODO Loop thorugh storm_duration
+    # Initlaize arrays used in 
+    time = unitHydrograph[3]['time'] # pond_x hr
+    inflow = unitHydrograph[3]['flow_1_hour'] # pond_x hr TODO depends on storm_duration loop
+    i1plusi2 = [] # pond_x hr
+    twoS_dtplusQ2 = [] # pond_x hr
+    twoS_dtminusQ2 = [] # pond_x hr
+    outflow = [] # pond_x hr (as Q2) & D-hr Storm Pond Routing Results
+    counter = 0
+
+    for t in time:
+        if counter == 0:
+            i1plusi2.append(0)
+        else:
+            i1plusi2.append(inflow[counter-1] + inflow[counter])
+
+        counter = counter + 1
+
+    print(time)
+    print(inflow)
+    print(i1plusi2)
+
+
     # Corresponds red arrow in the "D-hr Storm Pond Results" sheet
     #index_max_peak_outflow = np.argmax(pond_peak_outflow)
     #max_peak_outflow = storm_duration[index_max_peak_outflow]
