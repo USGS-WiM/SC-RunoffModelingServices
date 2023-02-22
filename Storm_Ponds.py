@@ -4,23 +4,23 @@ from SC_Synthetic_UH_Method import computeSCSyntheticUnitHydrograph
 
 
 def calcStormPonds(lat, lon, AEP, CNModificationMethod, Area, Tc, RainfallDistributionCurve, PRF, CN, S, Ia,
-              pondOption, pond_bottom_elev, Orif1_Coeff, Orif1_Dia, Orif1_CtrEL, Orif1_NumOpenings, Orif2_Coeff, Orif2_Dia, Orif2_CtrEL, Orif2_NumOpenings, Rec_Weir_Coeff, Rec_Weir_Ex, Rec_Weir_Length, Rec_WeirCrest_EL, Rec_Num_Wiers, OS_BCWeir_Coeff, OS_Weir_Ex, OS_Length , OS_Crest_EL , Seepage_Bottom, Seepage_Side,
+              pondOption, pond_bottom_elev, Orif1_Coeff, Orif1_Dia, Orif1_CtrEL, Orif1_NumOpenings, Orif2_Coeff, Orif2_Dia, Orif2_CtrEL, Orif2_NumOpenings, Rec_Weir_Coeff, Rec_Weir_Ex, Rec_Weir_Length, Rec_WeirCrest_EL, Rec_Num_Weirs, OS_BCWeir_Coeff, OS_Weir_Ex, OS_Length , OS_Crest_EL , Seepage_Bottom, Seepage_Side,
               length = None, w1 = None, w2 = None, side_slope_z = None, bottom_slope = None,
               Elev_Area = None):
         
     # lat, lon, AEP, CNModificationMethod, Area, Tc, RainfallDistributionCurve, PRF, CN, S, Ia: see computeSCSyntheticUnitHydrograph
     # pondOption: 1 or 2 
-    # pond_bottom_elev: Elecation of pond bottom in feet
-    # Orif1_Coeff & Orif2_Coeff: Coefficent of 1st and 2nd stage circular orfices
-    # Orif1_Dia & Orif2_Dia: Diameter of 1st and 2nd stage circular orfices in inches
-    # Orif1_CtrEL & Orif2_CtrEL: Centerline elecation aboce bottom of pond for 1st and 2nd stage circular orfices in feet
-    # Orif1_NumOpenings & Orif2_NumOpenings: number of openings for 1st and 2nd stage circular orfices
-    # Rec_Weir_Coeff: 3rd stage rectangular weir coefficent 
+    # pond_bottom_elev: Elevation of pond bottom in feet
+    # Orif1_Coeff & Orif2_Coeff: coefficient of 1st and 2nd stage circular orifices
+    # Orif1_Dia & Orif2_Dia: Diameter of 1st and 2nd stage circular orifices in inches
+    # Orif1_CtrEL & Orif2_CtrEL: Centerline elevation above bottom of pond for 1st and 2nd stage circular orifices in feet
+    # Orif1_NumOpenings & Orif2_NumOpenings: number of openings for 1st and 2nd stage circular orifices
+    # Rec_Weir_Coeff: 3rd stage rectangular weir coefficient 
     # Rec_Weir_Ex: 3rd stage rectangular weir exponent 
     # Rec_Weir_Length: 3rd stage rectangular weir length in feet 
     # Rec_WeirCrest_EL: 3rd stage rectangular weir crest elevation above pond bottom in feet 
-    # Rec_Num_Wiers: number of weirs for 3rd stage rectangular weir
-    # OS_BCWeir_Coeff: broad-crested weird coefficent for overflow spillway 
+    # Rec_Num_Weirs: number of weirs for 3rd stage rectangular weir
+    # OS_BCWeir_Coeff: broad-crested weird coefficient for overflow spillway 
     # OS_Weir_Ex: weir exponent for overflow spillway
     # OS_Length: overflow spillway length in feet
     # OS_Crest_EL: crest elevation above pond bottom for overflow spillway in feet
@@ -34,7 +34,7 @@ def calcStormPonds(lat, lon, AEP, CNModificationMethod, Area, Tc, RainfallDistri
     # Elev_Area: list of values elevation (ft-MSL) vs surface area (sq ft), for pond option 2
 
 
-    # Caluclate Unit Hydrograph
+    # Calculate Unit Hydrograph
     unitHydrograph = computeSCSyntheticUnitHydrograph(lat, lon, AEP, CNModificationMethod, Area, Tc, RainfallDistributionCurve, PRF, CN, S, Ia)
 
     # Fixed Variables
@@ -58,7 +58,7 @@ def calcStormPonds(lat, lon, AEP, CNModificationMethod, Area, Tc, RainfallDistri
         Q, twoS_dtplusQ, Y = calcPondOne(length, w1, w2, side_slope_z, bottom_slope, pond_bottom_elev, 
                                         Orif1_Coeff, Orif1_Dia, Orif1_CtrEL, Orif1_NumOpenings, 
                                         Orif2_Coeff, Orif2_Dia, Orif2_CtrEL, Orif2_NumOpenings, 
-                                        Rec_Weir_Coeff, Rec_Weir_Ex, Rec_Weir_Length, Rec_WeirCrest_EL, Rec_Num_Wiers,
+                                        Rec_Weir_Coeff, Rec_Weir_Ex, Rec_Weir_Length, Rec_WeirCrest_EL, Rec_Num_Weirs,
                                         OS_BCWeir_Coeff, OS_Weir_Ex, OS_Length, OS_Crest_EL,
                                         Seepage_Bottom, Seepage_Side,
                                         max_depth, burst_duration)
@@ -69,14 +69,14 @@ def calcStormPonds(lat, lon, AEP, CNModificationMethod, Area, Tc, RainfallDistri
         Q, twoS_dtplusQ, Y = calcPondTwo(Elev_Area, pond_bottom_elev,
                                         Orif1_Coeff, Orif1_Dia, Orif1_CtrEL, Orif1_NumOpenings, 
                                         Orif2_Coeff, Orif2_Dia, Orif2_CtrEL, Orif2_NumOpenings, 
-                                        Rec_Weir_Coeff, Rec_Weir_Ex, Rec_Weir_Length, Rec_WeirCrest_EL, Rec_Num_Wiers,
+                                        Rec_Weir_Coeff, Rec_Weir_Ex, Rec_Weir_Length, Rec_WeirCrest_EL, Rec_Num_Weirs,
                                         OS_BCWeir_Coeff, OS_Weir_Ex, OS_Length, OS_Crest_EL,
                                         Seepage_Bottom, Seepage_Side,
                                         max_depth, burst_duration)
 
     # Calculate outflow (Q2) for each storm duration
-    for D in storm_duration:     # Loop thorugh storm_duration
-        # Initlaize arrays used in 
+    for D in storm_duration:     # Loop through storm_duration
+        # Initialize arrays used in 
         time = unitHydrograph[3]['time'] # pond_x hr(column B)
         inflow = unitHydrograph[3]['flow_' + str(D) + '_hour'] # pond_x hr (column C)
         i1plusi2 = [] # pond_x hr (column D)
@@ -192,7 +192,7 @@ def calcStormPonds(lat, lon, AEP, CNModificationMethod, Area, Tc, RainfallDistri
 def calcPondTwo(Elev_Area, pond_bottom_elev,
                 Orif1_Coeff, Orif1_Dia, Orif1_CtrEL, Orif1_NumOpenings, 
                 Orif2_Coeff, Orif2_Dia, Orif2_CtrEL, Orif2_NumOpenings, 
-                Rec_Weir_Coeff, Rec_Weir_Ex, Rec_Weir_Length, Rec_WeirCrest_EL, Rec_Num_Wiers,
+                Rec_Weir_Coeff, Rec_Weir_Ex, Rec_Weir_Length, Rec_WeirCrest_EL, Rec_Num_Weirs,
                 OS_BCWeir_Coeff, OS_Weir_Ex, OS_Length, OS_Crest_EL,
                 Seepage_Bottom, Seepage_Side,
                 max_depth, burst_duration):
@@ -200,31 +200,31 @@ def calcPondTwo(Elev_Area, pond_bottom_elev,
     if pond_bottom_elev != Elev_Area[0][0]:
         raise Exception("Bottom pond elevation must be the same as the first elevation input.")
         
-    # Initalize arrays used in 
+    # Initialize arrays used in 
     Q = [] # Pond_X hr, 2S_Dt, Y-Q (2) 
     S = [] # Pond_X, 2S_Dt+Q, Y-S (2)
     A = [] # Y-S (2)
     change_S = [] # Pond_X hr
     twoS_dtplusQ = [] # Y-S (2)
     Y = [] # Pond_X hr, 2S_Dt, Y-Q (2)
-    # Caluclate values in Y-Q (2) sheet
+    # Calculate values in Y-Q (2) sheet
     Orif1_A = 3.14159*((Orif1_Dia/12)**2)/4
     Orif2_A = 3.14159*((Orif2_Dia/12)**2)/4
     for y in range(0, max_depth):
         print(y)
         Y.append(y)
-        # First Stage Orfice Total Flow
+        # First Stage Orifice Total Flow
         Orif1_H = max(0,y-Orif1_CtrEL)
         Orif1_Q = max(0,Orif1_Coeff*Orif1_A*math.sqrt(64.4*Orif1_H))   
         Orif1_total_flow = Orif1_NumOpenings*Orif1_Q
-        # Second Stage Orfice Total Flow
+        # Second Stage Orifice Total Flow
         Orif2_H = max(0,y-Orif2_CtrEL)
         Orif2_Q = max(0,Orif2_Coeff*Orif2_A*math.sqrt(64.4*Orif2_H)) 
         Orif2_total_flow = Orif2_NumOpenings*Orif2_Q
         # Upper Stage Rectangular Weir Total Flow
         Rec_Weir_H = max(0,y-Rec_WeirCrest_EL)
         Rec_Single_Weir_Q = Rec_Weir_Coeff*Rec_Weir_Length*Rec_Weir_H**Rec_Weir_Ex
-        Rec_Stage_total_flow = Rec_Single_Weir_Q*Rec_Num_Wiers
+        Rec_Stage_total_flow = Rec_Single_Weir_Q*Rec_Num_Weirs
         # Overflow Spillway Q
         OS_H = max(0,y-OS_Crest_EL)
         OS_Q = OS_BCWeir_Coeff*OS_Length*OS_H**OS_Weir_Ex
@@ -266,10 +266,10 @@ def calcPondTwo(Elev_Area, pond_bottom_elev,
 def calcPondOne(length, w1, w2, side_slope_z, bottom_slope, pond_bottom_elev, 
                 Orif1_Coeff, Orif1_Dia, Orif1_CtrEL, Orif1_NumOpenings, 
                 Orif2_Coeff, Orif2_Dia, Orif2_CtrEL, Orif2_NumOpenings, 
-                Rec_Weir_Coeff, Rec_Weir_Ex, Rec_Weir_Length, Rec_WeirCrest_EL, Rec_Num_Wiers,
+                Rec_Weir_Coeff, Rec_Weir_Ex, Rec_Weir_Length, Rec_WeirCrest_EL, Rec_Num_Weirs,
                 OS_BCWeir_Coeff, OS_Weir_Ex, OS_Length, OS_Crest_EL,
                 Seepage_Bottom, Seepage_Side, max_depth, burst_duration):
-    # Initalize arrays used in 
+    # Initialize arrays used in 
     Q = [] # Pond_X hr, 2S_Dt, Y-Q (1) 
     S = [] # Pond_X, 2S_Dt+Q, Y-S (1)
     Total_L = [] # Y-S (1)
@@ -279,24 +279,24 @@ def calcPondOne(length, w1, w2, side_slope_z, bottom_slope, pond_bottom_elev,
     change_S = [] # Pond_X hr
     twoS_dtplusQ = [] # Y-S (1)
     Y = [] # Pond_X hr, 2S_Dt, Y-Q (1)
-    # Caluclate values in Y-Q (1) sheet
+    # Calculate values in Y-Q (1) sheet
     Orif1_A = 3.14159*((Orif1_Dia/12)**2)/4
     Orif2_A = 3.14159*((Orif2_Dia/12)**2)/4
     for y in range(0, max_depth+1):
         Y.append(y)
         h = pond_bottom_elev + y
-        # First Stage Orfice Total Flow
+        # First Stage Orifice Total Flow
         Orif1_H = max(0,y-Orif1_CtrEL)
         Orif1_Q = max(0,Orif1_Coeff*Orif1_A*math.sqrt(64.4*Orif1_H))   
         Orif1_total_flow = Orif1_NumOpenings*Orif1_Q
-        # Second Stage Orfice Total Flow
+        # Second Stage Orifice Total Flow
         Orif2_H = max(0,y-Orif2_CtrEL)
         Orif2_Q = max(0,Orif2_Coeff*Orif2_A*math.sqrt(64.4*Orif2_H)) 
         Orif2_total_flow = Orif2_NumOpenings*Orif2_Q
         # Upper Stage Rectangular Weir Total Flow
         Rec_Weir_H = max(0,y-Rec_WeirCrest_EL)
         Rec_Single_Weir_Q = Rec_Weir_Coeff*Rec_Weir_Length*Rec_Weir_H**Rec_Weir_Ex
-        Rec_Stage_total_flow = Rec_Single_Weir_Q*Rec_Num_Wiers
+        Rec_Stage_total_flow = Rec_Single_Weir_Q*Rec_Num_Weirs
         # Overflow Spillway Q
         OS_H = max(0,y-OS_Crest_EL)
         OS_Q = OS_BCWeir_Coeff*OS_Length*OS_H**OS_Weir_Ex

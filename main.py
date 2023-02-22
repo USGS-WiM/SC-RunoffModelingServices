@@ -1,5 +1,4 @@
 from fastapi import FastAPI, HTTPException, Response
-from fastapi.responses import RedirectResponse
 from starlette.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -478,21 +477,21 @@ class calculateStormPonds(BaseModel):
     S: float = Field(..., title="Watershed Retention", description="watershed Retention, S (float)", example="4.86")
     Ia: float = Field(..., title="Initial Abstraction", description="Initial Abstraction, Ia (float)", example="0.97")
     pondOption: int = Field(..., title="Pond Option", description="Pond Option, (int)", example="1")
-    pond_bottom_elev: float = Field(..., title="Bottom Elevation", description="Elevation of pond botton in feet (float)", example="100")
-    Orif1_Coeff: float = Field(..., title="Orfice 1 Coefficent", description="Coefficent of 1st stage circular orfice (float)", example=".60")
-    Orif1_Dia: float = Field(..., title="Orfice 1 Diameter", description="Diameter of 1st stage circular orfice in inches (float)", example="6.0")
-    Orif1_CtrEL: float = Field(..., title="Orfice 1 Centerline Elevation", description="Centerline elevation above pond bottom of 1st stage circular orfice in feet (float)", example=".5")
-    Orif1_NumOpenings: int = Field(..., title="Orfice 1 Number of Openings", description="Number of openings for 1st stage circulare orfice, (int)", example="1")
-    Orif2_Coeff: float = Field(..., title="Orfice 2 Coefficent", description="Coefficent of 2nd stage circular orfice (float)", example=".60")
-    Orif2_Dia: float = Field(..., title="Orfice 2 Diameter", description="Diameter of 2nd stage circular orfice in inches (float)", example="6.0")
-    Orif2_CtrEL: float = Field(..., title="Orfice 2 Centerline Elevation", description="Centerline elevation above pond bottom of 2nd stage circular orfice in feet (float)", example="2.0")
-    Orif2_NumOpenings: int = Field(..., title="Orfice 2 Number of Openings", description="Number of openings for 2nd stage circular orfice, (int)", example="1")
-    Rec_Weir_Coeff: float = Field(..., title="Weir Coefficent", description="Coefficent of 3rd stage rectangular weir (float)", example="3.30")
+    pond_bottom_elev: float = Field(..., title="Bottom Elevation", description="Elevation of pond bottom in feet (float)", example="100")
+    Orif1_Coeff: float = Field(..., title="Orifice 1 Coefficient", description="Coefficient of 1st stage circular orifice (float)", example=".60")
+    Orif1_Dia: float = Field(..., title="Orifice 1 Diameter", description="Diameter of 1st stage circular orifice in inches (float)", example="6.0")
+    Orif1_CtrEL: float = Field(..., title="Orifice 1 Centerline Elevation", description="Centerline elevation above pond bottom of 1st stage circular orifice in feet (float)", example=".5")
+    Orif1_NumOpenings: int = Field(..., title="Orifice 1 Number of Openings", description="Number of openings for 1st stage circular orifice, (int)", example="1")
+    Orif2_Coeff: float = Field(..., title="Orifice 2 Coefficient", description="Coefficient of 2nd stage circular orifice (float)", example=".60")
+    Orif2_Dia: float = Field(..., title="Orifice 2 Diameter", description="Diameter of 2nd stage circular orifice in inches (float)", example="6.0")
+    Orif2_CtrEL: float = Field(..., title="Orifice 2 Centerline Elevation", description="Centerline elevation above pond bottom of 2nd stage circular orifice in feet (float)", example="2.0")
+    Orif2_NumOpenings: int = Field(..., title="Orifice 2 Number of Openings", description="Number of openings for 2nd stage circular orifice, (int)", example="1")
+    Rec_Weir_Coeff: float = Field(..., title="Weir Coefficient", description="Coefficient of 3rd stage rectangular weir (float)", example="3.30")
     Rec_Weir_Ex: float = Field(..., title="Weir Exponent", description="Exponent of 3rd stage rectangular weir (float)", example="1.5")
     Rec_Weir_Length: float = Field(..., title="Weir Length", description="Length of 3rd stage rectangular weir in feet (float)", example="2.0")
     Rec_WeirCrest_EL: float = Field(..., title="Weir Crest Elevation", description="Crest elevation above pond bottom of 3rd stage rectangular weir in feet (float)", example="4.0")
-    Rec_Num_Wiers: int = Field(..., title="Number of Wiers", description="Number of weirs for 3rd stage rectangular weir, (int)", example="1")
-    OS_BCWeir_Coeff: float = Field(..., title="Broad-Crested Weir Coefficent", description="Broad-Crested weir coefficent of overflow spillway (float)", example="3.00")
+    Rec_Num_Weirs: int = Field(..., title="Number of Weirs", description="Number of weirs for 3rd stage rectangular weir, (int)", example="1")
+    OS_BCWeir_Coeff: float = Field(..., title="Broad-Crested Weir Coefficient", description="Broad-Crested weir coefficient of overflow spillway (float)", example="3.00")
     OS_Weir_Ex: float = Field(..., title="Weir Exponent", description="Exponent of  overflow spillway (float)", example="1.5")
     OS_Length: float = Field(..., title="Overflow Spillway Length", description="Length of overflow spillway in feet (float)", example="2.0")
     OS_Crest_EL: float = Field(..., title="Overflow Crest Elevation", description="Crest elevation above pond bottom of overflow spillway in feet (float)", example="6.0") 
@@ -533,7 +532,7 @@ class calculateStormPonds(BaseModel):
                 "Rec_Weir_Ex": 1.5,
                 "Rec_Weir_Length": 2,
                 "Rec_WeirCrest_EL": 4,
-                "Rec_Num_Wiers": 1,
+                "Rec_Num_Weirs": 1,
                 "OS_BCWeir_Coeff": 3,
                 "OS_Weir_Ex": 1.5,
                 "OS_Length": 20,
@@ -872,7 +871,7 @@ def stormponds(request_body: calculateStormPonds, response: Response):
             request_body.Rec_Weir_Ex,
             request_body.Rec_Weir_Length,
             request_body.Rec_WeirCrest_EL,
-            request_body.Rec_Num_Wiers,
+            request_body.Rec_Num_Weirs,
             request_body.OS_BCWeir_Coeff,
             request_body.OS_Weir_Ex,
             request_body.OS_Length,
