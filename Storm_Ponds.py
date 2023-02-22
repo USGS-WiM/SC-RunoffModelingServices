@@ -211,7 +211,6 @@ def calcPondTwo(Elev_Area, pond_bottom_elev,
     Orif1_A = 3.14159*((Orif1_Dia/12)**2)/4
     Orif2_A = 3.14159*((Orif2_Dia/12)**2)/4
     for y in range(0, max_depth):
-        print(y)
         Y.append(y)
         # First Stage Orifice Total Flow
         Orif1_H = max(0,y-Orif1_CtrEL)

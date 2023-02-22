@@ -10,9 +10,9 @@ from Storm_Ponds import calcStormPonds
 
 app = FastAPI(
     title='SC Runoff Modeling Services',
-    #root_path='/local/scrunoffservices'
+    root_path='/local/scrunoffservices'
     # To run locally use
-    root_path=''
+    # root_path=''
     # To run in production use
     #    root_path='/local/scrunoffservices'
 )
