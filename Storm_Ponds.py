@@ -21,16 +21,16 @@ def calcponds():
     # TODO: These all need to be upper inputs
     unitHydrograph = computeSCSyntheticUnitHydrograph(33.3946, -80.3474, 10, "Merkel", 100.0, 78, "II", 240, 66.9, 4.94, 0.99)
 
-    #pond 1
+    # pond 1
     length = 200
     w1 = 200
     w2 = 200
     side_slope_z = 3
     bottom_slope = .5
 
-    #pond 2
+    # pond 2
 
-    #both
+    # both
     pond_bottom_elev = 100
     Orif1_Coeff=.6
     Orif1_Dia = 6
@@ -61,7 +61,7 @@ def calcponds():
     A = [] # Y-S (1)
     change_S = [] # Pond_1 hr
     twoS_dtplusQ = [] # Y-S (1)
-    Y = []
+    Y = [] # Pond_X hr, 2S_Dt, Y-Q (1)
     # Caluclate values in Y-Q (1) sheet
     Orif1_A = 3.14159*((Orif1_Dia/12)**2)/4
     Orif2_A = 3.14159*((Orif2_Dia/12)**2)/4
@@ -117,112 +117,133 @@ def calcponds():
 
         
 
-    print(Q) 
-    print(S)
-    print(twoS_dtplusQ)
-    print('Y:', Y)
+    # print('Q:', Q) 
+    # print('S:', S)
+    # print('twoS_dtplusQ:', twoS_dtplusQ)
+    # print('Y:', Y)
 
-    # TODO Loop thorugh storm_duration
-    # Initlaize arrays used in 
-    time = unitHydrograph[3]['time'] # pond_x hr
-    inflow = unitHydrograph[3]['flow_1_hour'] # pond_x hr TODO depends on storm_duration loop
-    i1plusi2 = [] # pond_x hr (column E)
-    twoS_dtplusQ2 = [] # pond_x hr (column F)
-    twoS_dtminusQ1 = [] # pond_x hr (column E)
-    Q2 = [] # pond_x hr (column H)
-    Y2 = [] # pond_x hr (column G)
-    outflows = [] # pond_x hr (as Q2) & D-hr Storm Pond Routing Results
-    counter = 0
-
-
-
-    for t in time:
-        if counter == 0:
-            i1plusi2.append(0)
-            twoS_dtminusQ1.append(0)
-            twoS_dtplusQ2.append(0)
-            Y2.append(0)
-            Q2.append(0)
-        else:
-            i1plusi2.append(inflow[counter-1] + inflow[counter])
-            twoS_dtminusQ1.append(twoS_dtplusQ2[counter-1]-2*Q2[counter-1])
-            twoS_dtplusQ2.append(i1plusi2[counter]+twoS_dtminusQ1[counter])
-            # Q2 & Y2
-            if (twoS_dtplusQ2[counter]<twoS_dtplusQ[1]):
-                Q2.append(Q[0]+((Q[1]-Q[0])/(twoS_dtplusQ[1]-twoS_dtplusQ[0]))*(twoS_dtplusQ2[counter]-twoS_dtplusQ2[0]))
-                Y2.append(Y[0]+((Y[1]-Y[0])/(twoS_dtplusQ[1]-twoS_dtplusQ[0]))*(twoS_dtplusQ2[counter]-twoS_dtplusQ2[0]))
-            elif (twoS_dtplusQ2[counter]<twoS_dtplusQ[2]):  
-                Q2.append(Q[1]+((Q[2]-Q[1])/(twoS_dtplusQ[2]-twoS_dtplusQ[1]))*(twoS_dtplusQ2[counter]-twoS_dtplusQ2[1]))
-                Y2.append(Y[1]+((Y[2]-Y[1])/(twoS_dtplusQ[2]-twoS_dtplusQ[1]))*(twoS_dtplusQ2[counter]-twoS_dtplusQ2[1]))
-            elif (twoS_dtplusQ2[counter]<twoS_dtplusQ[3]):  
-                Q2.append(Q[2]+((Q[3]-Q[2])/(twoS_dtplusQ[3]-twoS_dtplusQ[2]))*(twoS_dtplusQ2[counter]-twoS_dtplusQ2[2]))
-                Y2.append(Y[2]+((Y[3]-Y[2])/(twoS_dtplusQ[3]-twoS_dtplusQ[2]))*(twoS_dtplusQ2[counter]-twoS_dtplusQ2[2]))
-            elif (twoS_dtplusQ2[counter]<twoS_dtplusQ[4]):                 
-                Q2.append(Q[3]+((Q[4]-Q[3])/(twoS_dtplusQ[4]-twoS_dtplusQ[3]))*(twoS_dtplusQ2[counter]-twoS_dtplusQ2[3]))
-                Y2.append(Y[3]+((Y[4]-Y[3])/(twoS_dtplusQ[4]-twoS_dtplusQ[3]))*(twoS_dtplusQ2[counter]-twoS_dtplusQ2[3]))
-            elif (twoS_dtplusQ2[counter]<twoS_dtplusQ[5]):  
-                Q2.append(Q[4]+((Q[5]-Q[4])/(twoS_dtplusQ[5]-twoS_dtplusQ[4]))*(twoS_dtplusQ2[counter]-twoS_dtplusQ2[4]))
-                Y2.append(Y[4]+((Y[5]-Y[4])/(twoS_dtplusQ[5]-twoS_dtplusQ[4]))*(twoS_dtplusQ2[counter]-twoS_dtplusQ2[4]))
-            elif (twoS_dtplusQ2[counter]<twoS_dtplusQ[6]):  
-                Q2.append(Q[5]+((Q[6]-Q[5])/(twoS_dtplusQ[6]-twoS_dtplusQ[5]))*(twoS_dtplusQ2[counter]-twoS_dtplusQ2[5]))
-                Y2.append(Y[5]+((Y[6]-Y[5])/(twoS_dtplusQ[6]-twoS_dtplusQ[5]))*(twoS_dtplusQ2[counter]-twoS_dtplusQ2[5]))
-            elif (twoS_dtplusQ2[counter]<twoS_dtplusQ[7]):  
-                Q2.append(Q[6]+((Q[7]-Q[6])/(twoS_dtplusQ[7]-twoS_dtplusQ[6]))*(twoS_dtplusQ2[counter]-twoS_dtplusQ2[6]))
-                Y2.append(Y[6]+((Y[7]-Y[6])/(twoS_dtplusQ[7]-twoS_dtplusQ[6]))*(twoS_dtplusQ2[counter]-twoS_dtplusQ2[6]))
-            elif (twoS_dtplusQ2[counter]<twoS_dtplusQ[8]): 
-                Q2.append(Q[7]+((Q[8]-Q[7])/(twoS_dtplusQ[8]-twoS_dtplusQ[7]))*(twoS_dtplusQ2[counter]-twoS_dtplusQ2[7])) 
-                Y2.append(Y[7]+((Y[8]-Y[7])/(twoS_dtplusQ[8]-twoS_dtplusQ[7]))*(twoS_dtplusQ2[counter]-twoS_dtplusQ2[7])) 
-            elif (twoS_dtplusQ2[counter]<twoS_dtplusQ[9]):  
-                Q2.append(Q[8]+((Q[9]-Q[8])/(twoS_dtplusQ[9]-twoS_dtplusQ[8]))*(twoS_dtplusQ2[counter]-twoS_dtplusQ2[8]))
-                Y2.append(Y[8]+((Y[9]-Y[8])/(twoS_dtplusQ[9]-twoS_dtplusQ[8]))*(twoS_dtplusQ2[counter]-twoS_dtplusQ2[8]))  
-            elif (twoS_dtplusQ2[counter]<twoS_dtplusQ[10]): 
-                Q2.append(Q[9]+((Q[10]-Q[9])/(twoS_dtplusQ[10]-twoS_dtplusQ[9]))*(twoS_dtplusQ2[counter]-twoS_dtplusQ2[9])) 
-                Y2.append(Y[9]+((Y[10]-Y[9])/(twoS_dtplusQ[10]-twoS_dtplusQ[9]))*(twoS_dtplusQ2[counter]-twoS_dtplusQ2[9])) 
+    outflows = []
+    # Loop thorugh storm_duration
+    for D in storm_duration:
+        # Initlaize arrays used in 
+        time = unitHydrograph[3]['time'] # pond_x hr(column B)
+        inflow = unitHydrograph[3]['flow_' + str(D) + '_hour'] # pond_x hr (column C)
+        i1plusi2 = [] # pond_x hr (column D)
+        twoS_dtplusQ2 = [] # pond_x hr (column F)
+        twoS_dtminusQ1 = [] # pond_x hr (column E)
+        Q2 = [] # pond_x hr (column H) & D-hr Storm Pond Routing Results
+        Y2 = [] # pond_x hr (column G)
+        counter = 0
+    
+        for t in time:
+            if counter == 0:
+                i1plusi2.append(0)
+                twoS_dtminusQ1.append(0)
+                twoS_dtplusQ2.append(0)
+                Y2.append(0)
+                Q2.append(0)
             else:
-                Q2.append('error') 
-                Y2.append('error')
-        counter = counter + 1
+                i1plusi2.append(inflow[counter-1] + inflow[counter])
+                twoS_dtminusQ1.append(twoS_dtplusQ2[counter-1]-2*Q2[counter-1])
+                twoS_dtplusQ2.append(i1plusi2[counter]+twoS_dtminusQ1[counter])
+                # Q2 & Y2
+                if (twoS_dtplusQ2[counter]<twoS_dtplusQ[1]):
+                    print(1)
+                    Q2.append(Q[0]+((Q[1]-Q[0])/(twoS_dtplusQ[1]-twoS_dtplusQ[0]))*(twoS_dtplusQ2[counter]-twoS_dtplusQ[0]))
+                    Y2.append(Y[0]+((Y[1]-Y[0])/(twoS_dtplusQ[1]-twoS_dtplusQ[0]))*(twoS_dtplusQ2[counter]-twoS_dtplusQ[0]))
+                elif (twoS_dtplusQ2[counter]<twoS_dtplusQ[2]):  
+                    Q2.append(Q[1]+((Q[2]-Q[1])/(twoS_dtplusQ[2]-twoS_dtplusQ[1]))*(twoS_dtplusQ2[counter]-twoS_dtplusQ[1]))
+                    Y2.append(Y[1]+((Y[2]-Y[1])/(twoS_dtplusQ[2]-twoS_dtplusQ[1]))*(twoS_dtplusQ2[counter]-twoS_dtplusQ[1]))
+                elif (twoS_dtplusQ2[counter]<twoS_dtplusQ[3]):  
+                    print(3)
+                    Q2.append(Q[2]+((Q[3]-Q[2])/(twoS_dtplusQ[3]-twoS_dtplusQ[2]))*(twoS_dtplusQ2[counter]-twoS_dtplusQ[2]))
+                    Y2.append(Y[2]+((Y[3]-Y[2])/(twoS_dtplusQ[3]-twoS_dtplusQ[2]))*(twoS_dtplusQ2[counter]-twoS_dtplusQ[2]))
+                elif (twoS_dtplusQ2[counter]<twoS_dtplusQ[4]): 
+                    print(4)                
+                    Q2.append(Q[3]+((Q[4]-Q[3])/(twoS_dtplusQ[4]-twoS_dtplusQ[3]))*(twoS_dtplusQ2[counter]-twoS_dtplusQ[3]))
+                    Y2.append(Y[3]+((Y[4]-Y[3])/(twoS_dtplusQ[4]-twoS_dtplusQ[3]))*(twoS_dtplusQ2[counter]-twoS_dtplusQ[3]))
+                elif (twoS_dtplusQ2[counter]<twoS_dtplusQ[5]):  
+                    print(5)
+                    Q2.append(Q[4]+((Q[5]-Q[4])/(twoS_dtplusQ[5]-twoS_dtplusQ[4]))*(twoS_dtplusQ2[counter]-twoS_dtplusQ[4]))
+                    Y2.append(Y[4]+((Y[5]-Y[4])/(twoS_dtplusQ[5]-twoS_dtplusQ[4]))*(twoS_dtplusQ2[counter]-twoS_dtplusQ[4]))
+                elif (twoS_dtplusQ2[counter]<twoS_dtplusQ[6]):  
+                    print(6)
+                    Q2.append(Q[5]+((Q[6]-Q[5])/(twoS_dtplusQ[6]-twoS_dtplusQ[5]))*(twoS_dtplusQ2[counter]-twoS_dtplusQ[5]))
+                    Y2.append(Y[5]+((Y[6]-Y[5])/(twoS_dtplusQ[6]-twoS_dtplusQ[5]))*(twoS_dtplusQ2[counter]-twoS_dtplusQ[5]))
+                elif (twoS_dtplusQ2[counter]<twoS_dtplusQ[7]):  
+                    print(7)
+                    Q2.append(Q[6]+((Q[7]-Q[6])/(twoS_dtplusQ[7]-twoS_dtplusQ[6]))*(twoS_dtplusQ2[counter]-twoS_dtplusQ[6]))
+                    Y2.append(Y[6]+((Y[7]-Y[6])/(twoS_dtplusQ[7]-twoS_dtplusQ[6]))*(twoS_dtplusQ2[counter]-twoS_dtplusQ[6]))
+                elif (twoS_dtplusQ2[counter]<twoS_dtplusQ[8]): 
+                    print(8)
+                    Q2.append(Q[7]+((Q[8]-Q[7])/(twoS_dtplusQ[8]-twoS_dtplusQ[7]))*(twoS_dtplusQ2[counter]-twoS_dtplusQ[7])) 
+                    Y2.append(Y[7]+((Y[8]-Y[7])/(twoS_dtplusQ[8]-twoS_dtplusQ[7]))*(twoS_dtplusQ2[counter]-twoS_dtplusQ[7])) 
+                elif (twoS_dtplusQ2[counter]<twoS_dtplusQ[9]):  
+                    print(9)
+                    Q2.append(Q[8]+((Q[9]-Q[8])/(twoS_dtplusQ[9]-twoS_dtplusQ[8]))*(twoS_dtplusQ2[counter]-twoS_dtplusQ[8]))
+                    Y2.append(Y[8]+((Y[9]-Y[8])/(twoS_dtplusQ[9]-twoS_dtplusQ[8]))*(twoS_dtplusQ2[counter]-twoS_dtplusQ[8]))  
+                elif (twoS_dtplusQ2[counter]<twoS_dtplusQ[10]): 
+                    print(10)
+                    Q2.append(Q[9]+((Q[10]-Q[9])/(twoS_dtplusQ[10]-twoS_dtplusQ[9]))*(twoS_dtplusQ2[counter]-twoS_dtplusQ[9])) 
+                    Y2.append(Y[9]+((Y[10]-Y[9])/(twoS_dtplusQ[10]-twoS_dtplusQ[9]))*(twoS_dtplusQ2[counter]-twoS_dtplusQ[9])) 
+                else:
+                    Q2.append('error') 
+                    Y2.append('error')
+            counter = counter + 1
+        outflows.append(Q2)
+        
+        index_pond_peak_inflow = np.argmax(inflow)
+        pond_peak_inflow.append((inflow[index_pond_peak_inflow]))
+        time_of_pond_peak_inflow.append(time[index_pond_peak_inflow])
+        index_pond_peak_outflow = np.argmax(Q2)
+        pond_peak_outflow.append(Q2[index_pond_peak_outflow])
+        time_of_pond_peak_outflow.append(time[index_pond_peak_outflow])
+        pond_max_depth.append(max(Y2))
+        # print('time:', time)
+        # print('inflow:', inflow)
+        # print('i1plusi2:', i1plusi2)
+        # print('twoS_dtminusQ1:', twoS_dtminusQ1)
+        # print('twoS_dtplusQ2:', twoS_dtplusQ2)
+        # print('Q2:', Q2)
+        # print('Y2:', Y2)
+    
 
-    print('time:', time)
-    print('inflow:', inflow)
-    print('i1plusi2:', i1plusi2)
-    print('twoS_dtminusQ1:', twoS_dtminusQ1)
-    print('twoS_dtplusQ2:', twoS_dtplusQ2)
-    print('Q2:', Q2)
-    print('Y2:', Y2)
+    
 
     # Corresponds red arrow in the "D-hr Storm Pond Results" sheet
-    #index_max_peak_outflow = np.argmax(pond_peak_outflow)
-    #max_peak_outflow = storm_duration[index_max_peak_outflow]
-    max_peak_outflow = 6
+    index_max_peak_outflow = np.argmax(pond_peak_outflow)
+    max_peak_outflow = storm_duration[index_max_peak_outflow]
 
     runoff_and_ponding_results = {
-        # "storm_duration": unitHydrograph[2]['storm_duration'],
-        # "rainfall_depth": unitHydrograph[2]['rainfall_depth'],
-        # "CN_adjusted_for_rainfall_duration": unitHydrograph[2]['CN_adjusted_for_rainfall_duration'],  # I think the spreadsheet is wrong here 
-        # "runoff_volume_Q_CN": unitHydrograph[2]['runoff_volume_Q_CN'],
-        # "pond_peak_inflow": pond_peak_inflow, # max of inflow (pond_x hr 19)
-        # "time_of_pond_peak_inflow": time_of_pond_peak_inflow, # time of max inflow (pond_x hr k20)
-        # "pond_peak_outflow": pond_peak_outflow, # max of outflow (pond_x hr k22)
-        # "time_of_pond_peak_outflow": time_of_pond_peak_outflow, # time of max outflow (pond_x hr k23)
-        # "max_peak_outflow_storm_duration": max_peak_outflow, # storm duration with max peak outflow
-        # "max_depth": pond_max_depth # max_depth (pond_x hr k24)
+        "storm_duration": unitHydrograph[2]['storm_duration'],
+        "rainfall_depth": unitHydrograph[2]['rainfall_depth'],
+        "CN_adjusted_for_rainfall_duration": unitHydrograph[2]['CN_adjusted_for_rainfall_duration'],  
+        "runoff_volume_Q_CN": unitHydrograph[2]['runoff_volume_Q_CN'],
+        "pond_peak_inflow": pond_peak_inflow, # max of inflow (pond_x hr 19)
+        "time_of_pond_peak_inflow": time_of_pond_peak_inflow, # time of max inflow (pond_x hr k20)
+        "pond_peak_outflow": pond_peak_outflow, # max of outflow (pond_x hr k22)
+        "time_of_pond_peak_outflow": time_of_pond_peak_outflow, # time of max outflow (pond_x hr k23)
+        "max_peak_outflow_storm_duration": max_peak_outflow, # storm duration with max peak outflow
+        "max_depth": pond_max_depth # max_depth (pond_x hr k24)
     }
 
     pond_inflow_and_outflow_ordinates = {
-        # "time": unitHydrograph[3]['time'],
-        # "inflow_1_hour": unitHydrograph[3]['flow_1_hour'],
-        # "outflow_1_hour": outflows[0],
-        # "inflow_2_hour": unitHydrograph[3]['flow_2_hour'],
-        # "outflow_2_hour": outflows[1],
-        # "inflow_3_hour": unitHydrograph[3]['flow_3_hour'],
-        # "outflow_3_hour": outflows[2],
-        # "inflow_6_hour": unitHydrograph[3]['flow_6_hour'],
-        # "outflow_6_hour": outflows[3],
-        # "inflow_12_hour": unitHydrograph[3]['flow_12_hour'],
-        # "outflow_12_hour": outflows[4],
-        # "inflow_24_hour": unitHydrograph[3]['flow_24_hour'],
-        # "outflow_24_hour": outflows[5]
+        "time": unitHydrograph[3]['time'],
+        "inflow_1_hour": unitHydrograph[3]['flow_1_hour'],
+        "outflow_1_hour": outflows[0],
+        "inflow_2_hour": unitHydrograph[3]['flow_2_hour'],
+        "outflow_2_hour": outflows[1],
+        "inflow_3_hour": unitHydrograph[3]['flow_3_hour'],
+        "outflow_3_hour": outflows[2],
+        "inflow_6_hour": unitHydrograph[3]['flow_6_hour'],
+        "outflow_6_hour": outflows[3],
+        "inflow_12_hour": unitHydrograph[3]['flow_12_hour'],
+        "outflow_12_hour": outflows[4],
+        "inflow_24_hour": unitHydrograph[3]['flow_24_hour'],
+        "outflow_24_hour": outflows[5]
     }
+
+    # print(runoff_and_ponding_results)
+    # print(pond_inflow_and_outflow_ordinates)
 
     return runoff_and_ponding_results, pond_inflow_and_outflow_ordinates
