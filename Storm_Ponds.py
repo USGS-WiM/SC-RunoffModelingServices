@@ -3,12 +3,42 @@ import numpy as np
 from SC_Synthetic_UH_Method import computeSCSyntheticUnitHydrograph
 
 
-def calcponds():
+def calcStormPonds(lat, lon, AEP, CNModificationMethod, Area, Tc, RainfallDistributionCurve, PRF, CN, S, Ia,
+              pondOption, pond_bottom_elev, Orif1_Coeff, Orif1_Dia, Orif1_CtrEL, Orif1_NumOpenings, Orif2_Coeff, Orif2_Dia, Orif2_CtrEL, Orif2_NumOpenings, Rec_Weir_Coeff, Rec_Weir_Ex, Rec_Weir_Length, Rec_WeirCrest_EL, Rec_Num_Wiers, OS_BCWeir_Coeff, OS_Weir_Ex, OS_Length , OS_Crest_EL , Seepage_Bottom, Seepage_Side,
+              length = None, w1 = None, w2 = None, side_slope_z = None, bottom_slope = None,
+              Elev_Area = None):
         
-    pondOption = 2
+    # lat, lon, AEP, CNModificationMethod, Area, Tc, RainfallDistributionCurve, PRF, CN, S, Ia: see computeSCSyntheticUnitHydrograph
+    # pondOption: 1 or 2 
+    # pond_bottom_elev: Elecation of pond bottom in feet
+    # Orif1_Coeff & Orif2_Coeff: Coefficent of 1st and 2nd stage circular orfices
+    # Orif1_Dia & Orif2_Dia: Diameter of 1st and 2nd stage circular orfices in inches
+    # Orif1_CtrEL & Orif2_CtrEL: Centerline elecation aboce bottom of pond for 1st and 2nd stage circular orfices in feet
+    # Orif1_NumOpenings & Orif2_NumOpenings: number of openings for 1st and 2nd stage circular orfices
+    # Rec_Weir_Coeff: 3rd stage rectangular weir coefficent 
+    # Rec_Weir_Ex: 3rd stage rectangular weir exponent 
+    # Rec_Weir_Length: 3rd stage rectangular weir length in feet 
+    # Rec_WeirCrest_EL: 3rd stage rectangular weir crest elevation above pond bottom in feet 
+    # Rec_Num_Wiers: number of weirs for 3rd stage rectangular weir
+    # OS_BCWeir_Coeff: broad-crested weird coefficent for overflow spillway 
+    # OS_Weir_Ex: weir exponent for overflow spillway
+    # OS_Length: overflow spillway length in feet
+    # OS_Crest_EL: crest elevation above pond bottom for overflow spillway in feet
+    # Seepage_Bottom: seepage through pond bottom in in/hr
+    # Seepage_Side: seepage through pon bottom in in/hr
+    # length: length of inverted quadrilateral frustum in feet, for pond option 1
+    # w1: w1 of inverted quadrilateral frustum in feet, for pond option 1
+    # w2: w2 of inverted quadrilateral frustum in feet, for pond option 1
+    # side_slope_z: side slope z of inverted quadrilateral frustum in feet, for pond option 1
+    # bottom_slope: bottom slope of inverted quadrilateral frustum in feet, for pond option 1
+    # Elev_Area: list of values elevation (ft-MSL) vs surface area (sq ft), for pond option 2
+
+
+    # Caluclate Unit Hydrograph
+    unitHydrograph = computeSCSyntheticUnitHydrograph(lat, lon, AEP, CNModificationMethod, Area, Tc, RainfallDistributionCurve, PRF, CN, S, Ia)
 
     # Fixed Variables
-    storm_duration = [1, 2, 3, 6, 12, 24] # hours, referred to as a D-hour storm
+    storm_duration = unitHydrograph[2]['storm_duration']
     burst_duration = 6
     max_depth = 10
 
@@ -18,44 +48,13 @@ def calcponds():
     pond_peak_outflow = []
     time_of_pond_peak_outflow = []
     pond_max_depth = []
+    outflows = []
 
-
-    # TODO: These all need to be upper inputs
-    unitHydrograph = computeSCSyntheticUnitHydrograph(33.3946, -80.3474, 10, "Merkel", 100.0, 78, "II", 240, 66.9, 4.94, 0.99)
-
-    # both
-    pond_bottom_elev = 100
-    Orif1_Coeff=.6
-    Orif1_Dia = 6
-    Orif1_CtrEL = .5
-    Orif1_NumOpenings = 1
-    Orif2_Coeff=.6
-    Orif2_Dia = 6
-    Orif2_CtrEL = 2
-    Orif2_NumOpenings = 1
-    Rec_Weir_Coeff = 3.3
-    Rec_Weir_Ex = 1.5
-    Rec_Weir_Length = 2
-    Rec_WeirCrest_EL = 4
-    Rec_Num_Wiers = 1
-    OS_BCWeir_Coeff = 3
-    OS_Weir_Ex = 1.5
-    OS_Length = 20
-    OS_Crest_EL = 6
-    Seepage_Bottom = 2
-    Seepage_Side = 4
-
-    # pond 1
-    length = 200
-    w1 = 200
-    w2 = 200
-    side_slope_z = 3
-    bottom_slope = .5
-
-    # pond 2
-    Elev_Area = [[100, 2000], [101,2100],[102,2200],[103,2400],[104, 2900],[105,3300],[106,3700],[107,4000],[108,4400],[109,4800]]
-
+    # Pond options
     if pondOption == 1:
+        if [x for x in (length, w1, w2, side_slope_z, bottom_slope) if x is None]:            
+            raise Exception("Not all inputs for pond option 1 are present.")
+        # Calculate Q, twoS_dtplusQ, Y for pond option one
         Q, twoS_dtplusQ, Y = calcPondOne(length, w1, w2, side_slope_z, bottom_slope, pond_bottom_elev, 
                                         Orif1_Coeff, Orif1_Dia, Orif1_CtrEL, Orif1_NumOpenings, 
                                         Orif2_Coeff, Orif2_Dia, Orif2_CtrEL, Orif2_NumOpenings, 
@@ -64,6 +63,9 @@ def calcponds():
                                         Seepage_Bottom, Seepage_Side,
                                         max_depth, burst_duration)
     else:    
+        if [x for x in (Elev_Area) if x is None]:            
+            raise Exception("Not all inputs for pond option 1 are present.")
+        # Calculate Q, twoS_dtplusQ, Y for pond option two
         Q, twoS_dtplusQ, Y = calcPondTwo(Elev_Area, pond_bottom_elev,
                                         Orif1_Coeff, Orif1_Dia, Orif1_CtrEL, Orif1_NumOpenings, 
                                         Orif2_Coeff, Orif2_Dia, Orif2_CtrEL, Orif2_NumOpenings, 
@@ -72,10 +74,8 @@ def calcponds():
                                         Seepage_Bottom, Seepage_Side,
                                         max_depth, burst_duration)
 
-
-    outflows = []
-    # Loop thorugh storm_duration
-    for D in storm_duration:
+    # Calculate outflow (Q2) for each storm duration
+    for D in storm_duration:     # Loop thorugh storm_duration
         # Initlaize arrays used in 
         time = unitHydrograph[3]['time'] # pond_x hr(column B)
         inflow = unitHydrograph[3]['flow_' + str(D) + '_hour'] # pond_x hr (column C)
