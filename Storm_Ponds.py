@@ -63,8 +63,8 @@ def calcStormPonds(lat, lon, AEP, CNModificationMethod, Area, Tc, RainfallDistri
                                         Seepage_Bottom, Seepage_Side,
                                         max_depth, burst_duration)
     else:    
-        if [x for x in (Elev_Area) if x is None]:            
-            raise Exception("Not all inputs for pond option 1 are present.")
+        if Elev_Area is None:            
+            raise Exception("Not all inputs for pond option 2 are present.")
         # Calculate Q, twoS_dtplusQ, Y for pond option two
         Q, twoS_dtplusQ, Y = calcPondTwo(Elev_Area, pond_bottom_elev,
                                         Orif1_Coeff, Orif1_Dia, Orif1_CtrEL, Orif1_NumOpenings, 
@@ -207,25 +207,28 @@ def calcPondTwo(Elev_Area, pond_bottom_elev,
     change_S = [] # Pond_X hr
     twoS_dtplusQ = [] # Y-S (2)
     Y = [] # Pond_X hr, 2S_Dt, Y-Q (2)
+    h = [] # 2S_Dt+Q, Y-Q (2), Y-S (2)
     # Calculate values in Y-Q (2) sheet
     Orif1_A = 3.14159*((Orif1_Dia/12)**2)/4
     Orif2_A = 3.14159*((Orif2_Dia/12)**2)/4
     for y in range(0, max_depth):
-        Y.append(y)
+        h.append(Elev_Area[y][0])
+        Y.append(h[y]-pond_bottom_elev)
+
         # First Stage Orifice Total Flow
-        Orif1_H = max(0,y-Orif1_CtrEL)
+        Orif1_H = max(0,Y[y]-Orif1_CtrEL)
         Orif1_Q = max(0,Orif1_Coeff*Orif1_A*math.sqrt(64.4*Orif1_H))   
         Orif1_total_flow = Orif1_NumOpenings*Orif1_Q
         # Second Stage Orifice Total Flow
-        Orif2_H = max(0,y-Orif2_CtrEL)
+        Orif2_H = max(0,Y[y]-Orif2_CtrEL)
         Orif2_Q = max(0,Orif2_Coeff*Orif2_A*math.sqrt(64.4*Orif2_H)) 
         Orif2_total_flow = Orif2_NumOpenings*Orif2_Q
         # Upper Stage Rectangular Weir Total Flow
-        Rec_Weir_H = max(0,y-Rec_WeirCrest_EL)
+        Rec_Weir_H = max(0,Y[y]-Rec_WeirCrest_EL)
         Rec_Single_Weir_Q = Rec_Weir_Coeff*Rec_Weir_Length*Rec_Weir_H**Rec_Weir_Ex
         Rec_Stage_total_flow = Rec_Single_Weir_Q*Rec_Num_Weirs
         # Overflow Spillway Q
-        OS_H = max(0,y-OS_Crest_EL)
+        OS_H = max(0,Y[y]-OS_Crest_EL)
         OS_Q = OS_BCWeir_Coeff*OS_Length*OS_H**OS_Weir_Ex
         # Seepage in cfs
         if y == 0:
@@ -257,6 +260,7 @@ def calcPondTwo(Elev_Area, pond_bottom_elev,
     # print('S:', S)
     # print('twoS_dtplusQ:', twoS_dtplusQ)
     # print('Y:', Y)
+    # print('H:', h)
 
     return(Q, twoS_dtplusQ, Y)
 
@@ -278,39 +282,51 @@ def calcPondOne(length, w1, w2, side_slope_z, bottom_slope, pond_bottom_elev,
     change_S = [] # Pond_X hr
     twoS_dtplusQ = [] # Y-S (1)
     Y = [] # Pond_X hr, 2S_Dt, Y-Q (1)
+    h = [] # 2S_Dt+Q, Y-Q (1), Y-S (1)
     # Calculate values in Y-Q (1) sheet
     Orif1_A = 3.14159*((Orif1_Dia/12)**2)/4
     Orif2_A = 3.14159*((Orif2_Dia/12)**2)/4
     for y in range(0, max_depth+1):
-        Y.append(y)
-        h = pond_bottom_elev + y
+        
+        if y == 0:
+            h.append(pond_bottom_elev)
+        elif y == 1:
+            h.append(pond_bottom_elev+length*bottom_slope/100)
+        elif y == 2 or y == 3 or y == 4 or y == 5 or y == 6 or y == 7:
+            h.append(min(h[y-1]+max_depth/10, pond_bottom_elev+8))
+        else:
+            h.append(min(h[y-1]+max_depth/10, pond_bottom_elev+10))
+
+        Y.append(h[y]-pond_bottom_elev)
+
         # First Stage Orifice Total Flow
-        Orif1_H = max(0,y-Orif1_CtrEL)
+        Orif1_H = max(0,Y[y]-Orif1_CtrEL)
         Orif1_Q = max(0,Orif1_Coeff*Orif1_A*math.sqrt(64.4*Orif1_H))   
         Orif1_total_flow = Orif1_NumOpenings*Orif1_Q
         # Second Stage Orifice Total Flow
-        Orif2_H = max(0,y-Orif2_CtrEL)
+        Orif2_H = max(0,Y[y]-Orif2_CtrEL)
         Orif2_Q = max(0,Orif2_Coeff*Orif2_A*math.sqrt(64.4*Orif2_H)) 
         Orif2_total_flow = Orif2_NumOpenings*Orif2_Q
         # Upper Stage Rectangular Weir Total Flow
-        Rec_Weir_H = max(0,y-Rec_WeirCrest_EL)
+        Rec_Weir_H = max(0,Y[y]-Rec_WeirCrest_EL)
         Rec_Single_Weir_Q = Rec_Weir_Coeff*Rec_Weir_Length*Rec_Weir_H**Rec_Weir_Ex
         Rec_Stage_total_flow = Rec_Single_Weir_Q*Rec_Num_Weirs
         # Overflow Spillway Q
-        OS_H = max(0,y-OS_Crest_EL)
+        OS_H = max(0,Y[y]-OS_Crest_EL)
         OS_Q = OS_BCWeir_Coeff*OS_Length*OS_H**OS_Weir_Ex
         # Seepage in cfs
         if y == 0:
-            Total_L.append(length+2*bottom_slope*(h-pond_bottom_elev))
-            Total_W1.append(w1+2*side_slope_z*(h-pond_bottom_elev))
-            Total_W2.append(w2+2*side_slope_z*(h-pond_bottom_elev))
+            Total_L.append(length+2*bottom_slope*(h[y]-pond_bottom_elev))
+            Total_W1.append(w1+2*side_slope_z*(h[y]-pond_bottom_elev))
+            Total_W2.append(w2+2*side_slope_z*(h[y]-pond_bottom_elev))
             A1 = Total_L[y]*(Total_W1[y]+Total_W2[y])/2
             A.append(A1)
         else:
-            Total_L.append(Total_L[y-1]+2*side_slope_z*(Y[y] - Y[y-1])) 
-            Total_W1.append(Total_W1[y-1]+2*side_slope_z*(Y[y] - Y[y-1]))
-            Total_W2.append(Total_W2[y-1]+2*side_slope_z*(Y[y] - Y[y-1]))
+            Total_L.append(Total_L[y-1]+2*side_slope_z*(h[y] - h[y-1])) 
+            Total_W1.append(Total_W1[y-1]+2*side_slope_z*(h[y] - h[y-1]))
+            Total_W2.append(Total_W2[y-1]+2*side_slope_z*(h[y] - h[y-1]))
             A.append(Total_L[y]*(Total_W1[y]+Total_W2[y])/2)
+
         if y == 0:
             Seepage_Bottom_CFS = 0
             Seepage_Side_CFS = 0
@@ -335,6 +351,7 @@ def calcPondOne(length, w1, w2, side_slope_z, bottom_slope, pond_bottom_elev,
     # print('S:', S)
     # print('twoS_dtplusQ:', twoS_dtplusQ)
     # print('Y:', Y)
+    # print('H:', h)
 
     return(Q, twoS_dtplusQ, Y)
         

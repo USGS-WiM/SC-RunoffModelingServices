@@ -882,7 +882,8 @@ def stormponds(request_body: calculateStormPonds, response: Response):
             request_body.w1,
             request_body.w2,
             request_body.side_slope_z,
-            request_body.bottom_slope
+            request_body.bottom_slope,
+            request_body.Elev_Area
         )
         return {
             "runoff_and_ponding_results": runoff_and_ponding_results,
