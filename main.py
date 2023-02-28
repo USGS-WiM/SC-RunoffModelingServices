@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Response
+from fastapi import FastAPI, HTTPException, Response, Body
 from starlette.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -506,44 +506,87 @@ class calculateStormPonds(BaseModel):
     
     class Config:
         schema_extra = {
-            "example": {
-                "lat": 33.3946,
-                "lon": -80.3474,
-                "AEP": 4,
-                "CNModificationMethod": "Merkel",
-                "Area": 100.0,
-                "Tc": 64.5,
-                "RainfallDistributionCurve": "II",
-                "PRF": 240,
-                "CN": 67.3,
-                "S": 4.86,
-                "Ia": 0.97,
-                "pondOption": 1,
-                "pond_bottom_elev": 100,
-                "Orif1_Coeff":.6,
-                "Orif1_Dia": 6,
-                "Orif1_CtrEL": .5,
-                "Orif1_NumOpenings": 1,
-                "Orif2_Coeff": .6,
-                "Orif2_Dia": 6,
-                "Orif2_CtrEL": 2,
-                "Orif2_NumOpenings": 1,
-                "Rec_Weir_Coeff": 3.3,
-                "Rec_Weir_Ex": 1.5,
-                "Rec_Weir_Length": 2,
-                "Rec_WeirCrest_EL": 4,
-                "Rec_Num_Weirs": 1,
-                "OS_BCWeir_Coeff": 3,
-                "OS_Weir_Ex": 1.5,
-                "OS_Length": 20,
-                "OS_Crest_EL": 6,
-                "Seepage_Bottom": 2,
-                "Seepage_Side": 4,
-                "length": 200,
-                "w1": 200,
-                "w2": 200,
-                "side_slope_z": 3,
-                "bottom_slope": .5
+            "examples": {
+                "PondOption1": {
+                "summary": "Pond Option 1",
+                    "value": {
+                        "lat": 33.3946,
+                        "lon": -80.3474,
+                        "AEP": 4,
+                        "CNModificationMethod": "Merkel",
+                        "Area": 100.0,
+                        "Tc": 64.5,
+                        "RainfallDistributionCurve": "II",
+                        "PRF": 240,
+                        "CN": 67.3,
+                        "S": 4.86,
+                        "Ia": 0.97,
+                        "pondOption": 1,
+                        "pond_bottom_elev": 100,
+                        "Orif1_Coeff":.6,
+                        "Orif1_Dia": 6,
+                        "Orif1_CtrEL": .5,
+                        "Orif1_NumOpenings": 1,
+                        "Orif2_Coeff": .6,
+                        "Orif2_Dia": 6,
+                        "Orif2_CtrEL": 2,
+                        "Orif2_NumOpenings": 1,
+                        "Rec_Weir_Coeff": 3.3,
+                        "Rec_Weir_Ex": 1.5,
+                        "Rec_Weir_Length": 2,
+                        "Rec_WeirCrest_EL": 4,
+                        "Rec_Num_Weirs": 1,
+                        "OS_BCWeir_Coeff": 3,
+                        "OS_Weir_Ex": 1.5,
+                        "OS_Length": 20,
+                        "OS_Crest_EL": 6,
+                        "Seepage_Bottom": 2,
+                        "Seepage_Side": 4,
+                        "length": 200,
+                        "w1": 200,
+                        "w2": 200,
+                        "side_slope_z": 3,
+                        "bottom_slope": .5
+                    }
+                },
+                "PondOption2": {
+                    "summary": "Pond Option 2",
+                    "value": {
+                        "lat": 33.3946,
+                        "lon": -80.3474,
+                        "AEP": 4,
+                        "CNModificationMethod": "Merkel",
+                        "Area": 100.0,
+                        "Tc": 64.5,
+                        "RainfallDistributionCurve": "II",
+                        "PRF": 240,
+                        "CN": 67.3,
+                        "S": 4.86,
+                        "Ia": 0.97,
+                        "pondOption": 2,
+                        "pond_bottom_elev": 100,
+                        "Orif1_Coeff":.6,
+                        "Orif1_Dia": 6,
+                        "Orif1_CtrEL": .5,
+                        "Orif1_NumOpenings": 1,
+                        "Orif2_Coeff": .6,
+                        "Orif2_Dia": 6,
+                        "Orif2_CtrEL": 2,
+                        "Orif2_NumOpenings": 1,
+                        "Rec_Weir_Coeff": 3.3,
+                        "Rec_Weir_Ex": 1.5,
+                        "Rec_Weir_Length": 2,
+                        "Rec_WeirCrest_EL": 4,
+                        "Rec_Num_Weirs": 1,
+                        "OS_BCWeir_Coeff": 3,
+                        "OS_Weir_Ex": 1.5,
+                        "OS_Length": 20,
+                        "OS_Crest_EL": 6,
+                        "Seepage_Bottom": 2,
+                        "Seepage_Side": 4,
+                        "Elev_Area": [[100, 2000], [101,2100],[102,2200],[103,2400],[104, 2900],[105,3300],[106,3700],[107,4000],[108,4400],[109,4800]]
+                    }
+                }
             }
         }
 
@@ -840,9 +883,8 @@ def calculatemissingparametersSCSUH(request_body: CalculateMissingParametersSCSU
         raise HTTPException(status_code = 500, detail =  str(e))
     
 
-
 @app.post("/stormponds/")
-def stormponds(request_body: calculateStormPonds, response: Response):
+def stormponds(request_body: calculateStormPonds = Body(examples=calculateStormPonds.Config.schema_extra["examples"])):
 
     try: 
         runoff_and_ponding_results, pond_inflow_and_outflow_ordinates = calcStormPonds(
