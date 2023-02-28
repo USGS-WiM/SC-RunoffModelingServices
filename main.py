@@ -1,5 +1,4 @@
-from fastapi import FastAPI, HTTPException, Response
-from fastapi.responses import RedirectResponse
+from fastapi import FastAPI, HTTPException, Response, Body
 from starlette.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -7,6 +6,7 @@ from SC_Synthetic_UH_Method import weightedCurveNumber, PRFData, rainfallData, r
 from Bohman_Method_1989 import computeRuralFloodHydrographBohman1989
 from Bohman_Method_1992 import getRI2, computeUrbanFloodHydrographBohman1992
 from Tc_Calculator import lagTimeMethodTimeOfConcentration, travelTimeMethodTimeOfConcentration
+from Storm_Ponds import calcStormPonds
 
 app = FastAPI(
     title='SC Runoff Modeling Services',
@@ -463,6 +463,134 @@ class CalculateMissingParametersSCSUH(BaseModel):
                     ]
             }
         }
+
+class calculateStormPonds(BaseModel):
+    lat: float = Field(..., title="latitude", description="latitude coordinate of the drainage point (float)", example="33.3946")
+    lon: float = Field(..., title="longitude", description="longitude coordinate of the drainage point (float)", example="-80.3474")
+    AEP: float = Field(..., title="Annual Exceedance Probability", description="Annual Exceedance Probability (%); options are 100 50, 20, 10, 4, 2, 1, which correspond to 1-yr, 2-yr, 5-yr, 10-yr, 25-yr, 50-yr, and 100-yr storms (int)", example="4")
+    CNModificationMethod: str = Field(..., title="Curve Number Modification Method", description="method used to modify the Curve Number; options are 'McCuen' or 'Merkel' (string)", example="Merkel")
+    Area: float = Field(..., title="Area", description="drainage area of delineated basin (float)", example="100.0")
+    Tc: float = Field(..., title="Time of Concentration", description="Time of Concentration as computed by Travel Time Method or Lag Time Equation (float)", example="64.5")
+    RainfallDistributionCurve: str = Field(..., title="Rainfall Distribution Curve", description="rainfall distribution curve letter; options are 'II', 'III', 'A', 'B', 'C', 'D' (string)", example="II")
+    PRF: float = Field(..., title="Peak Rate Factor (float)", description="", example="240")
+    CN: float = Field(..., title="Curve Number", description="weighted Curve Number (float)", example="67.3")
+    S: float = Field(..., title="Watershed Retention", description="watershed Retention, S (float)", example="4.86")
+    Ia: float = Field(..., title="Initial Abstraction", description="Initial Abstraction, Ia (float)", example="0.97")
+    pondOption: int = Field(..., title="Pond Option", description="Pond Option, (int)", example="1")
+    pond_bottom_elev: float = Field(..., title="Bottom Elevation", description="Elevation of pond bottom in feet (float)", example="100")
+    Orif1_Coeff: float = Field(..., title="Orifice 1 Coefficient", description="Coefficient of 1st stage circular orifice (float)", example=".60")
+    Orif1_Dia: float = Field(..., title="Orifice 1 Diameter", description="Diameter of 1st stage circular orifice in inches (float)", example="6.0")
+    Orif1_CtrEL: float = Field(..., title="Orifice 1 Centerline Elevation", description="Centerline elevation above pond bottom of 1st stage circular orifice in feet (float)", example=".5")
+    Orif1_NumOpenings: int = Field(..., title="Orifice 1 Number of Openings", description="Number of openings for 1st stage circular orifice, (int)", example="1")
+    Orif2_Coeff: float = Field(..., title="Orifice 2 Coefficient", description="Coefficient of 2nd stage circular orifice (float)", example=".60")
+    Orif2_Dia: float = Field(..., title="Orifice 2 Diameter", description="Diameter of 2nd stage circular orifice in inches (float)", example="6.0")
+    Orif2_CtrEL: float = Field(..., title="Orifice 2 Centerline Elevation", description="Centerline elevation above pond bottom of 2nd stage circular orifice in feet (float)", example="2.0")
+    Orif2_NumOpenings: int = Field(..., title="Orifice 2 Number of Openings", description="Number of openings for 2nd stage circular orifice, (int)", example="1")
+    Rec_Weir_Coeff: float = Field(..., title="Weir Coefficient", description="Coefficient of 3rd stage rectangular weir (float)", example="3.30")
+    Rec_Weir_Ex: float = Field(..., title="Weir Exponent", description="Exponent of 3rd stage rectangular weir (float)", example="1.5")
+    Rec_Weir_Length: float = Field(..., title="Weir Length", description="Length of 3rd stage rectangular weir in feet (float)", example="2.0")
+    Rec_WeirCrest_EL: float = Field(..., title="Weir Crest Elevation", description="Crest elevation above pond bottom of 3rd stage rectangular weir in feet (float)", example="4.0")
+    Rec_Num_Weirs: int = Field(..., title="Number of Weirs", description="Number of weirs for 3rd stage rectangular weir, (int)", example="1")
+    OS_BCWeir_Coeff: float = Field(..., title="Broad-Crested Weir Coefficient", description="Broad-Crested weir coefficient of overflow spillway (float)", example="3.00")
+    OS_Weir_Ex: float = Field(..., title="Weir Exponent", description="Exponent of  overflow spillway (float)", example="1.5")
+    OS_Length: float = Field(..., title="Overflow Spillway Length", description="Length of overflow spillway in feet (float)", example="2.0")
+    OS_Crest_EL: float = Field(..., title="Overflow Crest Elevation", description="Crest elevation above pond bottom of overflow spillway in feet (float)", example="6.0") 
+    Seepage_Bottom: float = Field(..., title="Bottom Seepage", description="Seepage through pond bottom in in/hr, (float)", example="2.0")
+    Seepage_Side: float = Field(..., title="Side Slope Seepage", description="Seepage through side slopes in in/hr, (float)", example="4.0")
+    length: float = Field(default=None, title="Length of Inverted Quadrilateral Frustum", description="Length of inverted quadrilateral frustum in feet, for pond option 1, (float)", example="200")
+    w1: float = Field(default=None, title="W1 Inverted Quadrilateral Frustum", description="W1 of inverted quadrilateral frustum in feet, for pond option 1, (float)", example="200")
+    w2: float = Field(default=None, title="W2 Inverted Quadrilateral Frustum", description="W2 of inverted quadrilateral frustum in feet, for pond option 1, (float)", example="200")
+    side_slope_z: float = Field(default=None, title="Side Slope of Inverted Quadrilateral Frustum", description="Side slope z of inverted quadrilateral frustum, for pond option 1, (float)", example="3.0")
+    bottom_slope: float = Field(default=None, title="Bottom Slope of Inverted Quadrilateral Frustum", description="Bottom slope of inverted quadrilateral frustum in %, for pond option 1, (float)", example=".5")
+    Elev_Area: list = Field(default=None, title="Elevation vs Surface Area", description="Elevation in ft-MSL vs Surface Area in sq ft, for pond option 2, (float)", example="[[100, 2000], [101,2100],[102,2200],[103,2400],[104, 2900],[105,3300],[106,3700],[107,4000],[108,4400],[109,4800]]")
+    
+    class Config:
+        schema_extra = {
+            "examples": {
+                "PondOption1": {
+                "summary": "Pond Option 1",
+                    "value": {
+                        "lat": 33.3946,
+                        "lon": -80.3474,
+                        "AEP": 4,
+                        "CNModificationMethod": "Merkel",
+                        "Area": 100.0,
+                        "Tc": 64.5,
+                        "RainfallDistributionCurve": "II",
+                        "PRF": 240,
+                        "CN": 67.3,
+                        "S": 4.86,
+                        "Ia": 0.97,
+                        "pondOption": 1,
+                        "pond_bottom_elev": 100,
+                        "Orif1_Coeff":.6,
+                        "Orif1_Dia": 6,
+                        "Orif1_CtrEL": .5,
+                        "Orif1_NumOpenings": 1,
+                        "Orif2_Coeff": .6,
+                        "Orif2_Dia": 6,
+                        "Orif2_CtrEL": 2,
+                        "Orif2_NumOpenings": 1,
+                        "Rec_Weir_Coeff": 3.3,
+                        "Rec_Weir_Ex": 1.5,
+                        "Rec_Weir_Length": 2,
+                        "Rec_WeirCrest_EL": 4,
+                        "Rec_Num_Weirs": 1,
+                        "OS_BCWeir_Coeff": 3,
+                        "OS_Weir_Ex": 1.5,
+                        "OS_Length": 20,
+                        "OS_Crest_EL": 6,
+                        "Seepage_Bottom": 2,
+                        "Seepage_Side": 4,
+                        "length": 200,
+                        "w1": 200,
+                        "w2": 200,
+                        "side_slope_z": 3,
+                        "bottom_slope": .5
+                    }
+                },
+                "PondOption2": {
+                    "summary": "Pond Option 2",
+                    "value": {
+                        "lat": 33.3946,
+                        "lon": -80.3474,
+                        "AEP": 4,
+                        "CNModificationMethod": "Merkel",
+                        "Area": 100.0,
+                        "Tc": 64.5,
+                        "RainfallDistributionCurve": "II",
+                        "PRF": 240,
+                        "CN": 67.3,
+                        "S": 4.86,
+                        "Ia": 0.97,
+                        "pondOption": 2,
+                        "pond_bottom_elev": 100,
+                        "Orif1_Coeff":.6,
+                        "Orif1_Dia": 6,
+                        "Orif1_CtrEL": .5,
+                        "Orif1_NumOpenings": 1,
+                        "Orif2_Coeff": .6,
+                        "Orif2_Dia": 6,
+                        "Orif2_CtrEL": 2,
+                        "Orif2_NumOpenings": 1,
+                        "Rec_Weir_Coeff": 3.3,
+                        "Rec_Weir_Ex": 1.5,
+                        "Rec_Weir_Length": 2,
+                        "Rec_WeirCrest_EL": 4,
+                        "Rec_Num_Weirs": 1,
+                        "OS_BCWeir_Coeff": 3,
+                        "OS_Weir_Ex": 1.5,
+                        "OS_Length": 20,
+                        "OS_Crest_EL": 6,
+                        "Seepage_Bottom": 2,
+                        "Seepage_Side": 4,
+                        "Elev_Area": [[100, 2000], [101,2100],[102,2200],[103,2400],[104, 2900],[105,3300],[106,3700],[107,4000],[108,4400],[109,4800]]
+                    }
+                }
+            }
+        }
+
+
 ######
 ##
 ## API Endpoints
@@ -753,3 +881,57 @@ def calculatemissingparametersSCSUH(request_body: CalculateMissingParametersSCSU
 
     except Exception as e:
         raise HTTPException(status_code = 500, detail =  str(e))
+    
+
+@app.post("/stormponds/")
+def stormponds(request_body: calculateStormPonds = Body(examples=calculateStormPonds.Config.schema_extra["examples"])):
+
+    try: 
+        runoff_and_ponding_results, pond_inflow_and_outflow_ordinates = calcStormPonds(
+            request_body.lat,
+            request_body.lon,
+            request_body.AEP,
+            request_body.CNModificationMethod,
+            request_body.Area,
+            request_body.Tc,
+            request_body.RainfallDistributionCurve,
+            request_body.PRF,
+            request_body.CN,
+            request_body.S,
+            request_body.Ia,
+            request_body.pondOption,
+            request_body.pond_bottom_elev,
+            request_body.Orif1_Coeff,
+            request_body.Orif1_Dia,
+            request_body.Orif1_CtrEL,
+            request_body.Orif1_NumOpenings,
+            request_body.Orif2_Coeff,
+            request_body.Orif2_Dia,
+            request_body.Orif2_CtrEL,
+            request_body.Orif2_NumOpenings,
+            request_body.Rec_Weir_Coeff,
+            request_body.Rec_Weir_Ex,
+            request_body.Rec_Weir_Length,
+            request_body.Rec_WeirCrest_EL,
+            request_body.Rec_Num_Weirs,
+            request_body.OS_BCWeir_Coeff,
+            request_body.OS_Weir_Ex,
+            request_body.OS_Length,
+            request_body.OS_Crest_EL,
+            request_body.Seepage_Bottom,
+            request_body.Seepage_Side,
+            request_body.length,
+            request_body.w1,
+            request_body.w2,
+            request_body.side_slope_z,
+            request_body.bottom_slope,
+            request_body.Elev_Area
+        )
+        return {
+            "runoff_and_ponding_results": runoff_and_ponding_results,
+            "pond_inflow_and_outflow_ordinates": pond_inflow_and_outflow_ordinates        
+        }        
+
+    except Exception as e:
+        raise HTTPException(status_code = 500, detail =  str(e))
+
