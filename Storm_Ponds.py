@@ -7,7 +7,7 @@ def calcStormPonds(lat, lon, AEP, CNModificationMethod, Area, Tc, RainfallDistri
               pondOption, pond_bottom_elev, Orif1_Coeff, Orif1_Dia, Orif1_CtrEL, Orif1_NumOpenings, Orif2_Coeff, Orif2_Dia, Orif2_CtrEL, Orif2_NumOpenings, Rec_Weir_Coeff, Rec_Weir_Ex, Rec_Weir_Length, Rec_WeirCrest_EL, Rec_Num_Weirs, OS_BCWeir_Coeff, OS_Weir_Ex, OS_Length , OS_Crest_EL , Seepage_Bottom, Seepage_Side,
               length = None, w1 = None, w2 = None, side_slope_z = None, bottom_slope = None,
               Elev_Area = None):
-        
+
     # lat, lon, AEP, CNModificationMethod, Area, Tc, RainfallDistributionCurve, PRF, CN, S, Ia: see computeSCSyntheticUnitHydrograph
     # pondOption: 1 or 2 
     # pond_bottom_elev: Elevation of pond bottom in feet
@@ -49,6 +49,9 @@ def calcStormPonds(lat, lon, AEP, CNModificationMethod, Area, Tc, RainfallDistri
     time_of_pond_peak_outflow = []
     pond_max_depth = []
     outflows = []
+    first_half_inch = []
+    first_inch = []
+    first_two_inch = []
 
     # Pond options
     if pondOption == 1:
@@ -84,6 +87,10 @@ def calcStormPonds(lat, lon, AEP, CNModificationMethod, Area, Tc, RainfallDistri
         twoS_dtminusQ1 = [] # pond_x hr (column E)
         Q2 = [] # pond_x hr (column H) & D-hr Storm Pond Routing Results
         Y2 = [] # pond_x hr (column G)
+        sum_i = [] # pond_x hr (column O)
+        sum_q = [] # pond_x hr (column R)
+        inflow_sum = 0
+        Q2_sum = 0
         counter = 0
     
         for t in time:
@@ -93,6 +100,8 @@ def calcStormPonds(lat, lon, AEP, CNModificationMethod, Area, Tc, RainfallDistri
                 twoS_dtplusQ2.append(0)
                 Y2.append(0)
                 Q2.append(0)
+                sum_i.append(0)
+                sum_q.append(0)
             else:
                 i1plusi2.append(inflow[counter-1] + inflow[counter])
                 twoS_dtminusQ1.append(twoS_dtplusQ2[counter-1]-2*Q2[counter-1])
@@ -131,9 +140,42 @@ def calcStormPonds(lat, lon, AEP, CNModificationMethod, Area, Tc, RainfallDistri
                 else:
                     Q2.append('error') 
                     Y2.append('error')
+                # sum_i
+                inflow_sum = inflow_sum + inflow[counter]
+                sum_i.append(inflow_sum*12*6*60/(Area*43560))
+                # sum_q
+                Q2_sum = Q2_sum + Q2[counter]
+                sum_q.append(Q2_sum*12*6*60/(Area*43560))
+
             counter = counter + 1
         outflows.append(Q2)
         
+        sumi_half_inch = np.array(sum_i).searchsorted(.5, 'right') - 1
+        sumi_half_inch = time[sumi_half_inch]
+        sumi_inch = np.array(sum_i).searchsorted(1.0, 'right') - 1
+        sumi_inch = time[sumi_inch]
+        sumi_two_inch = np.array(sum_i).searchsorted(2.0, 'right') -1
+        sumi_two_inch = time[sumi_two_inch]
+        q2_half_inch = np.array(sum_q).searchsorted(.5, 'right') - 1
+        q2_half_inch = time[q2_half_inch]
+        q2_inch = np.array(sum_q).searchsorted(1.0, 'right') - 1
+        q2_inch = time[q2_inch]
+        q2_two_inch = np.array(sum_q).searchsorted(2.0, 'right') - 1
+        q2_two_inch = time[q2_two_inch]
+
+        if (q2_half_inch >=2800):
+            first_half_inch.append('NA')
+        else:
+            first_half_inch.append((q2_half_inch-sumi_half_inch)/60)
+        if (q2_inch >=2800):
+            first_inch.append('NA')
+        else:
+            first_inch.append((q2_inch-sumi_inch)/60)
+        if (q2_two_inch >=2800):
+            first_two_inch.append('NA')
+        else:
+            first_two_inch.append((q2_two_inch-sumi_two_inch)/60)
+
         index_pond_peak_inflow = np.argmax(inflow)
         pond_peak_inflow.append((inflow[index_pond_peak_inflow]))
         time_of_pond_peak_inflow.append(time[index_pond_peak_inflow])
@@ -158,12 +200,16 @@ def calcStormPonds(lat, lon, AEP, CNModificationMethod, Area, Tc, RainfallDistri
         "rainfall_depth": unitHydrograph[2]['rainfall_depth'],
         "CN_adjusted_for_rainfall_duration": unitHydrograph[2]['CN_adjusted_for_rainfall_duration'],  
         "runoff_volume_Q_CN": unitHydrograph[2]['runoff_volume_Q_CN'],
+        "peak_runoff_Qp": unitHydrograph[2]['peak_runoff_Qp'],
         "pond_peak_inflow": pond_peak_inflow, # max of inflow (pond_x hr 19)
         "time_of_pond_peak_inflow": time_of_pond_peak_inflow, # time of max inflow (pond_x hr k20)
         "pond_peak_outflow": pond_peak_outflow, # max of outflow (pond_x hr k22)
         "time_of_pond_peak_outflow": time_of_pond_peak_outflow, # time of max outflow (pond_x hr k23)
         "max_peak_outflow_storm_duration": max_peak_outflow, # storm duration with max peak outflow
-        "max_depth": pond_max_depth # max_depth (pond_x hr k24)
+        "first_half_inch": first_half_inch,
+        "first_inch": first_inch,
+        "first_two_inch": first_two_inch,
+        "max_ponding_depth": pond_max_depth # max_depth (pond_x hr k24)
     }
 
     pond_inflow_and_outflow_ordinates = {
